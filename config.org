@@ -1,0 +1,4266 @@
+#+TITLE: Thiago's Emacs Configuration
+#+AUTHOR: Thiago Alves
+#+EMAIL: thiago@rapinialves.com
+#+DATE: Fri, Jan 1 2021
+#+LANGUAGE: en
+
+* Prologue
+Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to this community that is always available to help me when I have any question about Emacs.
+
+This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (from now on, referred as just Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this configuration (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ on the Doom's community.
+
+Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://liberapay.com/hlissner][creator]].
+
+#+caption: From the =config.el= file comments
+#+begin_note
+In your journey configuring Emacs the way you want, you might need to use more functions then I'm using in this configuration. Here are some additional functions or macros that could help you configure Doom:
+
+- ~load!~ for loading external =*.el= files relative to =$DOOMDIR/config.el=;
+- ~use-package!~ for configuring packages;
+- ~after!~ for running code after a package has loaded;
+- ~add-load-path!~ for adding directories to the ~load-path~, relative to =$DOOMDIR/config.el=. Emacs searches the ~load-path~ when you load packages with ~require~ or ~use-package~;
+- ~map!~ for binding new keys;
+
+To get information about any of these functions or macros, move the cursor over the highlighted symbol at press '=K=' (non-evil users must press '=C-c g k='). This will open documentation for it, including demos on how to use them.
+
+You can also try '=gd=' (or '=C-c g d=') to jump to their definition and see their source code.
+#+end_note
+
+** About this document
+The organization of my Emacs configuration tries to structure the design and build of a text editor tailored for my needs.
+
+Some of these needs are technology related (e.g. programming languages, diagrams tooling, etc.), while others are aesthetic or productivity related.
+
+I want to stress out to the reader, that you are, ultimately, reading a personal opinion, and what works for me may or may not work for you.
+
+I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences, still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]], so I will focus the configuration at that point, to adjust Emacs and Org to fit my personal workflow.
+
+After configuring Emacs for writing prose, I will focus this document on programming (which is what I do for work). I will cover [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], and [[https://developer.apple.com/swift/][Swift]]. Some in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
+
+Overall, my intention is to make changes on Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
+
+** About literate configuration
+A long time ago I found out about [[http://literateprogramming.com][Literate Programming]] when I read my first Emacs configuration with Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], which I have to say, it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
+
+I believe the mentality shift happened when I finally decided to read the original paper about [[http://literateprogramming.com/knuthweb.pdf][Literate Programming]] by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]], and just like that, I want to practice Literate Programming on about everything I do.
+
+Since this document is about a text editor configuration, I have to highlight couple differences between Mr. Knuth's Literate Programming and my Literate Configuration.
+
+The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
+
+* TODO Editor standard features [5/12]
+Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve the same results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
+
+** DONE Requirements
+As mentioned on section [[About this document]], this part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all editors.
+
+*** Fast start
+Although this seams like the biggest /no-brainer/ of my requirements, it would be funny if was not sad the fact that Emacs is the worst in this category when loaded with plugins (from here on, referred as /packages/) compared to editors of the same caliber (e.g. [[https://www.vim.org/][Vim]], [[https://www.sublimetext.com][Sublime Text]], [[https://code.visualstudio.com/][Visual Studio Code]], etc.). I personally believe that Emacs compensate with its power, nevertheless, I still want to have an editor that opens on a snap when I need.
+
+By default, Doom starts a fresh emacs process fast, but it take its sweet time to open a buffer depending on the buffer's type and the amount of packages you have available. For sake of being able to have a functional editor with all my requirements, I will say that I have just the requirement of starting it in less than 1.8 seconds. Eventually I will address the other part of this equation (probably using =emacsclient= or some type of memory snapshot).
+
+*** Modal editing
+I need to come clean to the reader about my past experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
+
+*** At point completions
+Also know as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
+*** Automatic indentation
+Here I'm not talking about indent after pressing '=RET='. I'm talking about re-indenting the file as I change it. On the Emacs world, this is also known as /electric indent/.
+
+I understand that in some occasions this process may slow down the editor, so I will define here that I want the whole indentation to change when I change the total number of lines on the file.
+
+*** Smart backspace
+When I'm editing a file (usually a source code), in some scenarios, the editor helps me out by inserting text that I want. One example of this is the closing pair character. If I type a ' ="= ', Doom will add a second one after my cursor. In most of the scenarios, to revert what just happened, I press =<BACKSPACE>=, and I get the same state I was before pressing the key that generated the completion.
+
+But there is one case where this does not happen, which is when Doom adds a paired new line when I press =<ENTER>= after open a pair. The net effect of this completion, is to have the cursor on the next line, indented correctly. But when I immediately press =<BACKSPACE>=, Doom deletes the indentation and that's it.
+
+This requirement, is to make sure the =<BACKSPACE>= key behaves in the same way when we use it after a completion.
+
+*** Balanced pairs
+The common behavior you might see on text editors is to complete a character pair as you type. For instance, if you type an open parenthesis, the editor would insert the closing one automatically, and if you press the closing parenthesis, the editor would simply move the cursor to the right of the already inserted close parenthesis character.
+
+My requirement is to my editor to keep any of these character pairs balanced. If I try to delete a line with a closing pair character that would make the pairs of such character unbalanced, the editor would delete the line content, but would leave the closing character for the pair, preventing the file from getting on an unbalanced state.
+
+*** Rich keybindings
+Any half-decent text editor these days supports an infinite pletora of shortcuts. What I believe an editor should support to be ahead of the game, is the ability to bind *any* editor action to a key, and to offer to the user some sort of guidance while one uses the editor.
+
+For instance, if you configure your editor to search for files when you press '=SPC f f=', when you press '=SPC f=' and wait, I want the editor to display all the possible options for you to complete your key sequence.
+
+*** Useful line numbers
+I like the text editor to show me line numbers when they mater, and when they do, I like to get the most of them. This requirement is to make sure that line numbers are aware of the modal editing, so when I'm on /normal mode/ with line numbers visible, the editor should show me lines as relative numbers, and when I'm editing the file (in /insert mode/), the line numbers should be absolute.
+
+*** Auto-saving
+I want to stop saving my files. Any editor has substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
+
+*** UI state persistence
+I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
+
+*** Remote editing
+This is a pretty straightforward requirement: I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
+
+** DONE Emacs-only configurations
+This section will cover some changes I like to do on the Emacs (or Doom) default behavior, and some required settings to make sure Emacs have all the information it needs to function properly.
+
+*** Identity
+It's important we let Emacs know who we are, and also, according to Doom's comments on the sample =config.el= available upon installation, some functionality uses this identification (e.g. GPG configuration, email clients, file templates and snippets).
+
+#+caption: config.el
+#+name: source
+#+begin_src emacs-lisp
+;;; DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+(setq user-full-name "Thiago Alves"
+      user-mail-address "thiago@rapinialves.com")
+#+end_src
+
+I also like to have a variable holding the value of my email's host name:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defvar user-domain (cadr (split-string user-mail-address "@"))
+  "Holds the user's personal domain. By default, this variable is
+  the `user-email-address' host.")
+#+end_src
+
+*** Key modifiers
+Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
+
+#+caption: macOS key mappings
+#+name: macos-keys
+| macOS Key  | Emacs Key |
+|------------+-----------|
+| ⌘ (cmd)    | 'super    |
+| ⌃ (ctrl)   | 'control  |
+| ⌥ (option) | 'meta     |
+
+Emacs expose three variables to allow you to make these adjustments:
+
+- ~mac-command-modifier~
+- ~mac-control-modifier~
+- ~mac-option-modifier~
+
+To adjust this values according to table [[macos-keys]], set each one of them to the symbol described on the column =Emacs Key=:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq mac-command-modifier 'super
+      mac-control-modifier 'control
+      mac-option-modifier  'meta)
+#+end_src
+
+*** Training wheels
+By default, Emacs prevent you from executing certain /dangerous/ commands inadvertently. While I understand and sympathize with the need of such feature, I personally prefer to turn it off.
+
+To change this option, set the variable ~disabled-command-function~ to ~nil~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq disabled-command-function nil)
+#+end_src
+
+On Emacs, you can set variables when open files, we call those [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html][File Variables]]. There are occasions I want to execute some arbitrary code when I open a file. To do that, I would add a file variable called ~eval~, and pass my arbitrary code to it. As you can imagine, this is a dangerous features, so I have to give you the standard disclaimer:
+
+#+begin_warning
+The next configuration can lead to Emacs executing malicious code upon opening a file. By allowing Emacs to enable local ~eval~ you gain some nice ways to configure Emacs per file, on the cost of a high risk of vulnerability, so... think a little bit about how do you indiscriminately open files on your editor before enabling this one.
+#+end_warning
+
+To enable Emacs to use ~eval~ as a file variable, set the variable ~enable-local-eval~ to a non-~nil~ value:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq enable-local-eval t)
+#+end_src
+
+*** Emacs source code
+Emacs documentation system is fantastic! It allows you to inspect any value, binding or function on the fly, and it displays the source code for of any callable together with its documentation.
+
+For some of the Emacs functions, such source code is a /C/ function from its core code, and by default, Emacs does not knows where to look for its own source code.
+
+To help Emacs to find its own source code, first clone it from the Emacs [[https://git.savannah.gnu.org/git/emacs.git][repository]]:
+
+#+begin_src sh :tangle no
+$ mkdir -p $HOME/workplace/vendor/gnu
+$ cd $HOME/workplace/vendor/gnu
+$ git clone https://git.savannah.gnu.org/git/emacs.git
+#+end_src
+
+Then, set the variable ~source-directory~ to the cloned repository's path:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq source-directory (concat (getenv "HOME") "/workplace/vendor/gnu/emacs"))
+#+end_src
+
+*** Line numbers
+I like to have line numbers displayed on the side of any source code I edit, but I don't like them everywhere (e.g. during prose writing), so I always make them disabled by default, and let the appropriate modes to set them on when they needed it:
+
+To disable line numbers by default, set the variable ~display-line-numbers-type~ to ~nil~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq-default display-line-numbers-type nil)
+#+end_src
+
+Notice I used the function ~setq-default~ here. It tells Emacs that if a buffer uses a local version of it, it always starts with the given value.
+
+When Emacs is showing line numbers, it do so on the window's left /gutter/. To save some screen space, Emacs only reserves only the necessary space on its gutter, to display the biggest visible line number. I believe this behavior disrupts the user experience when I scroll from line 99 to 100 and back. The visual effect is the editor screen moving right and left as I scroll.
+
+It would be incredible inefficient to read the entire file just to check what is the biggest line number, so we can instruct Emacs do the second best thing: to only grow the gutter's size, and never shrink it.
+
+To have such configuration, set the variable ~display-line-numbers-grow-only~ to a non-~nil~ value:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq-default display-line-numbers-grow-only t)
+#+end_src
+
+*** Indentation
+On this section, I will ask the reader to disagree on disagree, and set aside the almost religious subject of tabs versus spaces.
+
+I prefer to always indent my files with =4= spaces with some rare exceptions for certain languages. To make Emacs use =4= spaces to indent by default, set the variable ~tab-width~ to =4=:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq-default tab-width 4)
+#+end_src
+
+And to force emacs to always use spaces instead of tabs, set the ~indent-tabs-mode~ variable to ~nil~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+
+*** Line wrapping
+Until the writing of this document, I had the opinion that /soft wrap/ was evil, and it had no place on any editor. Since then, I learned to appreciate /soft wrap/ for prose, and later in this document, you will see all the other setup around /soft wrap/ and have an idea why I was so against it.
+
+To prevent Emacs from wrapping your text as it goes over the size of thee screen, set the variable ~truncate-lines~ to a non-~nil~ value:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq-default truncate-lines t)
+#+end_src
+
+*** Scrolling
+One of my biggest gripes over Emacs is how it handles scrolling. Besides the slowness, the entire behavior is just bonkers. For me, the logical way to deal with scrolling, is to move the screen only when we move the cursor outside of it, and the editor should only move the screen by the value of current line number minus bottom line when user is going /down/ the text.
+
+To make Emacs not jump then necessary when cursor goes outside the screen, set the ~scroll-conservatively~ to a big number (bigger then the number of lines your display can show):
+
+#+caption: config.el
+#+begin_src  emacs-lisp
+(setq scroll-conservatively 1000)
+#+end_src
+
+By default, Emacs will move the cursor with the text as you scroll, but only until the edge of the screen. When the cursor reaches the edge, it will stay there as you keep scrolling. This behavior presents an anti-pattern for usability. When I decide to scroll my buffer with the mouse wheel, I'm generally looking at the screen, around the area where the cursor is. If the cursor moves up or down from its position, my eyes lose track of it, and I will assume, it stayed with its original position as I scroll. If I decide to get back writing, my expectation is to just start typing, because the cursor should be on its previous position, but if I do this, I will start typing on the wrong part of the text.
+
+After some lookup, I believe Emacs does not support such feature yet, so I decided to go with the best alternative for usability, which is to not move the cursor from its screen position at all. This way, my eyes will keep track of its position as I scroll, and I won't have any surprises as I type.
+
+To prevent Emacs from moving the cursor up to the edge of the screen, set the variable ~scroll-preserve-screen-position~ to a non-~nil~ value, and if you want this behavior to be the same for horizontal and vertical scroll, set it to a non-~nil~ and non-~t~ value:
+
+#+caption: config.el
+#+begin_src  emacs-lisp
+(setq scroll-preserve-screen-position 'always)
+#+end_src
+
+To fine tune my scroll, I like to have a bit of room between my cursor and the edge of the screen when I navigate the buffer using the keyboard.
+
+To add a margin on your cursor as it gets on the edge of the screen, set the variable ~scroll-margin~ to the number of lines you want to always keep visible:
+
+#+caption: config.el
+#+begin_src  emacs-lisp
+(setq scroll-margin 2)
+#+end_src
+
+** DONE Modal editing
+As I mentioned on section [[Modal editing]], I do consider /Modal Editing/ far superior as other methods. The main reason is the separation of states while editing a text. At some level, we all do modal editing, but the keybindings style popularized by Vim goes a step forward and /formalize/ these states.
+
+I decided to use Doom as the base of my configuration because it has good reasonable defaults, and its author is also an ex-/Vimer/ like me, so he tailored this distribution with a Vim user in mind.
+
+On Emacs, the package responsible to provide Vim inside Emacs is [[https://github.com/emacs-evil/evil][Evil]], and from all Vim plugins for other editors that I use (and they were not few), Evil is by far the best. So much that compare it with other Vim plugins is do injustice to Evil developers. More often than not, we call Evil the Vim inside Emacs.
+
+In this section, I will go through configurations and other packages related directly to Evil, so if you don't use Evil or modal editing, feel free to skip this one.
+
+#+begin_center
+◆
+#+end_center
+
+If you're new to Vim, when you learn about the modes, on of the first /it's weird/ feelings you'll have is when you are in /Normal Mode/, then, you decide to go into /Insert Mode/, but right after that, you change your mind and press =<ESC>=... What just happened? you didn't act on anything, you didn't press any movement key, still, the cursor moved one character to the left!
+
+Well, I have to tell you that this behavior is not a bug, is just how we should expect the change of modes to be.
+
+I said /should/, because I disliked this behavior since I first used Vim. I never understood the rationale behind it and I always tried to fix it in my configurations. The good news is, Evil developers added an option to do just that.
+
+To fix the moving back the cursor annoyance, set the variable ~evil-move-cursor-back~ to ~nil~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq evil-move-cursor-back nil)
+#+end_src
+
+#+begin_center
+◆
+#+end_center
+
+On the same lines of /moving back the cursor/, there is another /expected/ behavior of Vim that I don't get it, the infamous /overwriting your clipboard with the contents of a selection that you just paste on top of it/ (I couldn't find a better way to refer to this behavior).
+
+I'm sure that, at some point, this behavior made sense for a lot of developers, but in my personal opinion, if you are pasting the clipboard on top of a selected text, is highly unlikely that you want to use the contents of such selection right after pasting something on top of it. I believe the natural behavior of developers these days, is to consider the selected text you just paste on top of it, as gone.
+
+And just like with the previous annoyance, Evil also offers an option to change this behavior. If you want to *not* copy the content of a selection you just paste something on top of it, set the variable ~evil-kill-on-visual-paste~ to ~nil~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq evil-kill-on-visual-paste nil)
+#+end_src
+
+#+begin_center
+◆
+#+end_center
+
+Because Evil tries to stay faithful to Vim, it does not force Emacs objects into Vim's lingo. One of these examples is the visual selection. Emacs has something called /regions/ that serves, also, to the purpose of selecting text, but in reality, the Vim's visual selection and Emacs' regions, are not the same thing.
+
+However, Evil is an Emacs package, and it also tries to integrate with existent packages and features, and it offers a configuration that makes Evil visual selection, to expand the Emacs selection region when we select something. The net effect of this, is that we can use the terms selection and region interchangeability for all practical purposes.
+
+If you want Evil to synchronize its visual selection with the Emacs region, set the variable ~evil-visual-region-expanded~ to a non-~nil~ value:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq evil-visual-region-expanded t)
+#+end_src
+
+#+begin_center
+◆
+#+end_center
+
+Vim (therefore also Evil) has this notion of a grammar to execute actions on text:
+
+#+begin_src emacs-lisp :tangle no
+{operation}{operator}{target object}
+#+end_src
+
+Where /operation/ is the command you're executing, operator can be /i/ (inside) or /a/ (also), and the /target object/ can be any of the targets defined Evil (e.g. /s/ for /sentense/, /p/ for /paragraph/, /[/ for /square brackets content/, etc. ).
+
+One of these target object is /w/ for /word/ and in my experience, the meaning of /"word"/ varies according to context. Let me explain...
+
+If you're editing a text file for blog, the meaning of /"word"/ is most likely the same meaning of the English dictionary, but if you're editing a /Lisp/ code, a word probably include more characters then the conventional /"word"/ (e.g. while /"foo"/ is a word in any context, /"foo-bar"/ is a word, probably only when you're editing a Lisp file).
+
+A quick trick to make Evil understand the meaning of /"word"/ as I just described, is to create an alias for the function ~forward-evil-symbol~, and name it ~forward-evil-word~. This way, we override the normal function to act as if it is the ~forward-evil-symbol~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(defalias #'forward-evil-word #'forward-evil-symbol)
+#+end_src
+
+** TODO Inline completion
+TBD
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! company
+  (setq company-idle-delay 0.5)
+  (setq company-minimum-prefix-length 2)
+  (setq company-show-numbers t)
+  (add-hook 'evil-normal-state-entry-hook #'company-abort)
+
+  (company-tng-mode 1)
+  (setq company-frontends (delq 'company-pseudo-tooltip-frontend company-frontends)))
+#+end_src
+
+** TODO Auto-indentation
+** DONE Smart backspace
+As part of my day job, I had to do a lot of Android development, and inevitably I used [[https://www.jetbrains.com/][JetBrains]]
+IDE [[https://www.jetbrains.com/idea/][IntelliJ IDEA]]. I bring this up not to chastise who uses or to complain about it. In face, InjelliJ the best IDE for Java and Kotlin out there. It has some features that are so good, that I want to implement on any text editor I use. One of these features is what I call /Smart Backspace/.
+
+On both, Doom and IntelliJ, when you type an open pair, the editor completes with the closing one:
+
+#+begin_src kotlin :tangle no
+fun foo() {|}
+#+end_src
+
+Also on both, when you press =<ENTER>=, the editor position the cursor on a newly inserted line, on using the correct indentation, and it also inserts a '=\n=' character after cursor. The result of these actions would be like this:
+
+#+begin_src kotlin :tangle no
+fun foo() {
+    |
+}
+#+end_src
+
+The difference between both editors happens when you press =<BACKSPACE>= at this point. While in Doom, this operation would result in:
+
+#+begin_src kotlin :tangle no
+fun foo() {
+|
+}
+#+end_src
+
+On IntelliJ, it results in:
+
+#+begin_src kotlin :tangle no
+fun foo() {|}
+#+end_src
+
+But what happened here?
+
+IntelliJ was able to figure out that, since I was on the indent column of the line *and* I haven't typed anything after the auto-pair, when I pressed =<BACKSPACE>=, my intention was to get back to the state I was before pressing =<ENTER>=, therefore the name I gave to this feature: /Smart backspace/.
+
+To achieve the same result with Doom, we have to add a function advice to delete advice Doom adds to Emacs (the ~+default--delete-backward-char-a~ advice is what is responsible to balance the blank characters you enter after a pair completion).
+
+Our advice function checks if our cursor is position on the expected position to revert the =<ENTER>= pressed between the two pairs. If it is, we remove all the characters before the cursor on the current line. This will put the cursor on a position that Doom's advice function can remove the two new line characters around the cursor, putting the buffer on the same state we were before we pressed =<ENTER>=:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +default--super-backward-delete (&rest _)
+  "Special function to super-delete things. If the line content
+before cursor contains only blank characters, this function will
+delete all the blank characters, and then, join with the
+previous line. I there is any non-blank character before cursor,
+this function will delete the entire line, but keep the correct
+indentation on it."
+  :before '+default--delete-backward-char-a
+  (let* ((line-pos (- (point) (point-at-bol)))
+         (prev-indent (save-excursion
+                        (forward-line -1)
+                        (current-indentation)))
+         (prev-line-bol (point-at-bol 0))
+         (next-line-eol (point-at-eol 2))
+         (smart-bs-p (or (save-excursion
+                           (and (re-search-backward "{[ \t]*\n[ \t]*" prev-line-bol t)
+                                (re-search-forward "[ \t]*\n[ \t]*}" next-line-eol t)))
+                         (save-excursion
+                           (and (re-search-backward "\\[[ \t]*\n[ \t]*" prev-line-bol t)
+                                (re-search-forward "[ \t]*\n[ \t]*\\]" next-line-eol t)))
+                         (save-excursion
+                           (and (re-search-backward "([ \t]*\n[ \t]*" prev-line-bol t)
+                                (re-search-forward "[ \t]*\n[ \t]*)" next-line-eol t))))))
+    (when (and smart-bs-p
+               (<= line-pos (+ prev-indent standard-indent)))
+      (delete-char (- line-pos)))))
+#+end_src
+
+Adding this advice as an /autoload/ function on our configuration is all we need to get the functionality working. When Doom loads the =smartparens= on the default module, it replaces the Emacs ~delete-backward-char~ function with its ~+default--delete-backward-char-a~ advice, which will load our function, which, in turn, installs itself as a =:before= advice on Doom's function.
+
+** DONE Balanced pairs
+In most editors (as far as editors go, I only saw Emacs allowing balanced pairs), there is no balanced pair protection. If you remove a line where a closing character is, without removing its open pair, your buffer becomes unbalanced.
+
+Emacs has some packages that help you keep the balance on pair characters, even if you try to remove a line containing just one of the pairs.
+
+Among the packages I checked, the two top two contenders for me are =lispville= and =smartparens= + (=evil-cleverparens= or =evil-smartparens=).
+
+From the two, =lispville= seams to be the most maintained, but it depends on =lispy= and even though you can use it just for the balance protection, it requires much more code and effort to do it right, so my choice is =smartparens= + =evil-cleverparens=. I tried =evil-smartparens= before, and it is not as polished as =evil-cleverparens=.
+
+To install them, make sure =smartparens= is enable in your =init.el=:
+
+#+caption: init.el
+#+begin_src emacs-lisp :tangle no
+  :config
+  (default
+      +bindings
+      +smartparens)
+#+end_src
+
+And =evil-cleverparens= is on the =packages.el= file as well:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! benchmark-init)
+(package! evil-cleverparens)
+#+end_src
+
+These changes will make Doom download them into its local cache when you run =doom sync=.
+
+Before I configure these packages, I would like to explain why I turn on balance protection only on Emacs modes deriving from =prog-mode=.
+
+The simplest explanation is that you don't really need pair balance protection in any other place then you coding buffers. I did some informal experiments on this area, and found that pair protection turned on when you write prose is magnitudes more annoying then useful, so I will stick with protection only in =prog-mode=.
+
+To make Emacs turn =smartparens= and related packages correctly, make sure that you turn on =evil-cleverparens-mode= on the =smartparens-enabled-hook=, and only enable the strict mode when editing a =prog-mode= buffer:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! smartparens
+  :init (add-hook 'smartparens-enabled-hook #'evil-cleverparens-mode)
+  :hook ((prog-mode . smartparens-strict-mode)))
+#+end_src
+
+Doom will turn on =smartparens= appropriately, so we don't need to hook anything else to get this feature working, but there is one more configuration that I like to have on, all the time. It is the ability of Emacs to highlight the /other pair/ when the cursor is on top of a character pair.
+
+To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! smartparens
+  (show-smartparens-global-mode 1))
+#+end_src
+
+** TODO Rich keybindings
+
+#+begin_src emacs-lisp
+(after! which-key
+  (setq which-key-min-display-lines 10)
+  (setq which-key-max-description-length 40))
+#+end_src
+
+** TODO Line numbers
+The next behavior is something I read a long time ago on some Vim mailing list. It's how the line numbers displayed on the buffer behave. Since on normal mode is pretty useful to know how the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
+
+So, I can describe this behavior as follows:
+
+- When on normal mode, show relative line numbers;
+- When on insert mode, show absolute line numbers;
+
+And to help us with this workflow, let's create couple /auto-loaded/ functions to help us out:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;; autoload/editor.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +doom--line-number-absolute-h ()
+  "If line numbers are visible, set the current line
+  number type to `absolute.'"
+  (if display-line-numbers
+      (setq display-line-numbers t)))
+
+;;;###autoload
+(defun +doom--line-number-visual-h ()
+  "If line numbers are visible, set the current line
+  number type to `visual'"
+  (if display-line-numbers
+      (setq display-line-numbers 'visual)))
+#+end_src
+
+And then, after loading Evil, we can hook thes functions to a mode switch:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! evil
+  (add-hook! '(evil-emacs-state-entry-hook
+               evil-insert-state-entry-hook) '+doom--line-number-absolute-h)
+  (add-hook! '(evil-emacs-state-exit-hook
+               evil-insert-state-exit-hook) '+doom--line-number-visual-h)
+#+end_src
+
+Also, let's make sure we are displaying line numbers on any coding buffer:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq-hook! 'prog-mode-hook display-line-numbers-type 'visual))
+#+end_src
+
+** TODO Auto-Save
+First of all, since I'm going to save my work constantly, I don't want Emacs to ask me if it should really exit, or if it should kill outstanding processes while doing it. For me, if I'm telling Emacs to quit, I want it to do it, regardless its state, but I don't want to lose any content of my current work. So, the first thing I'm going to do, is to disable questions when I'm quitting Emacs:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq confirm-kill-emacs nil
+      confirm-kill-processes nil)
+#+end_src
+
+Emacs allows you to define some /advices/ to any function you want. This allows you to hook some code when the user, or the system calls such functions. On the case of aggressive auto-save, I want Emacs to save any content when I try to close the buffer associated with the content, of if I'm trying to quit Emacs. To do so, I'll create an /autoload/ advice to perform such work:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +doom-save-all-buffers-a (&rest _)
+  "Advice added to functions that can potentially make user lose
+  data if one does not select to save the buffer.
+
+  This is a part of the full auto-save feature."
+  :before (list #'save-buffers-kill-emacs #'kill-current-buffer)
+  (save-some-buffers t t))
+#+end_src
+
+And to wrap up this configuration, I enable the auto-save mode:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(auto-save-visited-mode 1)
+#+end_src
+
+Call the same advice as a normal function when Emacs executes the auto-save hook:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-hook! 'auto-save-hook #'+doom-save-all-buffers-a)
+#+end_src
+
+And add the advice function to the ~after-focus-change-function~ as well, just to make sure Emacs save any outstanding buffer as soon as possible if it loses focus:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-function :after after-focus-change-function #'+doom-save-all-buffers-a)
+#+end_src
+
+The aggressive auto-save will work as expected, but it will crate a side effect with my literate config. Since Doom tangles the Org file every time we save it, the aggressive auto-save will make this tangle happen more often than we want.
+
+Doom documentation offers a partial solution to this problem asking us to remove the auto-tangle function from the save hook, so let's do it:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
+#+end_src
+
+That works, but now we have to do a =doom sync= for every change on our config. Even if the change didn't modified anything on =packages.el=, =init.el=, or any of the /autoload/ files.
+
+This got me thinking: I have to restart Emacs if I want my change to take effect. Why don't I add the tangle operation when Emacs is exiting?
+
+#+caption: config.org
+#+begin_src emacs-lisp
+;; (add-hook 'kill-emacs-hook
+;;           #'(lambda()
+;;               (when (file-newer-than-file-p (file-relative-name "config.org" doom-private-dir)
+;;                                             (file-relative-name "config.el" doom-private-dir))
+;;                 (+literate-tangle-h))))
+#+end_src
+
+And that is what I consider a mid-ground between functionality and convenience.
+
+
+Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures =ws-butler=. While I understand the rational behind the choice of always remove white spaces regardless the cursor position.
+
+To adjust that, let's make =ws-butler= behave how I expect it:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! ws-butler
+  (setq ws-butler-keep-whitespace-before-point t))
+#+end_src
+
+** TODO Frame persistent geometry
+Before I start tackling my own requirements, let's make Emacs /remember/ its window size and position between launches.
+
+First, I like to define an auto loaded function to hook into the emacs kill process to save frame dimensions. The reason to get an auto load function, is to allow Emacs to *not* load it until it really needs it, which would be when I'm quitting Emacs.
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +doom/save-frame-dimensions-h ()
+  "Caches the current frame dimentions and position so we can
+  restore it when we launch emacs again."
+  (if-let ((main-frame (car-safe (visible-frame-list))))
+      (doom-store-put 'last-frame-size
+                      (list (frame-position main-frame)
+                            (frame-width main-frame)
+                            (frame-height main-frame)
+                            (frame-parameter main-frame 'fullscreen)))))
+#+end_src
+
+Then, I like to have the analog function to call when we create a frame:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +doom/restore-frame-dimensions-h ()
+  (if-let (dims (doom-store-get 'last-frame-size))
+      (cl-destructuring-bind ((left . top) width height fullscreen) dims
+        (setq initial-frame-alist
+              (append initial-frame-alist
+                      `((left . ,left)
+                        (top . ,top)
+                        (width . ,width)
+                        (height . ,height)
+                        (fullscreen . ,fullscreen)))))
+    (add-to-list 'default-frame-alist '(height . 40))
+    (add-to-list 'default-frame-alist '(width . 140))))
+#+end_src
+
+With the function defined, I just need to connect them to the correct hooks:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-hook 'kill-emacs-hook #'+doom/save-frame-dimensions-h)
+(+doom/restore-frame-dimensions-h)
+#+end_src
+
+
+** TODO Remote editing
+* TODO Editor personal preferences [0/9]
+** TODO Requirements
+- In-editor file management ::
+- In-editor project management ::
+- In-editor terminal ::
+
+** TODO Packages
+Doom offers =evil-escape= as a default package, but was never able to adjust my muscle memory to it, so I will disable it on =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+;;; packages.el -*- lexical-binding: t; -*-
+
+(package! evil-escape :disable t)
+(package! evil-matchit)
+#+end_src
+
+The last Evil tweak I have is not really on Evil, but is tightly coupled with it. I like =evil-goggles= to be more prominent than the Doom's default:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! evil-matchit :defer t)
+#+end_src
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! evil-goggles
+  (evil-goggles-use-magit-faces)
+  (custom-set-faces!
+    '(evil-goggles-change-face           :inherit magit-diff-removed)
+    '(evil-goggles-yank-face             :inherit magit-diff-base)
+    '(evil-goggles-undo-redo-change-face :inherit magit-diff-base)))
+#+end_src
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! evil-goggles
+  :hook (doom-first-input . evil-goggles-mode)
+  :config
+  (setq evil-goggles-duration 0.15
+        evil-goggles-enable-delete t
+        evil-goggles-enable-change t)
+
+  (pushnew! evil-goggles--commands
+            '(evil-cp-delete
+              :face evil-goggles-delete-face
+              :switch evil-goggles-enable-delete
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-delete-line
+              :face evil-goggles-delete-face
+              :switch evil-goggles-enable-delete
+              :advice evil-goggles--delete-line-advice)
+            '(evil-cp-delete-sexp
+              :face evil-goggles-delete-face
+              :switch evil-goggles-enable-delete
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-delete-enclosing
+              :face evil-goggles-delete-face
+              :switch evil-goggles-enable-delete
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-yank
+              :face evil-goggles-yank-face
+              :switch evil-goggles-enable-yank
+              :advice evil-goggles--generic-async-advice)
+            '(evil-cp-yank-line
+              :face evil-goggles-yank-face
+              :switch evil-goggles-enable-yank
+              :advice evil-goggles--generic-async-advice)
+            '(evil-cp-yank-sexp
+              :face evil-goggles-yank-face
+              :switch evil-goggles-enable-yank
+              :advice evil-goggles--generic-async-advice)
+            '(evil-cp-yank-enclosing
+              :face evil-goggles-yank-face
+              :switch evil-goggles-enable-yank
+              :advice evil-goggles--generic-async-advice)
+            '(evil-cp-change
+              :face evil-goggles-change-face
+              :switch evil-goggles-enable-change
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-change-line
+              :face evil-goggles-change-face
+              :switch evil-goggles-enable-change
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-change-sexp
+              :face evil-goggles-change-face
+              :switch evil-goggles-enable-change
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-cp-change-enclosing
+              :face evil-goggles-change-face
+              :switch evil-goggles-enable-change
+              :advice evil-goggles--generic-blocking-advice)
+            '(evil-paste-after
+              :face evil-goggles-paste-face
+              :switch evil-goggles-enable-paste
+              :advice evil-goggles--paste-advice
+              :after t)
+            '(evil-cp-copy-paste-form
+              :face evil-goggles-paste-face
+              :switch evil-goggles-enable-paste
+              :advice evil-goggles--paste-advice
+              :after t)))
+#+end_src
+
+** TODO Keybindings
+As a general rule, I'm pretty happy with the default Evil keybindings, but I still like to make some changes overall. So, let's change some keybindings:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+#+end_src
+
+When I have more than one window opened on Emacs, I like to move my cursor using the default movement keys (=h=, =j=, =k=, and =l=) plus =Ctrl=:
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  :gn "C-h" #'evil-window-left
+  :gn "C-j" #'evil-window-down
+  :gn "C-k" #'evil-window-up
+  :gn "C-l" #'evil-window-right
+#+end_src
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  :gn "s-d" #'evil-mc-make-and-goto-next-match
+  :gn "s-u" #'evil-mc-skip-and-goto-prev-cursor
+  :gn "s-n" #'evil-mc-skip-and-goto-next-match
+  :gn "s-g" #'evil-mc-make-all-cursors
+  :gn "C-M-k" #'evil-mc-make-cursor-move-prev-line
+  :gn "C-M-j" #'evil-mc-make-cursor-move-next-line
+#+end_src
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  (:prefix "g"
+     :desc "Eval last sexp" :n ")" #'eval-last-sexp)
+#+end_src
+
+Unfortunately, =outline= also defines actions for these keys, so I have to /unbind/ them to make sure they work as expected:
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  (:after outline
+    (:map outline-mode-map
+      :gn "C-h" nil
+      :gn "C-j" nil
+      :gn "C-k" nil
+      :gn "C-l" nil))
+#+end_src
+
+And since we're on the window navigation subject, let me adjust couple bindings related to selecting which window to keep:
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  (:leader
+    (:prefix "w"
+      :desc "Enlarge window"         :n "z" #'doom/window-enlargen
+      :desc "Select window"          :n "o" #'delete-other-windows))
+#+end_src
+
+Another /nice to have/ binding I got used to, is to move blocks of text up and down, using =j= and =k=, plus the =Meta= (a.k.a. =Alt=, =option=, or  =⌥=):
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  :nvi "M-j" #'drag-stuff-down
+  :nvi "M-k" #'drag-stuff-up
+#+end_src
+
+You might have noticed that I use the =undo-tree= package to manage action history. This package offer a visual navigation of your file history jumps, allowing you too navigate between forks of /undo/ commands, and I like to map this tree visualization to the key =U= (uppercase u):
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  :n "U" #'undo-tree-visualize
+#+end_src
+
+I like to have a dedicated prefix key to bring back some popup buffers I might have dismissed:
+
+#+caption:config.el
+#+begin_src emacs-lisp :padline no
+  (:leader
+    (:prefix "v"
+      :desc "View Messages" :n "m" #'(lambda () (interactive) (pop-to-buffer "*Messages*"))
+      :desc "View Backtrace" :n "e" #'(lambda () (interactive) (pop-to-buffer "*Backtrace*"))))
+  (:map messages-buffer-mode-map
+    :n "q" #'delete-window)
+#+end_src
+
+Something that I really like but usually forget to use is the ability to insert a new line above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+  :gi [s-return]   #'+default/newline-below
+  :gi [s-S-return] #'+default/newline-above
+#+end_src
+
+And now we can close our mapping:
+
+#+caption: config.org
+#+begin_src emacs-lisp :padline no
+) ;; map!
+#+end_src
+
+** TODO Change text under cursor
+I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using =evil-numbers= (which Doom provides as a core package), I'll try a brand new package called =plus-minus=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! plus-minus
+  :recipe (:host github
+           :repo "peterwu/plus-minus"))
+#+end_src
+
+Now that we installed the package, let's configure it with ~use-package!~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! plus-minus :defer t)
+#+end_src
+
+Before defining the keybindings for this I would like to have an extra behavior when I try to increase or decrease a number at point. I would like to rotate the text at point with the same keybinding if the /think at point/ is not a number.
+
+Doom ships with the =rotate-text= package by default, but I need couple helper functions to define which package should handle the key press:
+
+#+caption: autoload/evil.el :mkdirp yes
+#+begin_src emacs-lisp :tangle autoload/evil.el :mkdirp yes
+;;; autoload/evil.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +doom/inc-or-rotate-at-point (arg)
+  (interactive "p")
+  (if (thing-at-point 'number)
+      (if current-prefix-arg (+/-:backward+) (+/-:forward+))
+    (condition-case nil
+        (rotate-text arg)
+      ('error (if current-prefix-arg (+/-:backward+) (+/-:forward+))))))
+
+;;;###autoload
+(defun +doom/dec-or-rotate-at-point (arg)
+  (interactive "p")
+  (if (thing-at-point 'number)
+      (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))
+    (condition-case nil
+        (rotate-text arg)
+      ('error (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))))))
+#+end_src
+
+And I also like to define some extra words for rotation:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! rotate-text
+  (add-to-list 'rotate-text-words '("yes" "no"))
+  (add-to-list 'rotate-text-words '("allow" "deny"))
+  (add-to-list 'rotate-text-words '("allowed" "denyed")))
+#+end_src
+
+With all in place, we just need to define the keybindings:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+  :n "C-a" #'+doom/inc-or-rotate-at-point
+  :n "C-x" #'+doom/dec-or-rotate-at-point
+  (:prefix "g"
+    :desc "Inc sequence" :v "C-a" #'+/-:block+
+    :desc "Dec sequence" :v "C-x" #'+/-:block-))
+#+end_src
+
+** TODO Appearances
+I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is as important. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
+
+The first step into this unspecified requirement, is to have a good theme.
+
+For a long time I tried to avoid this theme, but didn't mater how much I try to use a different one, I always end up installing the /Tomorrow Night/ theme; and according to Doom's files, there are two ways to load a theme. Both assume we have the theme installed and available. You can either set ~doom-theme~ or manually load a theme with the ~load-theme~ function. I prefer to use the Doom's variable:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-tomorrow-night)
+#+end_src
+
+And just to add a bit more differentiation to the theme's fonts, let's allow the theme to use bolds and italics:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq doom-themes-enable-bold t
+      doom-themes-enable-italic t)
+#+end_src
+
+I also start enjoying using Doom without the Solaire mode on. Because of that, I will disable that package on the =packages.el= file:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! solaire-mode :disable t)
+#+end_src
+
+The next step is to use a better font face and size, which I recognize is a bit subjective. Nevertheless, I'll put here my /current/ font selection.
+
+For my configuration, I have selected 3 fonts:
+
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like thee italic face for this font.
+- [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
+- [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements. Currently, I only use it on Treemacs.
+
+Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
+
+- Monospace Fonts:
+  + [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]]
+  + [[https://pcaro.es/p/hermit/][Hermit]]
+  + [[https://github.com/tonsky/FiraCode][FiraCode]]
+  + [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]]
+  + [[https://github.com/adobe-fonts/source-code-pro][SourceCode Pro]]
+  + [[https://github.com/googlefonts/robotomono][RobotoMono]]
+- Variable Pitch Fonts:
+  + [[https://en.wikipedia.org/wiki/Bookerly][Bookerly]]
+  + [[https://github.com/impallari/Libre-Baskerville][Libre Baskerville]]
+  + [[https://github.com/adobe-fonts/source-sans-pro][Source Sans Pro]]
+  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]]
+  + [[https://github.com/googlefonts/roboto][Roboto]]
+  + [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]]
+
+Doom exposes five (optional) variables for controlling fonts:
+
+- ~doom-font~ :: The global font used by Emacs;
+- ~doom-big-font~ :: Used for ~doom-big-font-mode~, which you can use for presentations or streaming;
+- ~doom-variable-pitch-font~ :: Font used for prose text (if you configure such modes to accept variable pitch fonts);
+- ~doom-serif-font~ :: The default font to use for the fixed-pitch-serif face;
+- ~doom-unicode-font~ :: Fallback font for Unicode glyphs;
+
+They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =xlfd= font string. You generally only need ~doom-font~ and ~doom-variable-pitch-font~, but I like to set ~doom-big-font~ as well, to make sure any time I switch to a presentation mode, it still feels like my configuration.
+
+Since I'm adding a different font for UI elements, I'll create a custom font just for this purpose:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(defface variable-pitch-ui `((t :font ,(font-spec :family "Roboto" :size 16)))
+  "Extra face used on UI elements.")
+#+end_src
+
+I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =variable-pitch-ui= when we need it down the road):
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
+      doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32)
+      doom-variable-pitch-font (font-spec :family "ETBembo" :size 22))
+#+end_src
+
+I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(set-face-attribute 'fill-column-indicator nil
+                    :font "Arial Unicode MS"
+                    :height 140
+                    :foreground "#2c2c2c")
+#+end_src
+
+And since we just fix the fill column indication, let's turn it on and set the appropriate character to it:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq-default fill-column 100
+              display-fill-column-indicator-column 100
+              display-fill-column-indicator-character 9550)
+#+end_src
+
+Another indicator I like to turn on, is the indentation guide. As with the fill column indicator, I don't like the character set to it by default, so I'll also fix it:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq-default highlight-indent-guides-character 9482
+              highlight-indent-guides-responsive 'dynamic)
+#+end_src
+
+Now, to tidy the appearance, I like to set some minor tweaks to have a pretty good looking UI.
+
+I like to remove the title from the app window.
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq frame-title-format nil
+      ns-use-proxy-icon nil)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+#+end_src
+
+And make scroll not jumpy:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq ns-use-thin-smoothing t)
+#+end_src
+
+When text-scale-mode is active it’s hard to tell what line height actually is. This variable helps calculating that reliably.
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defvar +doom--line-pixel-height (line-pixel-height)
+  "Line height in pixels.
+Used in various places to avoid getting wrong line height when
+`text-scale-mode' is active.")
+#+end_src
+
+** TODO Editor Tabs
+TBD
+
+https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/
+https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! svg-icon
+  :recipe (:host github
+           :repo "rougier/emacs-svg-icon"))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+
+(use-package! svg-icon
+  :commands svg-icon
+  :config
+  (setq
+   svg-icon-collections
+   '(("bootstrap" . "https://icons.getbootstrap.com/icons/%s.svg")
+     ("material" . "https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/%s.svg")
+     ("file" . "https://raw.githubusercontent.com/file-icons/icons/master/svg/%s.svg")
+     ("octicons" . "https://raw.githubusercontent.com/primer/octicons/master/icons/%s-24.svg")
+     ("boxicons" . "https://boxicons.com/static/img/svg/regular/bx-%s.svg"))))
+ ;
+(use-package! tab-line
+  :when window-system
+  :hook ((after-init . global-tab-line-mode))
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+(defun +doom-tabs-close-buffer-tab (buffer-or-name &optional window)
+  (let ((window (or window (gt-buffer-window))))
+    (if window
+        (with-selected-window window
+          (let ((tab-list (+doom-tabs-tabs-mode-persp-window))
+                (buffer-list (flatten-list
+                              (seq-reduce (lambda (list window)
+                                            (select-window window t)
+                                            (cons (+doom-tabs-tabs-mode-persp-window) list))
+                                          (window-list) nil))))
+            (select-window window)
+            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+                (progn
+                  (if (eq buffer (current-buffer))
+                      (bury-buffer)
+                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                  (unless (cdr tab-list)
+                    (ignore-errors (delete-window window))))
+              (and (kill-buffer buffer)
+                   (unless (cdr tab-list)
+                     (ignore-errors (delete-window window)))))))
+      (if (persp-buffer-in-other-p buffer)
+          (persp-remove-buffer buffer)
+        (kill-buffer buffer)))))
+
+
+;;;###autoload
+(defadvice! +doom-tabs-close-tab-a (&optional mouse-event)
+  "Close the selected tab.
+
+If tab is presented in another window, close the tab by using
+`bury-buffer' function. If tab is unique to all existing windows,
+kill the buffer with `kill-buffer' function. Lastly, if no tabs
+left in the window, it is deleted with `delete-window' function."
+  :override 'tab-line-close-tab
+  (let* ((posnp (and mouse-event (event-start mouse-event)))
+         (window (and posnp (posn-window posnp)))
+         (buffer (or (and posnp (get-pos-property 1 'tab (car (posn-string posnp))))
+                     (current-buffer)))
+         (window (or window (get-buffer-window buffer))))
+    (+doom-tabs-close-buffer-tab buffer window)
+    (force-mode-line-update)))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :init
+  (defcustom tab-line-tab-min-width 10
+    "Minimum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
+
+  (defcustom tab-line-tab-max-width 35
+    "Maximum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
+
+  (add-hook 'doom-load-theme-hook #'+doom-tabs--setup-faces-h)
+  (add-hook 'window-configuration-change-hook #'+doom-tabs--drop-caches-h)
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;; autoload/tabs.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +doom-tabs-name-buffer (buffer &rest _buffers)
+  "Create name for tab with padding and truncation.
+
+If buffer name is shorter than `tab-line-tab-max-width' it gets
+centered with spaces, otherwise it gets truncated, to preserve
+equal width for all tabs. This function also tries to fit as many
+tabs in window as possible, so if there are no room for tabs with
+maximum width, it calculates new width for each tab and truncates
+text if needed. You can set the minimal width with
+`tab-line-tab-min-width' variable."
+  (with-current-buffer buffer
+    (let* ((window-width (window-width (get-buffer-window)))
+           (close-button-size (if tab-line-close-button-show
+                                  (length (substring-no-properties tab-line-close-button))
+                                0))
+           (tab-amount (length (tab-line-tabs-window-buffers)))
+           (window-max-tab-width (/ window-width tab-amount))
+           (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
+                                tab-line-tab-max-width)
+                               ((< window-max-tab-width tab-line-tab-min-width)
+                                tab-line-tab-min-width)
+                               (t window-max-tab-width))
+                         close-button-size))
+           (buffer-name (string-trim (buffer-name)))
+           (name-width (length buffer-name)))
+      (if (>= name-width (- tab-width 3))
+          (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
+        (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
+               (buffer-name (concat padding buffer-name))
+               (name-width (length buffer-name)))
+          (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;;###autoload
+(defun +doom-tabs-tabs-mode-persp-window ()
+  (let ((win-buffs (tab-line-tabs-window-buffers)))
+    (reverse (seq-filter (lambda (buf)
+                           (let ((buf-name (buffer-name buf)))
+                             (and (member buf win-buffs)
+                                  (doom-real-buffer-p buf))))
+                         (and (fboundp 'persp-current-buffers)
+                              (persp-current-buffers))))))
+
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;;###autoload
+(defun +doom-tabs-hide-tab-line-maybe-h ()
+  (when (not (doom-real-buffer-p (current-buffer)))
+    (tab-line-mode -1)))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :config
+  (setq tab-line-close-button-show t)
+  (setq tab-line-new-button-show nil)
+  (setq tab-line-separator "")
+  (setq tab-line-tab-name-function #'+doom-tabs-name-buffer)
+  (setq tab-line-tabs-function #'+doom-tabs-tabs-mode-persp-window)
+  (setq tab-line-tabs-buffer-list-function #'persp-current-buffers)
+  (setq tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                          'keymap tab-line-right-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll right"))
+  (setq tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                         'keymap tab-line-left-map
+                                         'mouse-face 'tab-line-highlight
+                                         'help-echo "Click to scroll left"))
+  (setq tab-line-close-icon (all-the-icons-material "close"))
+  (setq tab-line-close-button (propertize (format "%s " tab-line-close-icon)
+                                          'keymap tab-line-tab-close-map
+                                          'mouse-face 'tab-line-close-highlight
+                                          'face 'tab-line-tab-curent
+                                          'help-echo "Click to close tab"))
+  (setq tab-line-exclude-modes '(ediff-mode
+                                 process-menu-mode
+                                 term-mode
+                                 vterm-mode
+                                 treemacs-mode
+                                 imenu-list-major-mode
+                                 +doom-dashboard-mode))
+  (add-hook 'doom-switch-buffer-hook #'+doom-tabs-hide-tab-line-maybe-h)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (map!
+   (:prefix "g"
+    :desc "" :n "t" #'tab-line-switch-to-next-tab
+    :desc "" :n "T" #'tab-line-switch-to-prev-tab))
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;;###autoload
+(defun +doom-tabs--drop-caches-h ()
+  "Drops `tab-line' cache in every window."
+  (dolist (window (window-list))
+    (set-window-parameter window 'tab-line-cache nil)))
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;;###autoload
+(defun +doom-tabs--setup-faces-h ()
+  (let* ((base (if (and (facep 'solaire-default-face)
+                        (not (eq (face-attribute 'solaire-default-face :background) 'unspecified)))
+                   (face-attribute 'default :background)
+                 (face-attribute 'mode-line :background)))
+         (bg (if (and (facep 'solaire-default-face)
+                      (not (eq (face-attribute 'solaire-default-face :background) 'unspecified)))
+                 (face-attribute 'solaire-default-face :background)
+               (face-attribute 'default :background)))
+         (fg (face-attribute 'default :foreground))
+         (dark-fg (face-attribute 'shadow :foreground))
+         (overline (face-attribute 'highlight :background))
+         (box-width (/ +doom--line-pixel-height 2))
+         (box-base (when (> box-width 0) (list :line-width box-width :color base)))
+         (box-bg (when (> box-width 0) (list :line-width box-width :color bg))))
+    (set-face-attribute 'tab-line nil
+                        :font "RobotoMono Nerd Font"
+                        :background base
+                        :foreground dark-fg
+                        :height 0.9
+                        :inherit nil
+                        :overline base
+                        :box box-base)
+    (set-face-attribute 'tab-line-tab nil
+                        :font "RobotoMono Nerd Font"
+                        :foreground dark-fg
+                        :background bg
+                        :inherit nil
+                        :box box-bg)
+    (set-face-attribute 'tab-line-tab-inactive nil
+                        :font "RobotoMono Nerd Font"
+                        :foreground dark-fg
+                        :background base
+                        :inherit nil
+                        :box box-base)
+    (set-face-attribute 'tab-line-tab-current nil
+                        :font "RobotoMono Nerd Font"
+                        :font "RobotoMono Nerd Font"
+                        :foreground fg
+                        :background bg
+                        :inherit nil
+                        :overline overline
+                        :box box-bg)
+    (set-face-attribute 'tab-line-highlight nil
+                        :font "RobotoMono Nerd Font"
+                        :foreground fg
+                        :background nil
+                        :inherit 'tab-line-tab
+                        :box box-bg)
+    (set-face-attribute 'tab-line-close-highlight nil
+                        :font "RobotoMono Nerd Font"
+                        :foreground overline
+                        :background nil
+                        :inherit 'tab-line-tab
+                        :box box-bg)))
+#+end_src
+
+#+RESULTS:
+: +doom-tabs--setup-faces-h
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (+doom-tabs--setup-faces-h)
+#+end_src
+
+#+caption: autoload/tabs.el
+#+begin_src emacs-lisp :tangle autoload/tabs.el :mkdirp yes
+;;;###autoload
+(defadvice! +doom-tabs-select-tab-a (&optional e)
+  :after 'tab-line-select-tab
+  (select-window (posn-window (event-start e))))
+#+end_src
+
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  )
+#+end_src
+
+** TODO Windows
+TBD
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +doom-window-single-buffer-p (&optional win)
+  (let ((win (or win (selected-window))))
+    (or (window-dedicated-p win)
+        (not (or (window-next-buffers win)
+                 (window-prev-buffers win))))))
+
+;;;###autoload
+(defun +doom-close-window-when-kill-buffer (&optional buffer-or-name)
+  (let* ((buf (get-buffer (or buffer-or-name (current-buffer))))
+         (win (get-buffer-window buf)))
+    (when (and win
+               (+doom-window-single-buffer-p win))
+      (delete-window win))))
+
+
+;;;###autoload
+(defadvice! +doom-close-window-when-no-buffer (&rest _)
+  :before-until #'kill-current-buffer
+  (let ((buf (current-buffer))
+        (tabs (+doom-tabs-tabs-mode-persp-window)))
+    (cond
+     ((window-dedicated-p) (delete-window) t)
+     ((eq buf (doom-fallback-buffer)) (message "Can't kill the fallback buffer.") t)
+     ((doom-real-buffer-p buf)
+      (let ((doom-inhibit-switch-buffer-hooks t)
+            (inhibit-redisplay t)
+            buffer-list-update-hook)
+        (if (memq buf tabs)
+            (progn
+              (when (and (buffer-modified-p buf)
+                         (not (y-or-n-p (format "Buffer %s is modified; kill anyway?" buf))))
+                (user-error "Aborted"))
+              (tab-line-close-tab))
+          (with-current-buffer buf
+            (restore-buffer-modified-p nil))
+          (kill-buffer buf)))
+      (run-hooks 'buffer-list-update-hook)
+      t))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+
+(add-hook 'kill-buffer-hook '+doom-close-window-when-kill-buffer)
+
+(advice-remove 'kill-current-buffer #'doom--switch-to-fallback-buffer-maybe-a)
+
+(set-popup-rules!
+  '(("^\\*"  :slot 2 :vslot -1 :select t)
+    ("^ \\*" :slot 2 :vslot -1 :size +popup-shrink-to-fit)
+    ("^\\*Completions" :ignore t)
+    ("^\\*Local variables\\*$"
+     :vslot -1 :slot 2 :size +popup-shrink-to-fit)
+    ("^\\*\\(?:[Cc]ompil\\(?:ation\\|e-Log\\)\\|Messages\\)"
+     :vslot -1 :size 0.3  :autosave t :quit t :ttl nil)
+    ("^\\*\\(?:doom \\|Pp E\\)"  ; transient buffers (no interaction required)
+     :vslot -1 :size +popup-shrink-to-fit :autosave t :select ignore :quit t :ttl 0)
+    ("^\\*doom:"  ; editing buffers (interaction required)
+     :vslot -1 :size 0.35 :autosave t :select t :modeline t :quit nil :ttl t)
+    ("^\\*doom:\\(?:v?term\\|e?shell\\)-popup"  ; editing buffers (interaction required)
+     :vslot -1 :size 0.35 :select t :modeline nil :quit nil :ttl nil)
+    ("^\\*\\(?:Wo\\)?Man "
+     :vslot -1 :size 0.45 :select t :quit t :ttl 0)
+    ("^\\*Calc"
+     :vslot -1 :side bottom :size 0.4 :select t :quit nil :ttl 0)
+    ("^\\*Customize"
+     :slot 2 :side right :size 0.5 :select t :quit nil)
+    ("^ \\*undo-tree\\*"
+     :slot 2 :side left :size 20 :select t :quit t)
+    ;; `help-mode', `helpful-mode'
+    ("^\\*[Hh]elp"
+     :slot 2 :vslot -1 :size 0.35 :select t)
+    ("^\\*eww\\*"  ; `eww' (and used by dash docsets)
+     :slot 2 :side right :size 0.5 :select t)
+    ("^\\*info\\*$"  ; `Info-mode'
+     :slot 2 :vslot 2 :size 0.45 :select t)
+    ("^\\*Warnings"
+     :vslot -1 :size 0.25)
+    ("^\\*Backtrace"
+     :vslot -1 :size 0.4 :quit nil)
+    ("^\\*CPU-Profiler-Report "
+     :side bottom :vslot -1 :slot 1 :height 0.4 :width 0.5 :quit nil)
+    ("^\\*Memory-Profiler-Report "
+     :side bottom :vslot -1 :slot 2 :height 0.4 :width 0.5 :quit nil)
+    ("^\\*Process List\\*"
+     :side bottom :vslot -1 :size 0.25 :select t :quit t)
+    ("^\\*\\(?:Proced\\|timer-list\\|Abbrevs\\|Output\\|Occur\\|unsent mail\\)\\*" :ignore t)
+    ("^\\*\\(?:doom:\\)?scratch\\*"
+     :slot 2 :side right :size 0.5 :select t :quit t)
+    ))
+#+end_src
+
+** TODO Completion framework
+Some times, I come across a new package or a set of them that I keep my eyes on it. After a while, such packages start showing their value and start getting adopted by the community. When that time comes, in some cases, I want to adopt them as well, but they're not shipped with Doom.
+
+When this scenario happens, I have to do a full replacement of packages. Usually by disabling the module I want to replace, and installing all the packages to get the same feature the module use to provide.
+
+Currently, I have two of those packages in my list:
+
+- Completion system (=selectrum=, =marginalia=, =orderless=, =prescient=, =embark=, and =consult=) to replace =ivy=, =helm=, and =ido=;
+- Workspaces (=perspectives.el=) to replace =persp-mode=;
+
+ These replacements require a long configuration, so if you don't intend to use them, feel free to skip this section, but before you go, here are my reasons to use these packages instead of the Doom's defaults:
+
+  - Selectrum and friends use core Emacs components, so no extra abstraction layer to deal with;
+  - Selectrum and friends are fast and lean;
+  - Selectrum and friends are independents from each other;
+  - =persp-mode= is not well-maintained anymore;
+  - =persp-mode= requires Doom to add hacks to make the package behave;
+  - =perspective.el= have integration packages with =projectile= and =treemacs=, which allows me to now maintain such integration;
+
+I'm trying to use =selectrum= and friends to see what all the hype is about, maybe you won't see this tidbit on my configuration for long, or maybe this is my next favorite set of packages.
+
+The appeal of =selectrum=, is the fact it uses the standard Emacs features to achieve its goals, this way, there is a better chance to not need to change my configuration in the future, even if I decide to use a different package for the completion UI.
+
+The other package enhancements that work well with =selectrum= are just another data point on the previous statements. Even though they work well together, they're build in a way that you could use them independently with any other completion UI.
+
+*** Filtering and highlighting
+The first package I want to install is =orderless=. This package augment the standard Emacs completion system providing multiple matches on a candidate.
+
+First, we need to add it to =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! orderless)
+#+end_src
+
+And configure it with ~use-package!~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! orderless
+  :demand t
+  :init
+  (icomplete-mode)
+  (setq orderless-component-separator "[ &]"
+        orderless-matching-styles '(orderless-prefixes
+                                    orderless-initialism
+                                    orderless-regexp))
+  :custom
+  (completion-styles '(orderless))
+  :config
+  (custom-set-faces!
+    '('orderless-match-face-0 :background "#435300" :foreground "#b5bd68")
+    '('orderless-match-face-1 :background "#4C2E60" :foreground "#b294bb")
+    '('orderless-match-face-2 :background "#644E00" :foreground "#f0c674")
+    '('orderless-match-face-3 :background "#1B2E47" :foreground "#81a2be"))
+
+  (add-hook 'minibuffer-exit-hook #'orderless-remove-transient-configuration))
+#+end_src
+
+On company, the matching portions of candidates are not highlighted. That’s because ~company-capf~ is hard-coded to look for the ~completions-common-part~ face, and it only use one face (~company-echo-common~) to highlight candidates.
+
+So, while you can’t get different faces for different components, you can at least get the matches highlighted in the sole available face with this configuration:
+
+#+caption: autoload/selectrum.el
+#+begin_src emacs-lisp :tangle autoload/selectrum.el :mkdirp yes
+;;; autoload/selectrum.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defadvice! +orderless-match-with-one-face (fn &rest args)
+  "Function to help company to highlight all candidates with just
+one face."
+  :around 'company-capf--candidates
+  (let ((orderless-match-faces [completions-common-part]))
+    (apply fn args)))
+#+end_src
+
+*** Sorting
+I'm really enjoying =orderless= but there is one aspect of it that botters me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
+
+Then it hit me: why not use both?
+
+The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the 2 required hooks for remembering, and the one variable, later on =selectum=, to use the /pre-processing/ from =prescient=. So let's start with =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! prescient)
+(package! selectrum-prescient)
+#+end_src
+
+Then, let's configure it, and set the persistent mode:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! prescient
+  :defer t
+  :config (prescient-persist-mode 1))
+#+end_src
+
+We should also configure the =selectrum-prescient= package with ~use-package!~, but *NOT ENABLE THE MODE*:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! selectrum-prescient :after selectrum)
+#+end_src
+
+*** Candidates annotations
+The next package is =marginalia=. This package will add annotations on candidates depending on the context of it. Think about it as a sort of =ivy-rich=, but more organized and use to customize.
+
+As with =ordeless=, we need to first, add it to the =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! marginalia)
+#+end_src
+
+Then, configure it using ~use-packages!~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! marginalia
+  :hook (doom-first-input . marginalia-mode)
+  :config
+  (setq marginalia-annotators '(marginalia-annotators-heavy)))
+#+end_src
+
+At this point, our completion system can filter its candidates (=orderless=) and display extra information for each one of them (=marginalia=), all that using the Emacs default completion system and UI, which is not up to my taste, so let's get the main package of this section.
+
+*** Completion UI
+I like to have a vertical and more dynamic completion UI. Here is where =selectrum= comes in play. So let's install it.
+
+First add =selectrum= itself to =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! selectrum)
+#+end_src
+
+And set it up with ~use-packages!~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! selectrum
+  :hook (doom-first-input . selectrum-mode)
+#+end_src
+
+Here is something a bit unusual for me when using ~use-package!~: To use the ~:init~ area to enable a mode.
+
+We have to do this because adding the keybinding to ~use-package!~, we're telling the system to only activate this package when we press one of those keys, but we want =selectrum= to get activated right out of the bat:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  :init
+#+end_src
+
+Then we can set variables to configure =selectrum= UI:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  (setq selectrum-display-action nil)
+  (setq selectrum-num-candidates-displayed 15)
+  (setq selectrum-extend-current-candidate-highlight t)
+  (setq selectrum-fix-minibuffer-height t)
+#+end_src
+
+And make sure =selectrum= is using =orderless= as its candidates refinement and highlight:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  (setq selectrum-refine-candidates-function #'orderless-filter)
+  (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+#+end_src
+
+And =prescient= for sorting:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  (setq selectrum-preprocess-candidates-function #'selectrum-prescient--preprocess)
+#+end_src
+
+Once the package is loaded, we can enable selectrum:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  :config
+  (selectrum-mode 1)
+#+end_src
+
+We also need to make sure =prescient= can /remember/ previous searches to improve the sorting over time:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  (add-hook 'selectrum-candidate-selected-hook #'selectrum-prescient--remember)
+  (add-hook 'selectrum-candidate-inserted-hook #'selectrum-prescient--remember)
+#+end_src
+
+Also,  ensure we refresh =selectrum= when cycling annotations with =marginalia=.
+
+#+caption: autoload/selectrum.el
+#+begin_src emacs-lisp :tangle autoload/selectrum.el :mkdirp yes
+  (defadvice! +selectrum-refresh-on-cycle (&rest _)
+    :after 'marginalia-cycle
+    (when (bound-and-true-p selectrum-mode) (selectrum-exhibit)))
+#+end_src
+
+The cursor line on Selectrum, is a bit too much for me. I like to have it with a more subdued color:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  (custom-set-faces! '(selectrum-current-candidate :background "#3c3c3c"))
+#+end_src
+
+And last, but not least, let's set some Vim friendly keybindings:
+
+#+caption:config.el
+#+begin_src emacs-lisp :padline no
+  (map!
+   :g "C-s-r" #'selectrum-repeat
+   (:map selectrum-minibuffer-map
+    :geni "M-RET" #'selectrum-submit-exact-input
+    :geni "C-j"   #'selectrum-next-candidate
+    :geni "C-S-j" #'selectrum-next-page
+    :geni "C-s-j" #'selectrum-goto-end
+    :geni "C-k"   #'selectrum-previous-candidate
+    :geni "C-S-k" #'selectrum-previous-page
+    :geni "C-s-k" #'selectrum-goto-beginning))
+#+end_src
+
+Don't forget to close the ~use-packages!~ sexp:
+
+#+caption: config.el
+#+begin_src emacs-lisp :padline no
+  )  ;; use-package! selectrum
+#+end_src
+
+*** Contextual Menu
+The next package is a kind of gem I read about. It will allow you to select different actions on a completion candidate based on its context. This package is =embark=. And again, let's start with =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! embark)
+(package! embark-consult)
+#+end_src
+
+Now we can configure =embark= with ~use-package!~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! embark
+  :defer t
+#+end_src
+
+We  can attach the proper functions to the proper hooks:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :init
+  (map!
+    :g "C-s-e" #'embark-act
+    (:map minibuffer-local-completion-map
+          "C-c C-o" #'embark-export
+          "C-c C-c" #'embark-act-noexit)
+    (:map embark-file-map
+          :desc "Open Dired on target" :g "j" #'ffap-dired
+          :desc "Open target with sudo" :g "s" #'sudo-edit
+          :desc "Open target with vlf" :g "l" #'vlf)
+    (:map embark-file-map
+          :desc "Cycle marginalia views" :g "A" #'marginalia-cycle))
+#+end_src
+
+It's also nice to have a reminder of the actions configured on =embark=:
+
+#+caption: autoload/selectrum.el
+#+begin_src emacs-lisp :tangle autoload/selectrum.el :mkdirp yes
+;;;###autoload
+(defun +embark-which-key-action-indicator (map)
+  "Helper function to display the `whichey' help buffer for embark."
+  (which-key--show-keymap "Embark" map nil nil 'no-paging)
+  #'which-key--hide-popup-ignore-command)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (setq embark-action-indicator #'+embark-which-key-action-indicator
+        embark-become-indicator embark-action-indicator)
+#+end_src
+
+And don't forget to close the =embark= sexp as well:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  )  ;; use-package! embark
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! embark-consult
+  :after (embark consult)
+  :hook
+  (embark-collect-mode . embark-consult-preview-minor-mode))
+#+end_src
+
+
+*** Extra commands
+In order to be a full replacement for =ivy= + =counsel=, we need to install =consult=, which comes with a bundle of useful helper commands. Let's start with =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! consult)
+#+end_src
+
+Now we need to configure each one of this packages. Let's start with the main =consult= package:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! consult
+  :defer t
+  :init
+  (fset 'multi-occur #'consult-multi-occur)
+  (define-key!
+    [remap apropos] #'consult-apropos
+    [remap goto-line] #'consult-goto-line
+    [remap imenu] #'consult-imenu
+    [remap switch-to-buffer] #'consult-buffer
+    [remap switch-to-buffer-other-window] #'consult-buffer-other-window
+    [remap switch-to-buffer-other-frame] #'consult-buffer-other-frame
+    [remap man] #'consult-man
+    [remap yank-pop] #'consult-yank-pop
+    [remap locate] #'consult-locate
+    [remap load-theme] #'consult-theme
+    [remap recentf-open-files] #'consult-recent-file)
+  :config
+  (setq consult-project-root-function #'doom-project-root)
+  (setq completion-in-region-function #'consult-completion-in-region)
+  (setq consult-narrow-key "<")
+  (setq consult-line-numbers-widen t)
+  (setq consult-async-input-debounce 0.5)
+  (setq consult-async-input-throttle 0.8))
+
+;; (use-package! consult-flycheck
+;;   :when (featurep! :checkers syntax)
+;;   :after (consult flycheck))
+#+end_src
+
+We just set couple functions that are not default to =consult= and some minor tweaks on its options.
+
+At this point, our configuration is matching the standard =ivy= + =counsel= duo.
+
+#+caption: autoload/selectrum.el
+#+begin_src emacs-lisp :tangle autoload/selectrum.el :mkdirp yes
+;;;###autoload
+(defadvice! +default/extended-yank-pop (&rest _)
+  "Interactively select what text to insert from the kill ring."
+  :override '+default/yank-pop
+  (interactive "P")
+  (call-interactively
+   (cond ((fboundp 'counsel-yank-pop)    #'counsel-yank-pop)
+         ((fboundp 'consult-yank-pop)    #'consult-yank-pop)
+         ((fboundp 'helm-show-kill-ring) #'helm-show-kill-ring)
+         ((error "No kill-ring search backend available. Enable ivy or helm!")))))
+
+;;;###autoload
+(defadvice! +default/extended-search-project (&optional arg)
+  "Conduct a text search in the current project root.
+If prefix ARG is set, include ignored/hidden files."
+  :override '+default/search-project
+  (interactive "P")
+  (let* ((projectile-project-root nil)
+         (disabled-command-function nil)
+         (current-prefix-arg (unless (eq arg 'other) arg))
+         (default-directory
+           (if (eq arg 'other)
+               (if-let (projects (projectile-relevant-known-projects))
+                   (completing-read "Search project: " projects nil t)
+                 (user-error "There are no known projects"))
+             default-directory)))
+    (call-interactively
+     (cond ((featurep! :completion ivy)  #'+ivy/project-search)
+           ((featurep! :completion helm) #'+helm/project-search)
+           ((fboundp 'consult--grep)     #'+selectrum/project-search)
+           (#'projectile-ripgrep)))))
+
+;;;###autoload
+(defadvice! +default/extended-search-cwd (&optional arg)
+  "Conduct a text search in files under the current folder.
+If prefix ARG is set, prompt for a directory to search from."
+  :override '+default/search-cwd
+  (interactive "P")
+  (let ((default-directory
+          (if arg
+              (read-directory-name "Search directory: ")
+            default-directory)))
+    (call-interactively
+     (cond ((featurep! :completion ivy)  #'+ivy/project-search-from-cwd)
+           ((featurep! :completion helm) #'+helm/project-search-from-cwd)
+           ((fboundp 'consult--grep) #'+selectrum/project-search-from-cwd)
+           (#'rgrep)))))
+#+end_src
+
+#+caption: autoload/selectrum.el
+#+begin_src emacs-lisp :tangle autoload/selectrum.el :mkdirp yes
+;;;###autoload
+(cl-defun +selectrum-file-search (&key query in all-files (recursive t) prompt args)
+  "Conduct a file search using ripgrep.
+:query STRING
+  Determines the initial input to search for.
+:in PATH
+  Sets what directory to base the search out of. Defaults to the current
+  project's root.
+:recursive BOOL
+  Whether or not to search files recursively from the base directory."
+  (declare (indent defun))
+  (unless (executable-find "rg")
+    (user-error "Couldn't find ripgrep in your PATH"))
+  (require 'consult)
+  (let* ((this-command 'consult-ripgrep)
+         (project-root (or (doom-project-root) default-directory))
+         (directory (or in project-root))
+         (ripgrep-command (seq-remove 'null
+                                      (append (butlast consult-ripgrep-command)
+                                              (list
+                                               (when all-files "-uu")
+                                               (unless recursive " --maxdepth 1")
+                                               "--hidden"
+                                               "-g!.git")
+                                              args
+                                              '("-e"))))
+         (prompt (or prompt
+                     (format "%s [%s]: "
+                             (mapconcat #'identity ripgrep-command " ")
+                             (cond ((equal directory default-directory) "./")
+                                   ((equal directory project-root) (projectile-project-name))
+                                   ((file-relative-name directory project-root))))))
+         (query (or query
+                    (when (doom-region-active-p)
+                      (replace-regexp-in-string
+                       "[! |]" (lambda (substr)
+                                 (cond ((string= substr " ") "  ")
+                                       ((string= substr "|") "\\\\\\\\|")
+                                       ((concat "\\\\" substr))))
+                       (rxt-quote-pcre (doom-thing-at-point-or-region))))
+                    " ")))
+    ;; (setq deactivate-mark t)
+    (consult--grep prompt ripgrep-command directory query)))
+
+;;;###autoload
+(defun +selectrum/project-search (&optional arg initial-query directory)
+  "Performs a live project search from the project root using ripgrep.
+If ARG (universal argument), include all files, even hidden or compressed ones,
+in the search."
+  (interactive "P")
+  (+selectrum-file-search
+    :prompt (format "Find text on project files \[%s\]"
+                    (if (or (and (not directory) (doom-project-root))
+                            (and directory (equal directory (doom-project-root))))
+                        (projectile-project-name)
+                      (file-relative-name (or directory (doom-project-root) default-directory))))
+    :query initial-query
+    :in directory
+    :all-files arg))
+
+;;;###autoload
+(defun +selectrum/project-search-from-cwd (&optional arg initial-query)
+  "Performs a project search recursively from the current directory.
+If ARG (universal argument), include all files, even hidden or compressed ones."
+  (interactive "P")
+  (+selectrum/project-search arg initial-query default-directory))
+#+end_src
+
+
+*** Change Doom's behavior
+By default, Doom comes with all its configuration tailored for =ivy= or =helm=, this means that some packages will need some help from us to work nicely with =selectrum= and friends.
+
+The first module we have to change, is /workspaces/.
+
+** TODO Workspaces
+There is one module on Doom that don't play nice with =selectrum=: /Workspace/ (based on =persp-mode=).
+
+The problem with /Workspace/ is that its base package is buggy, and requires Doom to do a lot of work in order to get it more or less working.
+
+Instead of trying to replace functions from this package, we will disable the module entirely and add =perspective.el=, which is the package =persp-mode= forked.
+
+We already disable the module on our =init.el= by commenting the line referent to it (you can check it on the [[Prologue]] section). But there is another package Doom uses to synchronize its workspaces that conflicts with =perspective.el=: =treemacs-persp=.
+
+Since we will install another package to sync with =treemacs=, we can disable this one on our =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! treemacs-persp :disable t)
+#+end_src
+
+The next step is to add the three packages we will use to replace =persp-mode=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! perspective)
+(package! persp-projectile)
+(package! treemacs-perspective)
+#+end_src
+
+With that we can start configuring these packages with =use-package!=. Let's begin with the main package since it is the most complex:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! perspective
+#+end_src
+
+Add the trigger to let Doom knows when to actually load the package:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :hook (doom-first-input . persp-mode)
+#+end_src
+
+=perspective.el= allows different styles of sorting for its workspaces, the one that is closer to what Doom offers by default is to sort them by the order we create them.
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :custom
+  (persp-sort 'created)
+#+end_src
+
+It still print the perspectives on the inverse order that we want, but we will fix that behavior when we implement the /workspace tab bar/ later.
+
+And since we will implement the default Doom /workspace tab bar/, we don't need =perspective.el= to print its perspective on the modeline:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (persp-show-modestring nil)
+#+end_src
+
+This change is something particular to my taste. Doom set the name of the workspace that never closes to "main". Although this is a good name, I would rater something even more generic:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (persp-initial-frame-name "default")
+#+end_src
+
+With these configurations we can turn =perspective.el= on when Doom loads the module:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :config
+  (persp-mode 1)
+#+end_src
+
+As mentioned before, Doom has the /workspaces/ module tight coupled with other ares. The problem we have is =persp-mode=, uses the same mode name of =perspective.el=, and when some Doom configuration tries to retrieve an information from /workspaces/, it can't detect we disabled the module.
+
+To workaround this, we need to define or alias some functions that Doom expects to be available when /workspaces/ is on:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;; autoload/workspaces.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun persp-parameter (param-name &optional persp)
+  (alist-get param-name (persp-local-variables (or persp (persp-curr)))))
+
+;;;###autoload
+(defalias 'get-current-persp #'persp-current-name)
+
+;;;###autoload
+(defalias 'safe-persp-name (lambda (&rest _) (persp-current-name)))
+#+end_src
+
+Don't forget to close the =use-package!= sexp:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+) ;; use-package! perspective
+#+end_src
+
+Now we can install the =projectile= extension for =perspective.el=:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! persp-projectile :after (projectile perspective))
+#+end_src
+
+And the one for =treemacs=:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! treemacs-perspective :after (treemacs perspective)
+#+end_src
+
+The =treemacs= integration, also needs some tweaks to functions and hooks that Doom installs in order to guarantee a better behavior from =treemacs= and =persp-mode=.
+
+Once Doom loads the =treemacs= package, we set its scope to ~'Perspectives~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  :config
+  (treemacs-set-scope-type 'Perspectives)
+#+end_src
+
+Next, we need to change the ~treemacs--on-scope-kill~ function signature. =persp-mode= calls all hooks from ~persp-killed-hook~ with the current perspective as an argument. =perspective.el= changed this behavior to not send any information when calling hooks.
+
+The easiest way to fix this is to create a thin wrapper function for ~treemacs--on-scope-kill~ that will call the correct function passing the result of ~(persp-curr)~ as an argument:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (defalias 'treemacs--new-on-scope-kill
+    (lambda () (treemacs--on-scope-kill (persp-curr))))
+#+end_src
+
+Then, we can swap the functions on the ~persp-killed-hook~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (remove-hook 'persp-killed-hook #'treemacs--on-scope-kill)
+  (add-hook 'persp-killed-hook #'treemacs--new-on-scope-kill)
+#+end_src
+
+And finish it by closing the sexp for ~use-package!~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  )
+#+end_src
+
+The configuration we have so far will get =perspective.el= working, but not as conveniently as the standard feature on Doom. To achieve the whole functionality, there are two changes we still needs: Dashboard integration and keybindings.
+
+As with other keybindings in my configuration, I will get new functions to live on an /autoload/ file, and call them on the mapping.
+
+The main idea is to mimic Doom's keybindings, so let's look what binds are available for workspaces:
+
+| Action                        | Keybinding  |
+|-------------------------------+-------------|
+| Display tab bar               | =SPC TAB TAB= |
+| Switch workspace              | =SPC TAB .=   |
+| Switch to N^{th} workspace       | =SPC TAB= /N/   |
+| Switch to final workspace     | =SPC TAB 0=   |
+| Switch to last used workspace | =SPC TAB `=   |
+| Previous workspace            | =SPC TAB [=   |
+| Next workspace                | =SPC TAB ]=   |
+| New workspace                 | =SPC TAB n=   |
+| Rename workspace              | =SPC TAB r=   |
+| Delete this workspace         | =SPC TAB d=   |
+| Delete session                | =SPC TAB x=   |
+| Delete session and quit       | =SPC TAB X=   |
+| Save session to file          | =SPC TAB s=   |
+| Load session from file        | =SPC TAB l=   |
+| Restore last session          | =SPC TAB R=   |
+
+The next sections will cover each one of these commands, but before we begin, let's prepare our mapping functions:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+ (:leader
+  (:prefix-map ("TAB" . "workspace")
+#+end_src
+
+Now we can start with the /Display tab bar/ binding, since it is the foundation of Doom's workspace system.
+
+*** Display tab bar
+We know Doom uses two special font faces to draw the workspace tab bar (~+workspace-tab-selected-face~ and ~+workspace-tab-face~), but we removed the =workspace= module from our =init.el=. To keep our configuration as close to Doom as possible we need to redefine these faces. Let's use our /autoload/ file =autoload/workspace.el=:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defface +workspace-tab-selected-face '((t (:inherit highlight)))
+  "The face for selected tabs displayed by `+workspace/display'"
+  :group 'persp-mode)
+
+
+;;;###autoload
+(defface +workspace-tab-face '((t (:inherit default)))
+  "The face for selected tabs displayed by `+workspace/display'"
+  :group 'persp-mode)
+#+end_src
+
+With the faces defined, we can create a helper function to build the tab bar string using a propertized string so we can simply use it when we need it:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace--tabline (&optional names)
+  "Returns the given NAMES list as a propertied string
+representing each name as a tab for the current workspace
+session. If an item on the NAMES list matches the current
+workspace name, it will represent this item as a selected
+item."
+  (let ((names (or names (reverse (persp-names))))
+        (current-name (persp-current-name)))
+    (mapconcat
+     #'identity
+     (cl-loop for name in names
+              for i to (length names)
+              collect
+              (propertize (format " [%d] %s " (1+ i) name)
+                          'face (if (equal current-name name)
+                                    '+workspace-tab-selected-face
+                                  '+workspace-tab-face)))
+     " ")))
+#+end_src
+
+Notice that we use ~reverse~ when we call ~(persp-names)~. This is to fix the order of tabs that Doom uses.
+
+This helper function allows us to build the interactive function we need:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/display ()
+  "Display a list of workspaces (like tabs) in the echo area."
+  (interactive)
+  (when (bound-and-true-p persp-mode)
+    (let (message-log-max)
+      (message "%s" (+workspace--tabline)))))
+#+end_src
+
+And we can simply bind it to our shortcut key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Display tab bar"           "TAB" #'+workspace/display
+#+end_src
+
+*** Switch workspace
+The =persp-projectile= package will take care of creating a new workspace for each project we open, but we still need to switch to those workspaces, so let's take care of the /Switch workspace/ binding.
+
+Let's list the requirements for such function:
+
+- This function needs to be interactive, and if I call it with =M-x=, it should request the name of the workspace I want to switch to;
+- I can refer to a workspace when calling this function in two ways:
+  + Passing a string representing the workspace name;
+  + Passing a number representing the 1-based index for the workspace on the /workspace tab bar/;
+- If I pass a negative number to the function, it should get the workspace from end to start (e.g. a =-3= on a =10= workspaces session would represent workspace =8=);
+- If an error happens, we should warn the user;
+- When the switch is complete, we should display the /workspace tab bar/;
+
+And here is the implementation for such function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/switch-to (index &optional auto-create-p)
+  "Switch to a workspace at a given INDEX. A negative number will start from the
+end of the workspace list."
+  (interactive
+   (let ((last-used-workspace (+workspace-last-name)))
+     (list (completing-read "Switch to workspace: "
+                            (persp-names)            ;; list
+                            nil                      ;; filter
+                            (not current-prefix-arg) ;; required
+                            nil                      ;; initial input
+                            nil                      ;; history
+                            last-used-workspace))))  ;; default value
+  (when (bound-and-true-p persp-mode)
+    (condition-case err
+        (let ((target (+workspace-name-from-reference index))
+              (old-name (persp-current-name)))
+          (unless target
+            (if (numberp index)
+                (+workspace-error "No workspace on index #%s" (1+ index))
+              (+workspace-error "Invalid workspace '%s'" index)))
+          (if (equal target old-name)
+              (+workspace-warn "Already in %s" old-name)
+            (+workspace-switch target (or current-prefix-arg auto-create-p))
+            (+workspace/display)))
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+If you analyze this function, you'll realize we don't have some of the functions used here. They are:
+
+- ~+workspace-last-name~ to get the name of the last used workspace;
+- ~+workspace-name-from-reference~ to get a workspace name from a reference variable;
+- ~+workspace-switch~ to call the lower level API to switch the workspace;
+- ~+workspace-error~ called when we need to present an error to the user;
+- ~+workspace-warn~ called when we need to present a less problematic error to the user;
+- ~+workspace-internal-error~ when we find a failure on the internal APIs of =perspective.el=;
+
+We can start with the last workspace name:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-last-name ()
+  (when-let ((last-used-persp (persp-last)))
+    (persp-name last-used-persp)))
+#+end_src
+
+Then we can add the function to resolve a workspace name from any type of reference:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-name-from-reference (ref)
+  "Returns the name of a workspace referenced by REF.
+
+REF can be a perspective object, a string name, a string number,
+a positive number, or a negative number. How it retrieves the
+workspace name depends on the value of REF:
+
+Perspective object - it access the `CL-X->name' from the object;
+String name - return the same value if a workspace with that name
+  exists;
+String number - parse the number and get the workspace name from
+  the index representing the parsed number;
+Positive number - get the workspace name from the index
+  representing the giving number;
+Negative number - Access the workspace index from the end to the
+  start too retrieve the correct workspace;
+
+If REF does not match a current workspace in any way, it
+returns nil."
+  (cond ((perspective-p ref) (persp-name ref))
+        ((numberp ref) (+workspace-name-from-index ref t))
+        ((stringp ref) (cond ((+workspace-exists-p ref) ref)
+                             ((string-match-p "^[0-9]+$" ref) (+workspace-name-from-index (string-to-number ref)
+                                                                                          t))))))
+#+end_src
+
+This last function needs another helper one, to make sure it returns the correct name for a session on a given indes:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-name-from-index (index &optional noerror)
+  "Return the workspace name on INDEX.
+
+This function throw an error if there is no workspace on INDEX.
+If you pass a non-nil value to NOERROR, it will return nil when
+it can't find a workspace.
+
+When INDEX is negative, it access the workspace on the reverse
+order (e.g. on a 4 workspaces session, -1 access the workspace on
+index 3)."
+  (or (when-let ((is-number (numberp index))
+                 (names (reverse (persp-names)))
+                 (len (length names))
+                 (index (if (< index 0) (+ len index) index))
+                 (inbounds (and (>= index 0) (< index len))))
+        (nth index names))
+      (unless noerror
+        (+workspace-error "There is no workspace on index #%s!" index))))
+#+end_src
+
+And then we can add the low-level API:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-switch (name &optional auto-create-p)
+  "Switch to another workspace named NAME (a string).
+
+If AUTO-CREATE-P is non-nil, create the workspace if it doesn't exist, otherwise
+throws an error."
+  (unless (+workspace-exists-p name)
+    (if auto-create-p
+        (+workspace-new name)
+      (+workspace-error "%s is not an available workspace" name)))
+  (let ((old-name (persp-current-name)))
+    (unless (equal old-name name)
+      (persp-switch name))
+    (equal (persp-current-name) name)))
+#+end_src
+
+This function can brings an existent workspace to the front, or create a new workspace if the given name does not exist and the ~auto-create-p~ flag is a non-nil value.
+
+In this function, there are three functions we still don't have on our configuration:
+
+- ~+workspace-exists-p~ to check if a workspace with the given name exists;
+- ~+workspace-new~ to call actual /new perspective/ function;
+- ~+workspace-error~ called when we need to present an error to the user;
+
+Let's start with the ~+workspace-exists-p~ function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-exists-p (name)
+  "Returns t if NAME is the name of an existing workspace."
+  (member name (persp-names)))
+#+end_src
+
+Then, we can implement the ~workspace-new~ function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-new (name)
+  "Create a new workspace named NAME. If one already exists, return nil.
+otherwise return t on success, nil otherwise."
+  (when (+workspace--protected-p name)
+    (+workspace-error "Can't create a new '%s' workspace" name))
+  (when (+workspace-exists-p name)
+    (+workspace-error "A workspace named '%s' already exists" name))
+  (persp-new name))
+#+end_src
+
+The ~+workspace-new~ function have to block the creation of a workspace if the given name is the one used by the main workspace, or if it is the same used on the auto-save feature. These workspace names are what we consider /protected/ names. So let's create a function to check it:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace--protected-p (name)
+  "Return non nil if the given NAME is the default initial
+workspace name."
+  (or (equal name +workspaces-main)
+      (equal name +workspaces-auto-save-identifier)))
+#+end_src
+
+Let's also define those two variables in case we just want to change them later:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defvaralias #'+workspaces-main #'persp-initial-frame-name)
+
+
+;;;###autoload
+(defvar +workspaces-auto-save-identifier "autosave"
+  "Identifier used to auto-save the workspace session.")
+#+end_src
+
+Now we need to define our workspaces messaging API. To stay in parity with Doom, we need display the tab bar on the minibuffer, and then a message on its side with the severity of the message color coded.
+
+Since we already have a function to display the tabs for us, lets use that function to build a /message body/ for our API:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace--message-body (text &optional type)
+  "Returns a propertied string representing a workspace
+message.
+
+A workspace message consist of a 'tab line' representation of the
+workspace session, with the given TEXT concatenated after it.
+
+The text color changes depending of TYPE passed. If we omit the
+TYPE, the function assumes this message is an 'info message.
+
+We associate the message color to the respective font faces,
+which are:
+
+- 'info
+- 'success
+- 'warn
+- 'error
+
+The only TYPE that does not have a direct font face
+representation is 'info, which uses the `font-lock-comment-face'
+font face."
+  (concat (+workspace--tabline)
+          (propertize " | " 'face 'font-lock-comment-face)
+          (propertize (format "%s" text)
+                      'face (pcase type
+                              ('error 'error)
+                              ('warn 'warning)
+                              ('success 'success)
+                              ('info 'font-lock-comment-face)
+                              (_ 'font-lock-comment-face)))))
+#+end_src
+
+With this last function we can implement a generic message function that we can associate to the right calls later:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-message (text &optional type)
+  "Displays the given TEXT message on the echo area, formatted as
+a workspace message (see `+workspace--message-body' for details
+on the formatting) of the given TYPE. When type is 'error, if
+thee INTERNAL argument is a non-nil value, the message will use
+the `persp-error' function print it, and when it is nil, it uses
+the `error' function. Otherwise, it uses the normal `message'
+function."
+  (cond ((eq type 'error) (error text))
+        ((eq type 'user-error) (user-error text))
+        ((eq type 'internal-error) (persp-error text))
+        (t (message "%s" (+workspace--message-body text type)))))
+#+end_src
+
+And now we can define all the /end functions/ for the messaging API.
+
+All these functions have the same pattern. Instead of us defining each one of them, we can loop through the list of possible message types, and create a function for each one:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(mapc (lambda (type)
+        (defalias (intern (format "+workspace-%s" type))
+          (lambda (text &rest args)
+            (+workspace-message (apply 'format (cons text args)) (intern type)))
+          (format "Wrapper function around `+workspace-message' with the arg TYPE set to '%s." type)))
+      '("info" "success" "warn" "error" "user-error" "internal-error"))
+#+end_src
+
+With all the functions necessary to switch between workspaces, I can bind it to their correct key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Switch workspace"          "."   #'+workspace/switch-to
+#+end_src
+
+*** Switch to N^{th} workspace
+Doom allows you to switch workspaces by their index numbers, and since we already have the main function to do the switch, we can just create the others.
+
+As  with the message API, the /switch to workspace N/ is repetitive, and we can automate the creation of every one of these functions:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(dotimes (i 9)
+  (defalias (intern (format "+workspace/switch-to-%d" i))
+    (lambda () (interactive) (+workspace/switch-to i))
+    (format
+     "Thin wrapper around `+workspace/switch-to' function where we pass #%d as the INDEX parameter."
+     (1+ i))))
+#+end_src
+
+This will create 9 functions to switch to their respective workspace, so let's bind them:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Switch to 1st workspace"   "1"   #'+workspace/switch-to-0
+   :desc "Switch to 2nd workspace"   "2"   #'+workspace/switch-to-1
+   :desc "Switch to 3rd workspace"   "3"   #'+workspace/switch-to-2
+   :desc "Switch to 4th workspace"   "4"   #'+workspace/switch-to-3
+   :desc "Switch to 5th workspace"   "5"   #'+workspace/switch-to-4
+   :desc "Switch to 6th workspace"   "6"   #'+workspace/switch-to-5
+   :desc "Switch to 7th workspace"   "7"   #'+workspace/switch-to-6
+   :desc "Switch to 8th workspace"   "8"   #'+workspace/switch-to-7
+   :desc "Switch to 9th workspace"   "9"   #'+workspace/switch-to-8
+#+end_src
+
+*** Switch to final workspace
+Doom also provides a shortcut to get to the last opened workspace (last in the sense of order we created them):
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/switch-to-final ()
+  "Switch to the final workspace in open workspaces."
+  (interactive)
+  (+workspace/switch-to (car (persp-names))))
+#+end_src
+
+Now we just need to bind this function:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+:desc "Switch to final workspace" "0"   #'+workspace/switch-to-final
+#+end_src
+
+*** Switch to last used workspace
+The next binding is the /Switch to last workspace/, which luckily has a function defined on =perspective.el= for it:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Switch to last used workspace"  "`"   #'persp-switch-last
+#+end_src
+
+*** Previous and next workspace
+I'm bundling these two commands together because usually in emacs, you have a function that move to any direction, and then you define different functions for different directions that just call the /move/ function with different parameters.
+
+Let's create our /cycle/ function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/cycle (n)
+  "Cycle n workspaces to the right (default) or left."
+  (interactive (list 1))
+  (when (bound-and-true-p persp-mode)
+    (let ((current-name (persp-current-name)))
+      (condition-case-unless-debug err
+          (let* ((persps (reverse (persp-names)))
+                 (perspc (length persps))
+                 (index (cl-position current-name persps)))
+            (when (= perspc 1)
+              (+workspace-user-error "No other workspaces"))
+            (+workspace/switch-to (% (+ index n perspc) perspc))
+            (unless (called-interactively-p 'interactive)
+              (+workspace/display)))
+        (t (minibuffer-message "%s"
+                             (+workspace--message-body
+                              (error-message-string err)
+                              'error)))))))
+#+end_src
+
+Then, we just need to create a function to move to the previous workspace:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/switch-previous ()  (interactive) (+workspace/cycle -1))
+#+end_src
+
+And one for next one:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/switch-next () (interactive) (+workspace/cycle +1))
+#+end_src
+
+Then, we can bind both functions to their proper keys:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Previous workspace"        "["   #'+workspace/switch-previous
+   :desc "Next workspace"            "]"   #'+workspace/switch-next
+#+end_src
+
+*** New workspace
+On the sequence, we have the /New workspace/. We already created a helper low-level function to spun new workspaces, now we need a command to call that function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/new (&optional name)
+  "Create a new blank workspace named NAME."
+  (interactive
+   (list (when current-prefix-arg
+           (read-from-minibuffer "Name for the new workspace: "))))
+  (when (bound-and-true-p persp-mode)
+    (unless name
+      (setq name (format "Unnamed %s" (+workspace--generate-id))))
+    (condition-case err
+        (cond ((+workspace-exists-p name) (+workspace-user-error "%s already exists" name))
+              (t (+workspace-switch name t)
+                 (+workspace/display)))
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+Notice how we use the ~auto-create-p~ functionality on the ~+workspace-switch~ function. Also, you might have noticed we use a helper function to get a sequential number when we don't provide a name to the new workspace, and we didn't implement it yet, so let's do it now:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace--generate-id ()
+  "Returns the next sequential number that a new perspective
+could use on its name."
+  (or (cl-loop for name in (persp-names)
+               when (string-match-p "^Unnamed \\([0-9]+\\)$" name)
+               maximize (string-to-number (substring name
+                                                     (match-beginning 1)
+                                                     (match-end 1))) into max
+               finally return (if max (1+ max)))
+      1))
+#+end_src
+
+This function will iterate over all workspaces and if it finds one called =Unnamed N=, =N= becomes the maximum number found. In the end, it returns the maximum number plus one.
+
+Now, we just need to bind the main function with its keys:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "New workspace"             "n"   #'+workspace/new
+#+end_src
+
+*** Rename workspace
+Going through our list of commands, we need to provide a way for us to rename a giving workspace, specially if we create an empty and unnamed workspace.
+
+Let's start with the command function:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/rename (new-name)
+  "Rename the current workspace."
+  (interactive (list (read-from-minibuffer "New workspace name: ")))
+  (when (bound-and-true-p persp-mode)
+    (condition-case-unless-debug err
+        (let* ((current (persp-current-name))
+               (current (if current-prefix-arg
+                            (completing-read (format "Select a workspace to rename (default: %s): " current)
+                                             (persp-names)           ;; list
+                                             (lambda (ws-name)       ;; filter
+                                               (not (string= ws-name +workspaces-main)))
+                                             t                       ;; required
+                                             nil                     ;; initial input
+                                             nil                     ;; history
+                                             current)                ;; default value
+                          current))
+               (old-name (+workspace-rename current new-name)))
+          (unless old-name
+            (+workspace-error "Failed to rename %s" current))
+          (+workspace-success (format "Renamed '%s'->'%s'" old-name new-name)))
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+Pretty straightforward, but we still need the low-level function that actually renames the workspace:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-rename (name new-name)
+  "Rename the current workspace named NAME to NEW-NAME. Returns
+old name on success, nil otherwise."
+  (cond ((+workspace--protected-p name) (+workspace-error "Can't rename `%s' workspace" name))
+        ((not (+workspace-get name)) (+workspace-error "Perspective `%s' does not exists" name))
+        ((+workspace-get new-name) (+workspace-error "Perspective `%s' already exists" new-name))
+        (t (progn
+             (persp-rename new-name)
+             name))))
+#+end_src
+
+This function do 3 validations on the given arguments:
+
+1. Is the new name one of the protected names?
+   /Should fail if yes/;
+2. Is there a real workspace with the given name?
+   /Should fail if no/;
+3. Is there a real workspace with the new name?
+   /Should fail if yes/;
+
+And to make these validations we still need a function we didn't implement yet:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-get (name &optional noerror)
+  "return a workspace named name. Unless NOERROR is non-nil, this
+throws an error if name doesn't exist."
+  (cl-check-type name string)
+  (when-let (persp (gethash name (perspectives-hash)))
+    (cond ((perspective-p persp) persp)
+          ((not noerror) (+workspace-error "There is no workspace called '%s'" name)))))
+#+end_src
+
+Now, with all the functions in place, we can bind the main command to its key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Rename workspace"               "r"   #'+workspace/rename
+#+end_src
+
+*** Delete this workspace
+There are two main tasks still missing in our refactor of Doom Workspaces and this next three sections will cover one of them: Delete (or kill if you want).
+
+We will start with the ability to delete a single workspace:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/delete (name)
+  "Delete workspace named NAME. If called with C-U, prompts you
+for the name of the workspace to delete."
+  (interactive
+   (let ((current-name (persp-current-name)))
+     (list (if current-prefix-arg
+               (completing-read (format "Delete workspace (default: %s): " current-name)
+                                (persp-names)           ;; list
+                                (lambda (ws-name)       ;; filter
+                                  (not (string= ws-name +workspaces-main)))
+                                t                       ;; required
+                                nil                     ;; initial input
+                                nil                     ;; history
+                                current-name)           ;; default value
+             current-name))))
+  (when (bound-and-true-p persp-mode)
+    (condition-case err
+        (+workspace-delete name)
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+The command function simply allows us to select which workspace to delete, or it deletes the current one. As with the other commands, we still need the low-level function that actually deletes the workspace:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defun +workspace-delete (workspace)
+  "Delete the workspace denoted by WORKSPACE, which can be the
+name of a workspace, its index, or the workspace object itself."
+  (let ((ws-name (+workspace-name-from-reference workspace)))
+    (unless ws-name
+      (+workspace-error "Can't find a workspace for the reference '%s'" workspace))
+    (if (+workspace--protected-p ws-name)
+        t
+      (persp-kill ws-name)
+      (+workspace-success (format "Deleted '%s' workspace" workspace))
+      (not (+workspace-exists-p ws-name)))))
+#+end_src
+
+Now we can bind the command to its proper key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Delete this workspace"          "d"   #'+workspace/delete
+#+end_src
+
+*** Delete session
+The next command on the /delete/ series is to delete all workspaces.
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/delete-session (&optional interactive)
+  "Delete the current session, all workspaces, windows and their buffers."
+  (interactive (list t))
+  (when (bound-and-true-p persp-mode)
+    (condition-case err
+        (let ((windows (length (window-list)))
+              (persps (length (persp-names)))
+              (buffers 0))
+          (unless (cl-every #'+workspace-delete (persp-names))
+            (+workspace-error "Could not clear session"))
+          (+workspace/switch-to +workspaces-main t)
+          (setq buffers (doom/kill-all-buffers (buffer-list)))
+          (when interactive
+            (+workspace-success "Killed %s workspace(s), %s window(s) & %s buffer(s)" persps windows buffers)))
+        (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+And since we only used functions we already have implemented, we can bind it to its key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Delete session"                 "x"   #'+workspace/delete-session
+#+end_src
+
+*** Delete session and quit
+On the next sections in this document, we will configure session persistance, and the time when we will save our sessions, is when we kill Emacs. If we delete all sessions, and then quit, the result is that Emacs will save our /empty/ session before quitting. Although we might desire this behavior some times, we also need a way to tell emacs to /discard/ our current session. To achieve this, let's define a variable to use as a flag for saving the session or not:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+(defvar +workspace--auto-save-session-p t
+  "Flag used to determine if Emacs should automatically save the
+  current session when we quit.")
+#+end_src
+
+And now, we can have our last command on the /delete/ category to flag Emacs to not save current session when quitting. This way, if we wants to quit and save the current session, we simply quit Emacs, and if we want to discard the current session, we invoke the /delete session and quit/ command:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el
+;;;###autoload
+(defun +workspace/delete-session-and-quit ()
+  "Kill emacs without saving anything."
+  (interactive)
+  (when (bound-and-true-p persp-mode)
+    (call-interactively #'+workspace/delete-session)
+    (let ((+workspace--auto-save-session-p nil))
+      (kill-emacs))))
+#+end_src
+
+And since we only used functions we already have implemented, we can bind it to its key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Delete session and quit"        "X"   #'+workspace/delete-session-and-quit
+#+end_src
+
+*** Save session to file
+Our workspace refactor is working as expected, but we still need persistance. =perspective.el= and =persp-mode= behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
+
+With that out of the way, let's jump right into the first command:
+
+#+caption[File]: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun +workspace/save-session (name)
+  "Save the current workspace with the given NAME as its
+identifier."
+  (interactive
+   (list (completing-read "Save workspace session to file: "
+                          (mapcar
+                           (lambda (file)
+                             (string-remove-prefix
+                              +workspaces-data-file-prefix (file-name-base file)))
+                           (file-expand-wildcards (format "%s%s*.dws"
+                                                          +workspaces-data-dir
+                                                          +workspaces-data-file-prefix))))))
+  (when (bound-and-true-p persp-mode)
+    (condition-case err
+        (if (+workspace-session-save name)
+            (+workspace-success (format "'%s' workspace saved" name))
+          (+workspace-error (format "Could not save workspace %s" name)))
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+The only part of this function that is worth mentioning is that we show the list of current saved workspaces so we can see what is there when we're choosing a file name.
+
+We still need to code our low level  function to save a workspace:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+(defun +workspace-session-save (&optional identifier force interactive?)
+  "Saves the workspace session to a file named IDENTIFIER located
+on the `+workspaces-data-dir' directory. We can load a saved
+session with `+workspace-load'.
+
+If we call this function without a IDENTIFIER, we will generate a
+name using the current time, and the format \"%Y-%0m-%0d-%0H-%0M\".
+
+If FORCE is non nil, this function will overwrite the session
+file if it is already present in the system.
+
+Returns t on success, nil otherwise."
+  (when-let ((fname (+workspace-resolve-session-file-path identifier))
+             (should-save (or (or (not (file-exists-p fname)) force)
+                              (yes-or-no-p (format "Overwrite the '%s' session state?" identifier)))))
+    (let ((current-prefix-arg t))
+      (persp-state-save fname interactive?))
+    (file-exists-p fname)))
+#+end_src
+
+We will make sure that the most complex part of this function goes to another function to make easy to understand and reusable:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+(defun +workspace-resolve-session-file-path (&optional name)
+  "Returns the full path for a session file name given a NAME
+identifier.
+
+If we omit the NAME, we will use the current time with the
+format \"%Y-%0m-%0d-%0H-%0M\" (see `format-time-string' for
+information about the format), if NAME is not a string nor nil,
+we throw an error."
+  (unless (string-or-null-p name)
+    (+workspace-error "Invalid name! Argument '%s' is not string or nil" name))
+  (expand-file-name (format "%s%s.dws"
+                            +workspaces-data-file-prefix
+                            (or name (format-time-string "%Y-%0m-%0d-%0H-%0M")))
+                    +workspaces-data-dir))
+#+end_src
+
+In this function we introduce two new variables that we still didn't define. The ~+workspaces-data-dir~ holds the location of our workspace saved files, and ~+workspaces-data-file-prefix~ holds a common prefix for workspace files so we can filter them easily.
+
+Let's add these variables to our autoload file:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defvar +workspaces-data-dir (concat doom-etc-dir "workspaces/")
+  "Directory where we store perspective files.")
+
+
+;;;###autoload
+(defvar +workspaces-data-file-prefix "_workspaces_"
+  "The file name prefix of files used to store a workspace
+session. We will store these file at `+workspaces-data-dir'.")
+#+end_src
+
+And now we can add the command to its key:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   :desc "Save session to file"           "s"   #'+workspace/save-session
+#+end_src
+
+*** Load session from file
+At this point, we can arbitrarily save our sessions to files, but still need a way to load them. Let's create the /load/ command:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun +workspace/load-session (name)
+  "Load a workspace session with identifier NAME."
+  (interactive
+   (list
+    (completing-read "Workspace session to load: "
+                     (mapcar
+                      (lambda (file)
+                        (string-remove-prefix +workspaces-data-file-prefix (file-name-base file)))
+                      (file-expand-wildcards (format "%s%s*.dws"
+                                                     +workspaces-data-dir
+                                                     +workspaces-data-file-prefix)))
+                     (lambda (identifier)
+                       (not (string= identifier +workspaces-auto-save-identifier)))
+                     t)))
+  (when (bound-and-true-p persp-mode)
+    (condition-case err
+        (if (not (+workspace-session-load name))
+            (+workspace-error "Could not load workspace session %s" name)
+          (+workspace/display))
+      (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
+#+end_src
+
+The difference between the /save/ and /load/ commands (besides the obvious), is that when we load, we force the user to complete to a valid load file with the 4^{th} parameter on ~completing-read~.
+
+As usual, lets get our low-level API coded as well:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+(defun +workspace-session-load (name)
+  "Loads a workspace session identified by NAME. Can only
+retrieve workspace sessions that were explicitly saved with
+`+workspace-session-save'.
+
+Returns t if successful, nil otherwise."
+  (persp-state-load (+workspace-resolve-session-file-path name))
+  (> (length (persp-names)) 0))
+#+end_src
+
+And bind this command to its key:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+   :desc "Load session from file"         "l"   #'+workspace/load-session
+#+end_src
+
+*** Restore last session
+Now that we save and load our workspace sessions, is time for us to make this process a bit more automated. Just like Doom's behavior, we want Emacs to save our session when it exits, and we want to be able to restore the last auto-saved session.
+
+The first thing we need is a hook function to execute every time Emacs quits:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun +workspace-auto-save-h ()
+  (when +workspace--auto-save-session-p
+    (+workspace-session-save +workspaces-auto-save-identifier t nil)))
+#+end_src
+
+And we need a function to restore the last saved session:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun +workspace/restore-last-session ()
+  "Tries to load the 'auto-saved' session from last time we used
+  Emacs."
+  (interactive)
+  (condition-case err
+      (let ((as-file (+workspace-resolve-session-file-path +workspaces-auto-save-identifier)))
+        (message "Restoring session...")
+        (if (file-exists-p as-file)
+            (unless (+workspace-session-load +workspaces-auto-save-identifier)
+              (+workspace-error "Failed to restore previous auto-saved session"))
+          (+workspace-warn "There is no session previously saved"))
+        (message "Session restored. Welcome back."))
+    (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error)))))
+#+end_src
+
+With the restore command done, we can associate it with its key:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+   :desc "Restore last session"           "R"   #'+workspace/restore-last-session
+#+end_src
+
+Now that we defined all /leader/ keys, we can close our /leader/ mapping:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  )  ;; :prefix-map ("TAB" . "workspace")
+ )  ;; :leader
+#+end_src
+
+*** Other shortcuts
+Doom also offers nice shortcuts for us to access our workspace. They're all bound to =Meta= plus a number:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+ :n "C-t"   #'+workspace/new
+ :n "C-S-t" #'+workspace/display
+ :n "M-1"   #'+workspace/switch-to-0
+ :n "M-2"   #'+workspace/switch-to-1
+ :n "M-3"   #'+workspace/switch-to-2
+ :n "M-4"   #'+workspace/switch-to-3
+ :n "M-5"   #'+workspace/switch-to-4
+ :n "M-6"   #'+workspace/switch-to-5
+ :n "M-7"   #'+workspace/switch-to-6
+ :n "M-8"   #'+workspace/switch-to-7
+ :n "M-9"   #'+workspace/switch-to-8
+ :n "M-0"   #'+workspace/switch-to-final
+#+end_src
+
+And to really copy Doom's setup, let's add the same shortcuts for Mac:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+ (:when IS-MAC
+  :n "s-1"   #'+workspace/switch-to-0
+  :n "s-2"   #'+workspace/switch-to-1
+  :n "s-3"   #'+workspace/switch-to-2
+  :n "s-4"   #'+workspace/switch-to-3
+  :n "s-5"   #'+workspace/switch-to-4
+  :n "s-6"   #'+workspace/switch-to-5
+  :n "s-7"   #'+workspace/switch-to-6
+  :n "s-8"   #'+workspace/switch-to-7
+  :n "s-9"   #'+workspace/switch-to-8
+  :n "s-0"   #'+workspace/switch-to-final)
+#+end_src
+
+These shortcuts close the majority of workspace binding we may need:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+)  ;; map!
+#+end_src
+
+There are couple shortcuts that are not defined with the ~map!~ function, so we can tackle them here:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(define-key! persp-mode-map
+  [remap delete-window] #'+workspace/close-window-or-workspace
+  [remap evil-window-delete] #'+workspace/close-window-or-workspace)
+#+end_src
+
+This will delete the current workspace if closing the last open window. But we still need to implement the target function here:
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun +workspace/close-window-or-workspace ()
+  "Close the selected window. If it's the last window in the
+workspace, either close the workspace (as well as its associated
+frame, if one exists) and move to the next."
+  (interactive)
+  (condition-case err
+      (if (cdr (+doom-tabs-tabs-mode-persp-window))
+          (tab-line-close-tab)
+        (let ((delete-window-fn (if (featurep 'evil)
+                                    #'evil-window-delete
+                                  #'delete-window))
+              (buf (current-buffer)))
+          (if (window-dedicated-p)
+              (funcall delete-window-fn)
+            (let ((current-persp-name (persp-current-name)))
+              (cond ((or (+workspace--protected-p current-persp-name)
+                         (cdr (doom-visible-windows)))
+                     (funcall delete-window-fn))
+                    ((cdr (persp-names))
+                     (+workspace/delete current-persp-name))
+                    ((+workspace-error "Can't delete last workspace")))))))
+    (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error)))))
+#+end_src
+
+When we have the feature =workspaces= on our =init.el=, Doom will add an option on its dashboard to allow us to recover the last saved session. Since we disabled that feature, we need to add this option again:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-to-list
+ '+doom-dashboard-menu-sections
+ '("Reload last session"
+   :icon (all-the-icons-octicon "history"
+                                :face 'doom-dashboard-menu-title)
+   :face (:inherit (doom-dashboard-menu-title bold))
+   :action +workspace/restore-last-session))
+#+end_src
+
+The only thing remaining on our refactor, is to connect our auto-save function to the hook ~kill-emacs-hook~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
+#+end_src
+
+* TODO Prose writing [0/7]
+Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
+
+My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
+
+I come up with a directory infrastructure for my writings that will hold all type of text I need to produce:
+
+#+begin_src shell :tangle no
+   org
+  ├──  .archives
+  ├──  .attach
+  ├──  .templates
+  ├──  agenda
+  │  ├──  calendars
+  │  │  ├──  personal.org
+  │  │  └──  work.org
+  │  ├──  tasks
+  │  │  ├──  someday.org
+  │  │  └──  todo.org
+  │  ├──  contacts.org
+  │  └──  habits.org
+  ├──  documents
+  ├──  journal
+  ├──  notes
+  └──  presentations
+#+end_src
+
+Most of these directories are straightforward to understand their purpose, but I still want to go through them to document my need.
+
+- =.archives= :: Any Org task archived on my system will end up in this directory. After a while, this directory should be a shadow copy of the root =org= directory, but containing only files with archived tasks;
+- =.attach= :: This is the Doom's directory to store attached files;
+- =.templates= :: A snippets directory that I will include on my Yasnippet configuration to allow me to use Doom's file template system;
+- =agenda= :: The root folder for task management:
+  + =calendars= :: Here is where I will add the events for my calendars. Each calendar I have will have its own file here. These files are not intended to manage my calendars, and I will consider them as /read-only files/. Outside Emacs, I will have process running and synchronizing these files;
+  + =tasks= :: Directory to store Org files with tasks. The main file, which I will track on Org Agenda is thee =todo.org=, but I have this extra file called =someday.org= as a dump for tasks I wish to accomplish but are not essentials;
+  + =contacts.org= :: The Org file used to record my contacts. I still need to find a good way to synchronize this file with my phone contacts, but this is out of the scope of this document;
+  + =habits.org= :: Once I'm ready to try tracking my habits, this is the file I should use;
+- =documents= :: This is the dumping ground for any type of document (articles, design architecture, blog posts, wiki entries, etc.). Inside of it, I will have one directory per area (work, home, personal site, etc.);
+- =journal= :: I need to have one work journal and one personal journal, but I still don't know how to do this separation effectively. For now, I will have all my journaling stored here;
+- =notes= :: My curated notes. All files in this directory have no name (I use UUID as their name), and I can access their content by using the Zettelkasten method on my system;
+- =presentations= :: The directory for my presentation projects using =reveal.js=;
+
+Regarding my configuration for Org mode, I will split it into 6 distinct sections, one per usage I will have for Org:
+
+- Writing
+- Reading or reviewing
+- Publishing
+- Presenting
+- Note Taking
+- Time Management
+
+But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
+
+The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(setq org-directory (expand-file-name "~/depot/Dropbox/org"))
+
+(defvar +org-journal-directory (concat org-directory "/journal/")
+  "Path to directory holding all journal files")
+
+(defvar +org-docs-directory (concat org-directory "/documents/")
+  "Path to directory used to store non specific documents.")
+
+(defvar +org-calendars-files `(,(concat org-directory "/agenda/calendars/work.org")
+                               ,(concat org-directory "/agenda/calendars/personal.org"))
+  "List of directories to find files with appointment events (calendar)")
+
+(defvar +org-tasks-file (concat org-directory "/agenda/tasks/todo.org")
+  "Path to the org file that will store all habits.")
+
+(defvar +org-contacts-file (concat org-directory "/agenda/contacts.org")
+  "Path to the org file that will store all contacts.")
+
+(defvar +org-habits-file (concat org-directory "/agenda/habits.org")
+  "Path to the org file that will store all habits.")
+#+end_src
+
+Notice that we crated these variables before loading anything related to Org. The ~org-directory~ variable needs to have the correct value when Org mode is initializing, and the others are just grouped close to the main Org one.
+
+Now we can wait Org to load to  continue our configuration:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! org
+#+end_src
+
+I like to /beautify/ Org buffers with some tweaks. First I want header tags to be close to the header text:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq org-tags-column 0)
+#+end_src
+
+Then I like to have some indentation indicating which header level I am:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq org-startup-indented t)
+#+end_src
+
+I also like to display text formatting as close to WYSIWYG as I can have. This means that if I mark a word as italic, instead of showing =/word/=, I want to display /word/:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq org-hide-emphasis-markers t
+        org-pretty-entities t)
+#+end_src
+
+When Org collapse a header, it displays an ellipsis right after the header text. Although this is not "bad", I like to have a better indication of a collapsed header:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq org-ellipsis "  ")
+#+end_src
+
+In some documents, I need to write math formulas and Org can render them pretty well using LaTeX, but I like to adjust their render to use SVG instead of image, and use a transparent background to match the overall theme of Emacs
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (plist-put! org-format-latex-options
+              :scale 1.55
+              :foreground "White"
+              :background "Transparent")
+
+  (setq org-preview-latex-default-process 'dvisvgm
+        org-startup-with-latex-preview t)
+#+end_src
+
+ I need to adjust some of the Org fonts to use fixed pitch regardless if I'm using variable pitch. This will guarantee that tables, source blocks, and some other formatting will render properly on the UI, so let's create a function for it:
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el
+;;; autoload/org.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +doom-adjust-org-fonts-h ()
+  (after! org
+    (set-face-attribute 'org-document-title nil :height 2.0 :weight 'light)
+    (set-face-attribute 'org-document-info nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-property-value nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-drawer nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-formula nil :inherit 'org-table)
+    (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch :height 0.8)
+    (set-face-attribute 'org-block-end-line nil :inherit 'org-block-begin-line)
+    (set-face-attribute 'org-tag nil :height 150)
+    (set-face-attribute 'org-level-1 nil :height 1.4 :weight 'normal :slant 'normal)
+    (set-face-attribute 'org-level-2 nil :height 1.3 :weight 'normal :slant 'italic)
+    (set-face-attribute 'org-level-3 nil :height 1.2 :weight 'normal :slant 'italic)
+    (set-face-attribute 'org-level-4 nil :height 1.1 :weight 'bold   :slant 'normal)
+    (set-face-attribute 'org-level-5 nil :height 1.1 :weight 'bold   :slant 'normal)
+    (set-face-attribute 'org-level-6 nil :height 1.1 :weight 'bold   :slant 'normal)
+    (set-face-attribute 'org-level-7 nil :height 1.1 :weight 'bold   :slant 'normal)
+    (set-face-attribute 'org-level-8 nil :height 1.1 :weight 'bold   :slant 'normal))
+
+  (after! org-indent
+    (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))))
+#+end_src
+
+Once we create the function, we can attach it to a hook or execute it right away depending on Emacs running as a daemon or not:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'+doom-adjust-org-fonts-h)
+    (+doom-adjust-org-fonts-h))
+#+end_src
+
+And to close out my /beautification/, I want to render some unicode characters instead of some Org elements:
+
+| Org element | Unicode character |
+|-------------+-------------------|
+| =- [ ]=       | ☐                 |
+| =- [-]=       | ⊡                 |
+| =- [X]=       | ☑                 |
+
+And I also want to have better bullet marks:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (font-lock-add-keywords 'org-mode
+                          `(("^#\\+TITLE: *"
+                             (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+                            ("^\\*+ "
+                             (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+                            ("^ *\\([-+*] \\[ \\]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☐ "))))
+                            ("^ *\\([-+*] \\[-\\]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
+                            ("^ *\\([-+*] \\[[xX]\\]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☑ "))))
+                            ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
+                            ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "‣"))))
+                            ("^ *\\(\\*\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⁍"))))))
+#+end_src
+
+Besides /beautification/, there are some configurations I like to have as a default behavior. The first one is how I can edit a code block on a separate buffer. By default, Org will edit it using ~switch-to-buffer-other-window~. While this seams to be a popular choice, I just can't stand the two buffers together when I can't touch on the Org file while I have the source block opened.
+
+I will use the ='current-window= option to have the source block behaving like a normal buffer:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq org-src-window-setup 'current-window)
+#+end_src
+
+After all these tweaks, we can close our parenthesis:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+) ;; after! org
+#+end_src
+
+Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called =org-fragtog=. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
+
+First we add the plugin on our =packages.el= file:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! org-mode
+  :recipe (:host github
+           :repo "yantar92/org"
+           :branch "feature/org-fold"
+           :files ("*.el" "lisp/*.el" "contrib/lisp/*.el")
+           :pre-build (with-temp-file (expand-file-name "org-version.el" (straight--repos-dir "org"))
+                        (insert "(fset 'org-release (lambda () \"9.5\"))\n"
+                                "(fset 'org-git-version #'ignore)\n"
+                                "(provide 'org-version)\n")))
+  :shadow 'org)
+
+(package! org-fragtog)
+#+end_src
+
+Then, we use =use-package!= to defer its loading (we will load it manually later):
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! org-fragtog :defer t)
+#+end_src
+
+Another nice plugin to have is the =valign= plugin. It will align your Org tables nicely, even when you have formulas and images on them.
+
+As with the =org-fragtog=, let's first add it to our =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! valign)
+#+end_src
+
+Then, we use =use-package!= to defer its loading as we did with =org-fragtog=, but for this plugin, we want to set the ~valign-fancy-bar~ to ~t~, to have even nicer renders of tables:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! valign
+  :defer t
+  :init (setq valign-fancy-bar t))
+#+end_src
+
+So far, with our configuration, we will use the entire size of the frame as our text canvas before wrapping it. This is far from ideal when you're reading a text (specially for me). I want to have narrower text to reduce the amount of focus I need to read a line.
+
+We could configure the left and right gutter to achieve a narrower text area, or we could use another plugin for it. I tried both methods, and find out that the plugin has a better response and is easier to install and maintain.
+
+Let's add it to our =packages.el=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! olivetti)
+#+end_src
+
+Defer its loading on our configuration, and as with the =valign= package, we will use this time to also set the maximum width for our text:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! olivetti
+  :defer t
+  :init  (setq olivetti-body-width 120))
+#+end_src
+
+Now that I have a narrower width, the text will wrap more often, but the normal navigation keys will make the cursor jump from one line to the other, even if I have other /visual/ lines displayed.
+
+To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in =org-moode=, we want it bound to ~evil-next-visual-line~:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+ (:after org
+  (:map org-mode-map
+   :nvm "j" #'evil-next-visual-line
+   :nvm "k" #'evil-previous-visual-line
+   :nv "0" #'evil-beginning-of-visual-line
+   :nvm "^" #'evil-first-non-blank-of-visual-line
+   :nvm "$" #'evil-end-of-visual-line
+   (:prefix "g"
+    :desc "Next real line" :nvm "j" #'evil-next-line
+    :desc "Previous real line" :nvm "k" #'evil-previous-line
+    :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
+    :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
+    :desc "End of real line" :nvm "$" #'evil-end-of-line))))
+#+end_src
+
+While I'm sure I'm missing a command or two, these will get me started.
+
+I also need to adjust the window navigation keys that clash with default Org bindings:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+ (:after org
+  (:map org-mode-map
+   :n "s-j" #'org-next-visible-heading
+   :n "s-k" #'org-previous-visible-heading
+   :n "C-s-j" #'org-forward-heading-same-level
+   :n "C-s-k" #'org-backward-heading-same-level
+   :n "C-j" #'evil-window-down
+   :n "C-k" #'evil-window-up
+   )))
+#+end_src
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+ (:after org
+  (:map org-mode-map
+   :v "s-k" #'(lambda()
+                (interactive)
+                (yas-expand-snippet "link"
+                                    (region-beginning)
+                                    (region-end)))
+   )))
+#+end_src
+
+At this point we can tight up everything and setup our buffer when we open an org file.
+
+To separate my configuration from initialization logic, let's create another autoload function, but this time on a file used for /Org things/ (=autoload/org.el=):
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +doom-org-config-h ()
+  "Configure all aspects of an Org buffer right before we display
+  it to the user."
+  ;; Enable minor modes
+  (variable-pitch-mode 1)
+  (org-fragtog-mode 1)
+  (olivetti-mode 1)
+  (valign-mode 1)
+  ;; Disable unwanted minor modes
+  (hl-line-mode -1)
+  ;; Call org configuration functions
+  (org-display-inline-images)
+  ;; Force a buffer refresh to guarantee all setup is in use
+  (set-window-buffer nil (current-buffer)))
+#+end_src
+
+With this function in place, we can /hook/ it to our Org major mode:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook #'+doom-org-config-h)
+#+end_src
+
+** TODO Requirements
+** TODO Writing
+I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
+
+With that out of the way, I need to acknowledge that, currently in my career, there is no way I can get away with /not writing/. There are too much design, architecture, plans, and projects involved on my day to day work, that my team and I need some form of record of our decisions. And if writing is inevitable, I should, at least, try to make it less painful.
+
+For me, this means I should have a tool that offers me the power required to do any kind of writing, but in the same time, makes my life easier when doing the /writing thing/.
+
+Emacs and Org Mode fullfil the /power/ part of my goal, and this configuration will try to tackle the second.
+
+Let's look into my list of requirements for writing:
+
+- File templates :: My setup should have a set of file templates that would help me start writing something faster. At any time while using Emacs, I can start a new document and select one of these templates, and Emacs will create the file on the right location, using the selected template;
+- No hard line wrap :: While I can't stand soft-wraps on code, I'm getting used to it when I'm writing text, specially now that I can navigate using /visual lines/ on Org Mode. So, this requirement is to make sure I use soft wraps while editing an Org file;
+- Inline images :: If I add an image to a text, I want the image to show up right away. Also, if I open a file containing an image, Emacs should display the image automatically. I also want to auto-split the image into chunks so when navigate the text with the cursor, the screen does not jump over the image.
+- Inline formulas :: As with images, I want to render math formulas automatically;
+- Formatted tables :: Tables on my Org files should stay aligned all the time, and render with proper borders;
+- Focus writting :: When I need to dive deep into creating a document, it's useful to remove distractions from my writing environment. Besides getting rid of UI elements, I would like to have the same /Focus Mode/ behavior from [[https://ia.net/writer][iA Writer]];
+- Snippets :: I like to have a snippet system to help me with boilerplate writing for Org;
+
+Although we already covered most of this list of the previous section, we still need to configure /File templates,/ some personal /Snippets/, and /Focus Writing/, so let's get to it.
+
+*** Templates
+
+**** TODO Append Yasnippet directories to include the =.templates= from my Org infrastructure
+**** TODO Define a Hydra for /new documents/ to use my templates
+
+*** Focus Writing
+
+**** TODO add Focus mode
+
+*** Snippets
+Even though writing does not have boilerplate typing /per-se/, Org mode still has a formal syntax to follow. Most of the syntax are straightforward, but some could use a snippet help to make it easier and faster to type them.
+
+This section shows the snippets I decide to use for writing.
+
+Before defining the snippets though, I need to adjust the ~yas-keymap~ to behave properly with evil:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+ (:after yasnippet
+  (:map yas-keymap
+   :i [backspace] #'+snippets/delete-backward-char
+   :i [delete] #'+snippets/delete-forward-char-or-field
+   :i [s-return] #'yas-exit-snippet
+   :i [M-tab] #'yas-skip-and-clear-field)))
+#+end_src
+
+**** Source blocks
+This journey of literate configuration made me realize how much faster is to /prepare/ source blocks using snippets.
+
+The first snippet, is a simple =emacs-lisp= snippet that I use all the time:
+
+#+caption: snippets/org-mode/src-emacs-lisp
+#+begin_src snippet :tangle snippets/org-mode/src-emacs-lisp :mkdirp yes :padline no
+# -*- mode: snippet -*-
+# name: #+begin_src emacs-lisp
+# uuid: emacs-lisp
+# key: <el
+# --
+,#+begin_src emacs-lisp
+`%`$0
+,#+end_src
+#+end_src
+
+Then I have the same snippet, but allowing me to add a ~:tangle~ header to it:
+
+#+caption: snippets/org-mode/src-emacs-lisp-tangled
+#+begin_src snippet :tangle snippets/org-mode/src-emacs-lisp-tangled :mkdirp yes :padline no
+# -*- mode: snippet -*-
+# name: #+begin_src emacs-lisp :tangle
+# uuid: emacs-lisp-tangle
+# key: <elt
+# --
+${1:$(unless (or (string-blank-p yas-text) (equal yas-text "no"))
+        (format
+          "#+caption: %s\n"
+            (string-remove-suffix " :mkdirp yes" yas-text)))
+}#+begin_src emacs-lisp `":tangle "`${1:$$(unless (or yas-moving-away-p yas-modified-p)
+                            (yas-auto-next
+                              (condition-case nil
+                                  (let ((fname (read-file-name "Tangle to file: ")))
+                                    (if fname
+                                        (concat
+                                          (file-relative-name
+                                            fname
+                                              (file-name-directory (or (buffer-file-name)
+                                                                       ".")))
+                                          " :mkdirp yes")
+                                      "no"))
+                                ('quit "no"))))}
+`%`$0
+,#+end_src
+#+end_src
+
+And for a more generic approach, I have this snippet where you can define the language, if you want a tangle header, and if you do, allows you to select the file:
+
+#+caption: snippets/org-mode/src-tangled
+#+begin_src snippet :tangle snippets/org-mode/src-tangled :mkdirp yes :padline no
+# -*- mode: snippet -*-
+# name: #+begin_src on steroids
+# uuid: src_block
+# key: <st
+# --
+${3:$(unless (or (string-blank-p yas-text) (equal yas-text "no"))
+        (format
+          "#+caption: %s\n"
+            (string-remove-suffix " :mkdirp yes" yas-text)))
+}#+begin_src ${1:emacs-lisp} ${2:`":tangle "`${3:$$(unless (or yas-moving-away-p
+                                                               yas-modified-p)
+                            (yas-auto-next
+                              (condition-case nil
+                                  (let ((fname (read-file-name "Tangle to file: ")))
+                                    (if fname
+                                        (concat
+                                          (file-relative-name
+                                            fname
+                                              (file-name-directory (or (buffer-file-name)
+                                                                       ".")))
+                                          " :mkdirp yes")
+                                      "no"))
+                                ('quit "no"))))}}
+`%`$0
+,#+end_src
+#+end_src
+
+The last snippets I consider useful for source blocks are captions. On the two snippets with tangled files, the capture mark is already there, but if I want to add a caption to the non-tangled snippet I have to do it by hand. So, let's create a snippet to help us with this:
+
+#+caption: snippets/org-mode/caption
+#+begin_src snippet :tangle snippets/org-mode/caption :mkdirp yes :padline no
+# -*- mode: snippet -*-
+# name: #+caption:
+# key: cap
+# --
+#+caption: $0
+#+end_src
+
+This snippet is fine, but we still have to type the file name there. Let's create another one to make this task even easier:
+
+#+caption: snippets/org-mode/caption-file
+#+begin_src snippet :tangle snippets/org-mode/caption-file :mkdirp yes :padline no
+# -*- mode: snippet -*-
+# name: #+caption: filename
+# uuid: caption-file
+# key: capf
+# --
+#+caption: ${1:$$(unless (or yas-moving-away-p yas-modified-p)
+                            (yas-auto-next
+                              (file-relative-name
+                                (read-file-name "Tangle to file: ")
+                                (file-name-directory (or (buffer-file-name) "."))
+                              )))}$0
+#+end_src
+
+**** Org elements
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +org-link--links-in-kill-ring ()
+  "Return a list of links in kill ring."
+  (let ((kill-ring-kills (mapcar #'substring-no-properties kill-ring))
+        (potential-links))
+    (dolist (kill kill-ring-kills)
+      (when (string-match-p ffap-url-regexp kill)
+        (push kill potential-links)))
+    (nreverse potential-links)))
+#+end_src
+
+#+begin_src snippet :tangle snippets/org-mode/link :mkdirp yes
+# -*- mode: snippet -*-
+# name: Link
+# key: link
+# --
+[[${1:$$(unless (or yas-moving-away-p yas-modified-p)
+  (yas-auto-next
+    (yas-choose-value (+org-link--links-in-kill-ring))))}][${2:`(or yas-selected-text
+                                                                    "description")`}]${0:$$(insert "]")}
+#+end_src
+
+
+**** TODO Move macro snippet to the xwiki section on  [[Publishing]]
+
+#+begin_src snippet :tangle snippets/org-mode/macro :mkdirp yes
+# -*- mode: snippet -*-
+# name: #+BEGIN_MACRO ... block
+# uuid: macro
+# key: <m
+# --
+#+attr_block: :macro ${1:info} $2
+#+BEGIN_MACRO
+`%`$0
+#+END_MACRO
+#+end_src
+
+** TODO Reading or reviewing
+- Narrower width
+- Visual motion
+- Show document structure on sidebar
+- Annotations
+  + Referenceable
+  + Annotate external documents (default to Doom)
+
+** TODO Publishing
+- Blog or site post
+- Email document
+- Wiki entry
+
+** TODO Presenting
+- Use =reveal.js= inside a WebKit XWidget in fullscreen
+
+** TODO Note Taking
+I need to come clean to you. I'm a horrible note taker! I have ADHD and my capacity to keep up with any system to take notes is as short as a pigeon's attention span. That said, using Org Mode was as close as a success as I can desire. I believe if I have a setup that makes taking notes effortless, I might be able to finally start taking notes and refer to them when needed.
+
+Let me summarize my requirements for note taking:
+
+- Capture :: It has to happen from any place on my computer, and it has to happen in less than 2 seconds;
+  + Fleet notes :: The entry point of all notes on my system.This will be any kind of quick note, meeting note, or some idea or link to check later. After the daily clean up, the remaining fleet notes should be my work journal;
+  + Meeting notes :: A special type of note that I can integrate with a calendar to automate a pre-fill of its fields;
+- Triage :: The triage process is where I'll move my fleet notes to their appropriate place, and check the status of my tracking tasks:
+  + Daily :: Should provide convenient features to help me execute the daily triage in less than 20 minutes;
+- Search :: All org files should be searchable by /title/, /tags/, /content/, and /cross-references/. Agenda files don't need to exist in this list because they're intended to be highly dynamic, and they also will have a special system to check and curate them. Ideally, I would have a single search that could find the searching terms in all my Org files:
+  + Notes
+  + Journals
+  + Documents
+
+*** Capturing
+
+#+begin_src snippet :tangle capture/org-journal-mode/capture-meeting :mkdirp yes
+# -*- mode: snippet -*-
+# name: New meeting notes
+# key: capture-meeting
+# --
+${1:Meeting topic}  ${2:`":"`${3:$$(yas-auto-next
+                                     (yas-completing-read
+                                        "Meeting type? "
+                                        '("meeting" "support")))}`":"`}
+
+,*** Attendees
+-
+
+,*** Notes
+- $0
+
+,*** Action Items
+,**** TODO
+#+end_src
+
+#+begin_src snippet :tangle capture/org-journal-mode/capture-cr :mkdirp yes
+# -*- mode: snippet -*-
+# name: New code review started
+# key: capture-cr
+# --
+Started code review for ${1:Coworker Name}  ${2:`":"`${3:cr}`":"`}
+- Review link: [[${4:url}][${4:$$(file-name-base yas-text)}]]
+
+,*** Notes
+- $0
+#+end_src
+
+#+begin_src snippet :tangle capture/org-journal-mode/capture-idea :mkdirp yes
+# -*- mode: snippet -*-
+# name: New Idea
+# key: capture-idea
+# --
+${1:Idea!}  :idea:
+$0
+#+end_src
+
+#+begin_src snippet :tangle capture/org-journal-mode/capture-link :mkdirp yes
+# -*- mode: snippet -*-
+# name: Interesting link
+# key: capture-link
+# --
+Check out ${1:Title}
+- Link: [[${2:url}][$1]]
+${3:- ${4:note}}
+$0
+#+end_src
+
+#+begin_src snippet :tangle capture/org-mode/capture-contact :mkdirp yes
+# -*- mode: snippet -*-
+# name: New Contact
+# key: capture-contact
+# --
+${1:Name}
+:PROPERTIES:
+:TYPE: ${2:$$(yas-auto-next (yas-choose-value '(" person" " company")))}
+:${2:$(if (string= yas-text " company") "CONTACT" "COMPANY")}: ${3:Name}
+${2:$(if (string= yas-text " company") ":TITLE: \n" "")}:PHONE: ${4:phone}
+${2:$(if (string= yas-text " company") "" ":PHONE-W: \n")}:EMAIL: ${5:email}
+:URL:
+:ADDRESS:
+:PICTURE:
+:BIRTHDAY:
+:LAST_READ_MAIL:
+:END:
+
+$0
+#+end_src
+
+** TODO Time Management
+
+- Triage :: This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
+  + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have amore accurate record of my work day;
+  + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
+
+* TODO Development [0/9]
+TBD
+
+** TODO Requirements
+** TODO Version control system
+** TODO Shell script
+** TODO Python
+** TODO Javascript/Typescript
+** TODO C/C++
+** TODO Swift
+** TODO Kotlin
+** TODO Java
+
+* TODO Non-editor features [0/7]
+TBD
+
+** TODO Requirements
+** TODO File management
+Before we start configuring the target packages for this section (=dired= and =eshel=), I want to make some small adjustments to Treemacs. Although it is not a full blown file manager, it is a sort of file manager for my projects, so it fits in this section.
+
+The first thing I like to do, is to unpin Treemacs and let Doom use the latest version of it:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(unpin! treemacs)
+#+end_src
+
+The next change is to us our custom =variable-pitch-ui= font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +doom-themes-enable-treemacs-variable-pitch-labels (&rest _)
+  "This advice changes the treemacs variable pitch font to one
+  without serif so the UI looks more polished."
+  :override #'doom-themes-enable-treemacs-variable-pitch-labels
+  (when doom-themes-treemacs-enable-variable-pitch
+    (dolist (face '(treemacs-root-face
+                    treemacs-git-unmodified-face
+                    treemacs-git-modified-face
+                    treemacs-git-renamed-face
+                    treemacs-git-ignored-face
+                    treemacs-git-untracked-face
+                    treemacs-git-added-face
+                    treemacs-git-conflict-face
+                    treemacs-directory-face
+                    treemacs-directory-collapsed-face
+                    treemacs-file-face
+                    treemacs-tags-face))
+      (let ((faces (face-attribute face :inherit nil)))
+        (set-face-attribute
+         face nil :inherit
+         `(variable-pitch-ui ,@(delq 'unspecified (if (listp faces) faces (list faces)))))))))
+#+end_src
+
+By default, Treemacs will stay opened after you select a file to visit. Personally I don't like this, I rather have Treemacs closing when I select a file.
+
+In order to help me achieve my desired behavior, I'll  create another /autoload/ function that I'll call when I select a file:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +doom--visit-node-and-close-h (&optional arg)
+  "Closes treemacs window after selecting a file to visit."
+  (treemacs-visit-node-default arg)
+  (delete-window (treemacs-get-local-window)))
+#+end_src
+
+We can now, configure Treemacs properly:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! treemacs
+#+end_src
+
+First we need to tell Treemacs to use the new autoload function when I press =<ENTER>= on a file:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (treemacs-define-RET-action 'file-node-open #'+doom--visit-node-and-close-h)
+  (treemacs-define-RET-action 'file-node-closed #'+doom--visit-node-and-close-h)
+#+end_src
+
+Then, I like Treemacs to collapse directory into one when possible:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  (setq treemacs-collapse-dirs (if (executable-find "python3") 3 0))
+#+end_src
+
+https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspace/
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +doom-treemacs--setup-title-h ()
+  (let ((bg (face-attribute 'default :background))
+        (fg (face-attribute 'default :foreground)))
+    (face-remap-add-relative 'header-line
+                             :background bg :foreground fg
+                             :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+  (setq header-line-format
+        '((:eval
+           (let* ((text (format "%s perspective" (capitalize (persp-current-name))))
+                  (extra-align (+ (/ (length text) 2) 1))
+                  (width (- (/ (window-width) 2) extra-align)))
+             (concat (make-string width ?\s) text))))))
+#+end_src
+
+#+begin_src emacs-lisp
+  (add-hook 'treemacs-mode-hook #'+doom-treemacs--setup-title-h)
+#+end_src
+
+
+And finally, we can close our Treemacs configuration
+
+#+caption: config.org
+#+begin_src emacs-lisp
+  )
+#+end_src
+
+I also like to make sure it behaves as expected if I use the mouse:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+ (:after treemacs
+  (:map treemacs-mode-map
+   [mouse-1] #'treemacs-single-click-expand-action))
+#+end_src
+
+Treemacs offers a function that adds the current project if it is not on the workspace. That is a nice feature, but because I use workspaces heavily, the fact that this function does not /remove/ projects that do not belong to this workspace bothers me, so I  wrote this advice to do the dirty work for me:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +treemacs-add-and-display-current-project ()
+  "Open treemacs with current project. This function removes any
+project that is not the current one."
+  :override #'treemacs-add-and-display-current-project
+  (interactive)
+
+  (cl-dolist (p (treemacs-workspace->projects (treemacs-current-workspace)))
+    (unless (string= (doom-project-name) (treemacs-project->name p))
+      (treemacs-do-remove-project-from-workspace p t)))
+
+  (when (treemacs-workspace->is-empty?)
+      (treemacs-do-add-project-to-workspace (doom-project-root) (doom-project-name)))
+
+  (treemacs-select-window)
+  (treemacs-pulse-on-success))
+#+end_src
+
+And to finalize the Treemacs configuration, let's make it respect my window navigation keys:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+ (:after treemacs-evil
+  (:map evil-treemacs-state-map
+   "C-h" #'evil-window-left
+   "C-l" #'evil-window-right)))
+#+end_src
+
+#+caption: autoload/files.el
+#+begin_src emacs-lisp :tangleautoload/files.el :mkdirp yes
+;;;###autoload
+(defun +dired/toggle-git-mode ()
+  "Toggle `dired-git-info-mode' in git repos."
+  (interactive)
+  (when (and (not (file-remote-p default-directory))
+             (locate-dominating-file "." ".git"))
+    (call-interactively 'dired-git-info-mode)))
+
+;;;###autoload
+(defun +dired/open-directory ()
+  "Enters in the directory at point. If the cursor is not on a
+directory, do nothing."
+  (interactive)
+  (when (file-directory-p (dired-get-file-for-visit))
+    (dired-find-file)))
+
+;;;###autoload
+(defun +dired/mac-quick-view ()
+  "Invoke the macOS Quiclview on the file under point."
+  (interactive)
+  (shell-command (concat "qlmanage -p \""
+                         (dired-get-file-for-visit)
+                         "\" > /dev/null 2>&1")))
+
+;;;###autoload
+(defun +dired/widen-or-quit-all ()
+  "If `dired-narow' is on, revert to the normal view. If there
+is no active narrow, quit Dired."
+  (interactive)
+  (if (buffer-modified-p)
+      (revert-buffer)
+    (mapc (lambda (buf)
+            (let ((win (get-buffer-window buf)))
+              (unless (append (window-prev-buffers win) (window-prev-buffers win))
+                (delete-window win))
+              (kill-buffer buf)))
+          (doom-buffers-in-mode 'dired-mode))))
+
+;;;###autoload
+(defun +dired/narrow (narrow-func)
+  "Start a dynamic narrowing of files in current view."
+  (interactive
+   (list (if current-prefix-arg
+             'dired-narrow-fuzzy
+           'dired-narrow-regexp)))
+  (call-interactively narrow-func))
+
+;;;###autoload
+(defun +dired/yank-absolute-path ()
+  "Copy the absolute path of file on pointer to kill ring."
+  (interactive)
+  (dired-copy-filename-as-kill 0))
+
+;;;###autoload
+(defun +dired/yank-relative-path ()
+  "Copy the relative path of file on pointer to kill ring."
+  (interactive)
+  (dired-copy-filename-as-kill))
+
+;;;###autoload
+(defun +dired/open-externally ()
+  "Open file with application defined by OS."
+  (interactive)
+  (shell-command (concat "open \""
+                         (dired-get-file-for-visit)
+                         "\" > /dev/null 2>&1")))
+
+;;;###autoload
+(defun +dired/reveal-on-finder ()
+  "Show current file in Finder."
+  (interactive)
+  (shell-command (concat "open --reveal \""
+                         (dired-get-file-for-visit)
+                         "\" > /dev/null 2>&1")))
+
+(defun +dired-marked-file-p ()
+  "Return non-nil if we have marked file at point."
+  (dired-file-marker (dired-get-file-for-visit)))
+
+;;;###autoload
+(defun +dired/toggle-mark (&optional args)
+  "Toggle mark of file at point."
+  (interactive)
+  (if (+dired-marked-file-p)
+      (dired-unmark 1)
+    (dired-mark 1)))
+
+;;;###autoload
+(defun +dired/open-split-right ()
+  (interactive)
+  (select-window
+   (window--display-buffer (find-file-noselect (dired-get-file-for-visit))
+                           (split-window-right)
+                           'window)))
+
+;;;###autoload
+(defun +dired/open-split-bellow ()
+  (interactive)
+  (select-window
+   (window--display-buffer (find-file-noselect (dired-get-file-for-visit))
+                           (split-window-below)
+                           'window)))
+#+end_src
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! dired-collapse)
+(package! dired-narrow)
+;; (package! sunrise-commander)
+#+end_src
+
+#+begin_src emacs-lisp
+(after! dired
+  (setq
+        auto-revert-verbose nil
+        dired-dwim-target t
+        dired-listing-switches "-lAhvFoG --group-directories-first"
+        dired-omit-files "^\\.?#\\|^\\.$\\|^\\.\\.$\\|^\\..+$\\|^.DS_STORE$\\|^.projectile$"
+        dired-recursive-copies '(always)
+        dired-recursive-deletes '(top)
+        dired-use-ls-dired t
+        global-auto-revert-non-file-buffers t
+        insert-directory-program "gls"
+        ))
+
+(use-package! dired-collapse :after dired)
+(use-package! dired-narrow :after dired)
+;; (add-hook 'kill-buffer-hook '+doom--delete-window-if-only-buffer)
+;; (use-package! sunrise-commander :defer t)
+#+end_src
+
+#+begin_src emacs-lisp
+(map!
+ (:after dired
+         (:map dired-mode-map
+               :ne "t"        nil
+               :ne "y"        nil
+               :ne "c"        nil
+               :ne "o"        nil
+               :ne "m"        nil
+               :ne "/"        #'+dired/narrow
+               :ne "<escape>" #'+dired/widen-or-quit-all
+               :ne "q"        #'+dired/widen-or-quit-all
+               :ne "RET"      #'dired-find-file
+               :ne "TAB"      #'+dired/open-directory
+               :ne "<tab>"    #'+dired/open-directory
+               :ne "l"        #'+dired/open-directory
+               :ne "h"        #'dired-up-directory
+               :ne "U"        #'dired-up-directory
+               :ne "R"        #'dired-do-rename
+               :ne "d"        #'dired-do-delete
+               :ne "x"        #'+dired/toggle-mark
+               (:prefix "t"
+                        :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
+                        :desc "Toggle git info"       :ne "g" #'+dired/toggle-git-mode
+                        :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
+                        :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks)
+               (:prefix "y"
+                        :desc "Copy absolut path"     :ne "a" #'+dired/yank-absolute-path
+                        :desc "Copy file"             :ne "f" #'dired-do-copy
+                        :desc "Copy with regexp"      :ne "r" #'dired-do-copy-regexp
+                        :desc "Copy relative path"    :ne "y" #'+dired/yank-relative-path)
+               (:prefix "c"
+                        :desc "Create empty file"     :ne "f" #'dired-do-touch
+                        :desc "Create directory"      :ne "d" #'dired-create-directory
+                        :desc "Create project"        :ne "p" #'xxx)
+               (:prefix "o"
+                        :desc "Open no split"         :ne "o" #'dired-find-alternate-file
+                        :desc "Quick view"            :ne "p" #'+dired/mac-quick-view
+                        :desc "Reveal on Finder"      :ne "f" #'+dired/reveal-on-finder
+                        :desc "Open vertically"       :ne "s" #'+dired/open-split-bellow
+                        :desc "Open horizontally"     :ne "v" #'+dired/open-split-right
+                        :desc "Open externally"       :ne "x" #'+dired/open-externally)
+               (:prefix "m"
+                        :ne "h" nil
+                        :desc "Mark directories"  :ne "d" #'dired-mark-directories
+                        :desc "Mark extension"    :ne "e" #'dired-mark-extension
+                        :desc "Mark hidden files" :ne "h" #'dired-mark-omitted
+                        :desc "Mark with regexp"  :ne "r" #'dired-mark-files-regexp
+                        :desc "Mark subdir files" :ne "s" #'dired-mark-omitted
+                        :desc "Unmark all files"  :ne "u" #'dired-unmark-all-files
+                        :desc "Remove all marks"  :ne "U" #'dired-unmark-all-marks
+                        :desc "Mark executables"  :ne "x" #'dired-mark-executables))))
+#+end_src
+
+** TODO Project management
+Projectile is a great package. It usually provides more features that one particular user would need. But I still want to tweak it to make it behave more according my expectations.
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! projectile
+#+end_src
+
+To make =projectile= work with =selectrum=, we need to tell it to use the default Emacs completion system:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (setq projectile-completion-system 'default)
+#+end_src
+
+Doom sets a function to run when we open a project with =projectile=, but that function is not calling any /open file/ function for us. Let's create our own version of such function and help projectile to do the appropriate thing when we open a project.
+
+The actions I expect are:
+
+- Check if the project has one of the recognized files and open it, in this order (we should look for four extensions on each one of the files, also in this order: =.org=, no extension, =.md=, and =.rst=):
+  + =CHANGELOG=
+  + =NEWS=
+  + =README=
+- If none of the recognizeable files is present, run ~project-find-file~;
+
+Let's create such function as an /autoload/ function:
+
+#+caption: autoload/projects.el
+#+begin_src emacs-lisp :tangle autoload/projects.el
+;;; autoload/projects.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +doom-after-switch-project-action-h ()
+  "A project first action to execute when we switch our current
+project."
+  (let ((file (file-exists-p! (or "README.rst"
+                                  "README.md"
+                                  "README"
+                                  "README.org"
+                                  "NEWS.rst"
+                                  "NEWS.md"
+                                  "NEWS"
+                                  "NEWS.org"
+                                  "CHANGELOG.rst"
+                                  "CHANGELOG.md"
+                                  "CHANGELOG"
+                                  "CHANGELOG.org"))))
+    (if file
+        (find-file-existing file)
+      (projectile-find-file))))
+#+end_src
+
+And attach it to the =projectile= hook:
+
+#+begin_src emacs-lisp
+(setq projectile-switch-project-action #'+doom-after-switch-project-action-h)
+#+end_src
+
+As usual, don't forget to close the =after!= sexp:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+   )  ;; after! projectile
+#+end_src
+
+** TODO Terminal
+In general, I really like the setup Doom has for the terminal. There are 3 things I like to add there.
+
+One are some aliases that I'm used to use when working on the terminal:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(after! eshell
+  (set-eshell-alias!
+   "d"     "dired $1"
+   "edit"  "find-file-other-window $1"
+   "em"    "find-file-other-window $1"
+   "emacs" "find-file-other-window $1"
+   "f"     "find-file $1"
+   "gc"    "magit-commit $1"
+   "gl"    "(call-interactively 'magit-log-current)"
+   "gst"   "magit-status $1"
+   "ls"    "exa --group-directories-first --color always -F $1"
+   "la"    "exa --group-directories-first --color always -F -a $1"
+   "ll"    "exa --group-directories-first --color always -F -l -h --git $1"
+   "lla"   "exa --group-directories-first --color always -F -a -l -h --git $1"
+   "rg"    "rg --color=always $*"
+   "up"    "eshell-up $1"
+   "pk"    "eshell-up-peek $1"
+   "vi"    "find-file-other-window $1"
+   "vim"   "find-file-other-window $1"))
+#+end_src
+
+Two is the window navigation mapping:
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(map!
+ (:after eshell
+  (:map eshell-mode-map
+   :in "C-h" #'evil-window-left
+   :in "C-j" #'evil-window-down
+   :in "C-k" #'evil-window-up
+   :in "C-l" #'evil-window-right)))
+#+end_src
+
+And three is to fix =magit-status=. When I'm on the terminal, if I open =magit-status=, everything works as expected, but when I exit back to the terminal, Emacs switch the buffer on my terminal window to something else.
+
+The ideal behavior would be to any app launch from the terminal to take over eshell's window until done. Then, revert back to the terminal.
+
+I like to have a hint of the next possible completion while I'm working on shell. Zsh and Fish have great plugins for such feature, so I decided to add one for eshell as well:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! esh-autosuggest)
+#+end_src
+
+The only configuration we need to get this mode working, is to let Emacs enable it when =eshell-mode= is up.
+
+#+caption: config.org
+#+begin_src emacs-lisp
+(use-package! esh-autosuggest
+  :defer t
+  :hook ((eshell-mode . esh-autosuggest-mode)))
+#+end_src
+
+
+*** TODO Find a way to fix this behavior
+
+** TODO Emails
+** TODO Calendars
+** TODO Contacts
+* Appendix
+
+** The =init.el= file
+We can't tangle the =init.el= on Doom because it is always loaded before =doom sync= starts tangling =config.org=.
+
+I have two alternatives here:
+
+1. Let =init.el= as a lisp package;
+2. Create a =doom sync= extension to tangle a =init.org= file;
+
+For now, I will keep it as a separated Lisp file that I'm reproducing in this appendix for sake of documentation:
+
+#+caption: init.el
+#+include: "~/.config/doom/init.el" src emacs-lisp :tangle no
