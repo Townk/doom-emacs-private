@@ -1191,7 +1191,7 @@ text if needed. You can set the minimal width with
            (close-button-size (if tab-line-close-button-show
                                   (length (substring-no-properties tab-line-close-button))
                                 0))
-           (tab-amount (length (tab-line-tabs-window-buffers)))
+           (tab-amount (length (funcall tab-line-tabs-function)))
            (window-max-tab-width (/ window-width tab-amount))
            (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
                                 tab-line-tab-max-width)
@@ -1217,7 +1217,8 @@ text if needed. You can set the minimal width with
     (reverse (seq-filter (lambda (buf)
                            (let ((buf-name (buffer-name buf)))
                              (and (member buf win-buffs)
-                                  (doom-real-buffer-p buf))))
+                                  (doom-real-buffer-p buf)
+                                  (not (string-prefix-p buf-name "CAPTURE-")))))
                          (and (fboundp 'persp-current-buffers)
                               (persp-current-buffers))))))
 
@@ -1255,7 +1256,9 @@ text if needed. You can set the minimal width with
                                           'face 'tab-line-tab-curent
                                           'help-echo "Click to close tab"))
   (setq tab-line-exclude-modes '(ediff-mode
+                                 Info-mode
                                  process-menu-mode
+                                 eshell-mode
                                  term-mode
                                  vterm-mode
                                  treemacs-mode
@@ -1382,7 +1385,7 @@ TBD
 
 
 ;;;###autoload
-(defadvice! +doom-close-window-when-no-buffer (&rest _)
+(defadvice! +doom-close-window-when-no-buffer-a (&rest _)
   :before-until #'kill-current-buffer
   (let ((buf (current-buffer))
         (tabs (+doom-tabs-tabs-mode-persp-window)))
@@ -1396,7 +1399,7 @@ TBD
         (if (memq buf tabs)
             (progn
               (when (and (buffer-modified-p buf)
-                         (not (y-or-n-p (format "Buffer %s is modified; kill anyway?" buf))))
+                         (not (y-or-n-p (format "Buffer %s has unsaved changes; kill it anyway?" buf))))
                 (user-error "Aborted"))
               (tab-line-close-tab))
           (with-current-buffer buf
