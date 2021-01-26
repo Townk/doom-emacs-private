@@ -48,7 +48,7 @@ Since this document is about a text editor configuration, I have to highlight co
 
 The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
-* TODO Editor standard features [5/12]
+* Standard features [5/12]
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve the same results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
 
 ** DONE Requirements
@@ -673,7 +673,7 @@ With the function defined, I just need to connect them to the correct hooks:
 
 
 ** TODO Remote editing
-* TODO Editor personal preferences [0/9]
+* Personal preferences [0/9]
 ** TODO Requirements
 - In-editor file management ::
 - In-editor project management ::
@@ -1340,9 +1340,6 @@ text if needed. You can set the minimal width with
                         :inherit 'tab-line-tab
                         :box box-bg)))
 #+end_src
-
-#+RESULTS:
-: +doom-tabs--setup-faces-h
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -3089,7 +3086,7 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
-* TODO Prose writing [0/7]
+* Writing [0/7]
 Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
 
 My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
@@ -3133,7 +3130,7 @@ Most of these directories are straightforward to understand their purpose, but I
 
 Regarding my configuration for Org mode, I will split it into 6 distinct sections, one per usage I will have for Org:
 
-- Writing
+- Prose writing
 - Reading or reviewing
 - Publishing
 - Presenting
@@ -3462,7 +3459,7 @@ With this function in place, we can /hook/ it to our Org major mode:
 #+end_src
 
 ** TODO Requirements
-** TODO Writing
+** TODO Prose writing
 I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
 
 With that out of the way, I need to acknowledge that, currently in my career, there is no way I can get away with /not writing/. There are too much design, architecture, plans, and projects involved on my day to day work, that my team and I need some form of record of our decisions. And if writing is inevitable, I should, at least, try to make it less painful.
@@ -3641,9 +3638,26 @@ This snippet is fine, but we still have to type the file name there. Let's creat
                                                                     "description")`}]${0:$$(insert "]")}
 #+end_src
 
+** TODO Reading or reviewing
+- Narrower width
+- Visual motion
+- Show document structure on sidebar
+- Annotations
+  + Referenceable
+  + Annotate external documents (default to Doom)
 
-**** TODO Move macro snippet to the xwiki section on  [[Publishing]]
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! nov)
+#+end_src
 
+
+** TODO Publishing
+- Blog or site post
+- Email document
+- Wiki entry
+
+#+caption: snippets/org-mode/macro
 #+begin_src snippet :tangle snippets/org-mode/macro :mkdirp yes
 # -*- mode: snippet -*-
 # name: #+BEGIN_MACRO ... block
@@ -3656,18 +3670,7 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 #+END_MACRO
 #+end_src
 
-** TODO Reading or reviewing
-- Narrower width
-- Visual motion
-- Show document structure on sidebar
-- Annotations
-  + Referenceable
-  + Annotate external documents (default to Doom)
 
-** TODO Publishing
-- Blog or site post
-- Email document
-- Wiki entry
 
 ** TODO Presenting
 - Use =reveal.js= inside a WebKit XWidget in fullscreen
@@ -3716,20 +3719,20 @@ ${1:Meeting topic}  ${2:`":"`${3:$$(yas-auto-next
 # --
 Started code review for ${1:Coworker Name}  ${2:`":"`${3:cr}`":"`}
 - Review link: [[${4:url}][${4:$$(file-name-base yas-text)}]]
-
-,*** Notes
 - $0
 #+end_src
 
+#+caption: capture/org-journal-mode/capture-idea
 #+begin_src snippet :tangle capture/org-journal-mode/capture-idea :mkdirp yes
 # -*- mode: snippet -*-
 # name: New Idea
 # key: capture-idea
 # --
 ${1:Idea!}  :idea:
-$0
+k$0
 #+end_src
 
+#+caption: capture/org-journal-mode/capture-link
 #+begin_src snippet :tangle capture/org-journal-mode/capture-link :mkdirp yes
 # -*- mode: snippet -*-
 # name: Interesting link
@@ -3762,13 +3765,16 @@ ${2:$(if (string= yas-text " company") "" ":PHONE-W: \n")}:EMAIL: ${5:email}
 $0
 #+end_src
 
+
+*** TODO Deft
+
 ** TODO Time Management
 
 - Triage :: This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
   + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have amore accurate record of my work day;
   + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
 
-* TODO Development [0/9]
+* Development [0/9]
 TBD
 
 ** TODO Requirements
@@ -3781,7 +3787,7 @@ TBD
 ** TODO Kotlin
 ** TODO Java
 
-* TODO Non-editor features [0/7]
+* Non-editor features [0/7]
 TBD
 
 ** TODO Requirements
