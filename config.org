@@ -1461,47 +1461,73 @@ TBD
 (advice-remove 'kill-current-buffer #'doom--switch-to-fallback-buffer-maybe-a)
 
 (set-popup-rules!
-  '(("^\\*"  :slot 2 :vslot -1 :select t)
-    ("^ \\*" :slot 2 :vslot -1 :size +popup-shrink-to-fit)
+  '(("^\\*" :slot 2 :vslot -1 :side bottom :size 0.4 :select t)
+    ("^ \\*" :slot 2 :vslot -1 :side bottom :size +popup-shrink-to-fit)
     ("^\\*Completions" :ignore t)
     ("^\\*Local variables\\*$"
-     :vslot -1 :slot 2 :size +popup-shrink-to-fit)
+     :slot 2     :vslot -1   :side bottom :size +popup-shrink-to-fit
+     :select nil :modeline t :autosave t  :ttl 0 :quit t)
     ("^\\*\\(?:[Cc]ompil\\(?:ation\\|e-Log\\)\\|Messages\\)"
-     :vslot -1 :size 0.3  :autosave t :quit t :ttl nil)
-    ("^\\*\\(?:doom \\|Pp E\\)"  ; transient buffers (no interaction required)
-     :vslot -1 :size +popup-shrink-to-fit :autosave t :select ignore :quit t :ttl 0)
-    ("^\\*doom:"  ; editing buffers (interaction required)
-     :vslot -1 :size 0.35 :autosave t :select t :modeline t :quit nil :ttl t)
-    ("^\\*doom:\\(?:v?term\\|e?shell\\)-popup"  ; editing buffers (interaction required)
-     :vslot -1 :size 0.35 :select t :modeline nil :quit nil :ttl nil)
+     :slot 2     :vslot -1   :side bottom :width 110 :height 0.4
+     :select nil :modeline t :autosave t  :ttl nil   :quit t)
+    ("^\\*\\(?:doom \\|Pp E\\)"
+     :slot 2     :vslot -1   :side bottom :size +popup-shrink-to-fit
+     :select nil :modeline t :autosave t  :ttl 0 :quit t)
+    ("^\\*doom:"
+     :slot 2   :vslot -1   :side bottom :width 110 :height 0.4
+     :select t :modeline t :autosave t  :ttl t     :quit nil)
+    ("^\\*doom:\\(?:v?term\\|e?shell\\)-popup"
+     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
+     :select t :modeline nil :autosave nil :ttl nil   :quit nil)
     ("^\\*\\(?:Wo\\)?Man "
-     :vslot -1 :size 0.45 :select t :quit t :ttl 0)
+     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*Calc"
-     :vslot -1 :side bottom :size 0.4 :select t :quit nil :ttl 0)
+     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit nil)
+    ("^\\*eww\\*"
+     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*Customize"
-     :slot 2 :side right :size 0.5 :select t :quit nil)
-    ("^ \\*undo-tree\\*"
-     :slot 2 :side left :size 20 :select t :quit t)
-    ;; `help-mode', `helpful-mode'
-    ("^\\*[Hh]elp"
-     :slot 2 :vslot -1 :size 0.35 :select t)
-    ("^\\*eww\\*"  ; `eww' (and used by dash docsets)
-     :slot 2 :side right :size 0.5 :select t)
-    ("^\\*info\\*$"  ; `Info-mode'
-     :slot 2 :vslot 2 :size 0.45 :select t)
-    ("^\\*Warnings"
-     :vslot -1 :size 0.25)
-    ("^\\*Backtrace"
-     :vslot -1 :size 0.4 :quit nil)
-    ("^\\*CPU-Profiler-Report "
-     :side bottom :vslot -1 :slot 1 :height 0.4 :width 0.5 :quit nil)
-    ("^\\*Memory-Profiler-Report "
-     :side bottom :vslot -1 :slot 2 :height 0.4 :width 0.5 :quit nil)
-    ("^\\*Process List\\*"
-     :side bottom :vslot -1 :size 0.25 :select t :quit t)
-    ("^\\*\\(?:Proced\\|timer-list\\|Abbrevs\\|Output\\|Occur\\|unsent mail\\)\\*" :ignore t)
+     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit nil)
     ("^\\*\\(?:doom:\\)?scratch\\*"
-     :slot 2 :side right :size 0.5 :select t :quit t)
+     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
+     :select t :modeline nil :autosave nil :ttl nil   :quit t)
+    ("^ \\*undo-tree\\*"
+     :slot 2   :vslot -1     :side left    :width 20 :height 0.5
+     :select t :modeline nil :autosave nil :ttl 0    :quit t)
+    ("^\\*[Hh]elp"
+     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*YASnippet Tables\\*"
+     :slot 2   :vslot -1     :side right   :width 104 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*lexic\\*$"
+     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*WordNut\\*$"
+     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*info\\*$"
+     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*Warnings"
+     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
+     :select nil :modeline nil :autosave nil :ttl nil   :quit t)
+    ("^\\*Backtrace"
+     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
+     :select nil :modeline nil :autosave nil :ttl nil   :quit nil)
+    ("^\\*CPU-Profiler-Report "
+     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
+     :select nil :modeline nil :autosave nil :ttl 0     :quit nil)
+    ("^\\*Memory-Profiler-Report "
+     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
+     :select nil :modeline nil :autosave nil :ttl 0     :quit nil)
+    ("^\\*Process List\\*"
+     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
+     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+    ("^\\*\\(?:Proced\\|timer-list\\|Abbrevs\\|Output\\|Occur\\|unsent mail\\)\\*" :ignore t)
     ))
 #+end_src
 
