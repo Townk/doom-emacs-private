@@ -1076,11 +1076,38 @@ Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
 #+end_src
 
-** TODO Editor Tabs
-TBD
+Rainbow mode
 
-https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/
-https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +doom-fontify-rainbow-colorize-match-a (color &optional match)
+  "Return a matched string propertized with a face whose
+background is COLOR. The foreground is computed using
+`rainbow-color-luminance', and is either white or black."
+  :override 'rainbow-colorize-match
+  (let ((match (or match 0)))
+    (put-text-property
+     (match-beginning match) (match-end match)
+     'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
+                               "white" "black"))
+             (:background ,color)
+             (:inherit fixed-pitch)))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+ (:leader
+  (:prefix-map ("t" . "toggle")
+   :desc "Rainbow mode" :mvn "R" #'rainbow-mode
+   )))
+#+end_src
+
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '(font-lock-comment-face :inherit fixed-pitch))
+#+end_src
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
@@ -1103,6 +1130,15 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
      ("octicons" . "https://raw.githubusercontent.com/primer/octicons/master/icons/%s-24.svg")
      ("boxicons" . "https://boxicons.com/static/img/svg/regular/bx-%s.svg"))))
  ;
+
+** TODO Editor Tabs
+TBD
+
+https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/
+https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+
+#+caption: config.el
+#+begin_src emacs-lisp
 (use-package! tab-line
   :when window-system
   :hook ((after-init . global-tab-line-mode))
@@ -1256,15 +1292,20 @@ text if needed. You can set the minimal width with
                                           'mouse-face 'tab-line-close-highlight
                                           'face 'tab-line-tab-curent
                                           'help-echo "Click to close tab"))
-  (setq tab-line-exclude-modes '(ediff-mode
+  (setq tab-line-exclude-modes '(+doom-dashboard-mode
                                  Info-mode
-                                 process-menu-mode
+                                 calendar-mode
+                                 ediff-mode
                                  eshell-mode
-                                 term-mode
-                                 vterm-mode
-                                 treemacs-mode
+                                 help-mode
+                                 helpful-mode
                                  imenu-list-major-mode
-                                 +doom-dashboard-mode))
+                                 lexic-mode
+                                 process-menu-mode
+                                 term-mode
+                                 treemacs-mode
+                                 vterm-mode
+                                 wordnut-mode))
   (add-hook 'doom-switch-buffer-hook #'+doom-tabs-hide-tab-line-maybe-h)
 #+end_src
 
