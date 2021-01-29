@@ -3829,43 +3829,663 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 - Use =reveal.js= inside a WebKit XWidget in full screen
 
 ** TODO Note Taking
-I need to come clean to you. I'm a horrible note taker! I have ADHD and my capacity to keep up with any system to take notes is as short as a pigeon's attention span. That said, using Org Mode was as close as a success as I can desire. I believe if I have a setup that makes taking notes effortless, I might be able to finally start taking notes and refer to them when needed.
+Here in this section I need to come clean to the reader. I'm a horrible note taker! I have [[https://www.cdc.gov/ncbddd/adhd/facts.html][ADHD]] and my capacity to keep up with any system to take notes is as short as a [[https://www.cdc.gov/ncbddd/adhd/facts.html][fruit fly's attention span]]. That said, one of the longest streaks of success keeping up with notes I had in the past, was when I tried Org mode for the first time. I believe if I have a setup that makes taking notes effortless, I might be able to finally start taking notes and refer to them when needed.
 
-Let me summarize my requirements for note taking:
+After a lot of reading, consultation, and thinking, I believe I found a system I will enjoy working with. Let me describe it to you.
 
-- Capture :: It has to happen from any place on my computer, and it has to happen in less than 2 seconds;
-  + Fleet notes :: The entry point of all notes on my system.This will be any kind of quick note, meeting note, or some idea or link to check later. After the daily clean up, the remaining fleet notes should be my work journal;
-  + Meeting notes :: A special type of note that I can integrate with a calendar to automate a pre-fill of its fields;
-- Triage :: The triage process is where I'll move my fleet notes to their appropriate place, and check the status of my tracking tasks:
-  + Daily :: Should provide convenient features to help me execute the daily triage in less than 20 minutes;
-- Search :: All org files should be searchable by /title/, /tags/, /content/, and /cross-references/. Agenda files don't need to exist in this list because they're intended to be highly dynamic, and they also will have a special system to check and curate them. Ideally, I would have a single search that could find the searching terms in all my Org files:
-  + Notes
-  + Journals
-  + Documents
+One of the constants I found when searching for a note taking system was the fact that writing down a note (regardless of its type), has to happen in less than two seconds or I don't get motivated to do it all the time. This time is valid to take notes from a computer, as well as on the go. For some individuals, having a small notebook at hand all the time, is crucial for them. Since I'm more of a tech guy, my system will use exclusively computer software.
 
-*** Capturing
+To get under these two seconds to take a note when I'm on a computer, I defined a single entry point for all notes. This way I can optimize this process inside and outside Emacs if I want.
 
-#+begin_src snippet :tangle capture/org-journal-mode/capture-meeting :mkdirp yes
+My entry point for notes is [[https://github.com/bastibe/org-journal][Org Journal]]. I will use an entry scheme of one file per year, and create an [[https://orgmode.org/manual/Capture.html][org-capture]] system that will use this single journal file and help me achieve the two seconds mark.
+
+Part of my strategy is to have one capture template per type of note to reduce the necessary amount of thinking not related to the note itself. Another artifact I will use is [[https://joaotavora.github.io/yasnippet/][Yasnippet]] instead of =org-capture= templates. The reason for this decision is to keep a visual track on the entry text. With the standard =org-capture=, I have to move my eyes from top to bottom of the screen to look between the template text and the input field.
+
+I will take notes any time I feel the need, but here are the main topics for my notes:
+
+- Fleet notes :: These are the /quick notes/ of the day. I will use fleet notes any time a note does not fit on anyone of the next categories;
+- Journal entries :: When need to add an event on my personal journal, I will use this category. I need to clarify though, that a /personal journal/ for me, is anything that happens to myself, regardless if is a work related event or not;
+- Meeting notes :: Should happen on any meeting, I must review them no longer than 30 minutes after it,  and must include:
+  + List of participants;
+  + Meeting time;
+  + Meeting subjects;
+  + Important points on the meeting;
+  + Action items and their owners;
+- Support :: When I spend some time with a co-worker helping her on any subject, I will have a note about this support containing:
+  + Co-worker's name;
+  + Support's subject;
+  + Start and end time;
+  + Action items for me or the co-worker;
+- Idea :: Whenever something interesting pops from my brain, I will try to capture it in this category;
+- Link :: When I find something interesting online, or something I should spend some time reading or studying;
+- Past entry :: If I remember of something that happens a couple days earlier, or when I want to make a journal entry on the past, I will use this category;
+
+On the end of each day, I will sit down in front of my computer to review the notes I took on the day. I will think about each note I took and verify if its worth ot keeping it. If it is, I'll try to synthesize the note on my own words and relate it with previous notes.
+
+I will be able to search notes using their reference label, title, tags, or content (a great package for this is [[https://github.com/jrblevin/deft][Deft]]).
+
+*** TODO Journal
+TBD
+
+#+begin_src emacs-lisp
+(defconst +org-journal-dir (concat org-directory "/journal/")
+  "Path to directory holding all journal files.")
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package org-journal
+  :defer t
+  :init
+  (setq +org-journal-file-format "journal-%Y.org")
+  :config
+  (setq org-journal-encrypt-journal nil
+        org-journal-carryover-delete-empty-journal '(ask)
+        org-journal-carryover-items "TODO=\"STRT\"|TODO=\"HOLD\"|TODO=\"WAIT\"|TODO=\"DELG\""
+        org-extend-today-until 4
+        org-journal-file-type 'yearly
+        org-journal-enable-agenda-integration nil
+        org-journal-file-format +org-journal-file-format
+        org-journal-date-format "%A, %B %-e, %Y"
+        org-journal-time-format "%H:%M%#p - "
+        org-journal-time-format-post-midnight "+%H:%M%#p - "
+        org-journal-file-header (concat "#+TITLE: Daily Journal for %Y (%Z)\n"
+                                        "#+STARTUP: overview\n"
+                                        "#+CATEGORY: journal\n"
+                                        "\n"))
+
+  (font-lock-add-keywords 'org-journal-mode +doom-org-font-lock-beautify-keywords)
+  (set-window-buffer nil (current-buffer)))
+#+end_src
+
+#+caption: autoload/journal.el
+#+begin_src emacs-lisp :tangle autoload/journal.el :mkdirp yes
+;;; $DOOMDIR/autoload/org-journal.el -*- lexical-binding: t; -*-
+
+;;;###autoload
+(defun +org-journal/new-entry (&optional prefix add-header-p variable make-local)
+  "Open a journal file and start a new entry. Without any
+arguments, this function is equivalent to
+calling `(org-journal-new-entry t)'
+
+With PREFIX argumant, request the journal timestamp to the user.
+
+If ADD-HEADER-P is non-nil, fully create the new entry (this is
+equivalent to `(not PREFIX)' on the `org-journal-new-entry').
+
+VARIABLE is a string that, when set, will store the timestamp
+value selected by the user. This function ignores this argument
+if PREFIX is nil.
+
+When MAKE-LOCAL is a non-nil value, this function uses VARIABLE
+to create a local variable. If PREFIX or VARIABLE is nil, this
+argument has no effect."
+  (interactive "P")
+  (when make-local
+    (make-local-variable variable))
+  (org-journal-new-entry (not add-header-p)
+                         (when variable
+                           (set variable
+                                (when prefix
+                                  (org-read-date t t nil "New entry"))))))
+#+end_src
+
+*** TODO Capturing
+
+Talk about capture in general:
+- How am I going to use it?
+- How am I going to implement it with Yasnippets?
+- Any goals for this area?
+
+#+begin_src text :tangle no
+[n]     ● Fleet note
+[j]...  ● Journal
+[t]...  ● Tasks
+[c]     ● Contact
+[p]...  ● Project
+--------------------------------------------------------------------------------
+[q]     ● Abort
+#+end_src
+
+Start with the open definition for =org-capture=:
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;; autoload/org.el *- lexical-binding: t; -*-
+
+(defconst +org-capture--note-frame-height 15
+  "Number of lines a note frame should have when capturing a long
+note.")
+
+(defconst +org-capture--long-note-frame-height 35
+  "Number of lines a note frame should have when capturing a long
+note.")
+
+(defconst +org-capture--menu-width 50
+  "Number of lines a note frame should have when capturing a long
+note.")
+
+(defvar +org-capture--yas-prefix "--DOOM-ORG-CAPTURE-YAS-PREFIX--:"
+  "String used to identify a yasnippet template on a capture
+buffer")
+
+(defvar +org-capture--source-buffer nil
+  "Stores the buffer object where the capture started")
+
+(defvar +org-capture--source-selection nil
+  "Stores the buffer object where the capture started")
+
+(defvar +org-capture--timestamp nil
+  "Stores the time when the capture started")
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture--yas-expand-h ()
+  "Expand `+org-capture--yas-prefix' on the template."
+  (setq +org-capture--auto-align-tags-store org-auto-align-tags)
+  (let ((saved-point (point)))
+    (goto-char (point-min))
+    (if (search-forward-regexp (concat +org-capture--yas-prefix "\\([^:]*\\):") nil t)
+        (progn
+          (setq org-auto-align-tags nil)
+          (goto-char (match-end 0))
+          (replace-match (match-string 1))
+          (yas-expand))
+      (goto-char saved-point)))
+
+  ;; (org-num-mode -1)
+  (tab-line-mode -1)
+  (ws-butler-mode -1)
+  (setq-local org-startup-folded nil))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture--finish-h ()
+  "Clean up any outstanding variable and values set when capture
+starts."
+  (+org-capture-clear-journal-timestamp)
+  (setq org-auto-align-tags +org-capture--auto-align-tags-store)
+  (setq +org-capture--source-buffer nil
+        +org-capture--source-selection nil
+        +org-capture--auto-align-tags-store nil))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture-clear-journal-timestamp ()
+  "Unbound the capture variable returned by
+`+org-capture-last-journal-timestamp'. If you used the
+`+org-capture-journal-file' function, you should call this
+function when the capture is done to guarantee that on the next
+capture you're not inputting old values from your template."
+  (when (boundp '+org-capture-timestamp)
+    (makunbound '+org-capture-timestamp)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-capture
+  :after all-the-icons
+  :commands (org-capture +org-capture/open-frame)
+  :init
+  (add-hook 'org-capture-mode-hook '+org-capture--yas-expand-h)
+  (add-hook 'org-capture-after-finalize-hook '+org-capture--finish-h)
+  :config
+  (setq +org-capture-changelog-file "CHANGELOG.org")
+  (setq org-capture-templates-contexts '(("p" (+org-capture-projects-p))))
+  (setq +org-capture-fn (lambda ()
+                          (interactive)
+                          (set-window-parameter nil 'mode-line-format 'none)
+                          (set-window-parameter nil 'header-line-format 'none)
+                          (setq default-minibuffer-frame (org-capture))))
+  (setq org-capture-templates `())
+
+  (map!
+   (:map org-capture-mode-map
+    :gin "C-RET" #'org-capture-finalize
+    :gin [s-escape] #'org-capture-kill))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-projects-p ()
+  (with-current-buffer (or +org-capture--source-buffer (current-buffer))
+    (let* ((proj-root (doom-project-root))
+           (proj-root (when proj-root (expand-file-name proj-root)))
+           (buf-path (buffer-file-name))
+           (buf-path (when buf-path (expand-file-name buf-path))))
+      (and proj-root
+           buf-path
+           (string-prefix-p proj-root buf-path)))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defconst +org-capture-supported-icons
+  '(calendar
+    checklist
+    contact-add
+    globe
+    help
+    history
+    idea
+    inbox
+    journal
+    list
+    meeting
+    notes
+    postit
+    project
+    review
+    stop
+    timer)
+  "List of all iconse supported on captur templates.")
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture-get-string-icon (icon color)
+  "This function returns the requested ICON as a 2-characters
+string, propertized to dieplsy the associated icon frorm the
+`all-the-icons' package. It uses the COLOR arg to 'paint' the
+icon.
+
+Currrently, supported icons are:
+
+- 'calendar
+- 'checklist
+- 'contact-add
+- 'globe
+- 'help
+- 'history
+- 'idea
+- 'inbox
+- 'journal
+- 'list
+- 'meeting
+- 'notes
+- 'postit
+- 'project
+- 'review
+- 'stop
+- 'timer
+"
+  (pcase icon
+    ('calendar
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-octicon "calendar" :height 1.05 :v-adjust 0.1)))
+    ('checklist
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
+                 'display (all-the-icons-octicon "checklist" :height 0.95 :v-adjust 0.1)))
+    ('contact-add
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "person_add" :height 0.95 :v-adjust -0.17)))
+    ('globe
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
+                 'display (all-the-icons-faicon "globe" :height 1.15 :v-adjust -0.05)))
+    ('help
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "live_help" :height 0.95 :v-adjust -0.22)))
+    ('history
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "history" :height 0.95 :v-adjust -0.17)))
+    ('idea
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "lightbulb_outline" :height 0.95 :v-adjust -0.17)))
+    ('inbox
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "inbox" :height 0.95 :v-adjust -0.15)))
+    ('journal
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "book" :height 0.95 :v-adjust -0.15)))
+    ('list
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
+                 'display (all-the-icons-faicon "list" :height 0.93 :v-adjust -0.05)))
+    ('meeting
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "date_range" :height 0.95 :v-adjust -0.15)))
+    ('notes
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "library_books" :height 0.95 :v-adjust -0.1)))
+    ('postit
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
+                 'display (all-the-icons-faicon "sticky-note" :height 1.15 :v-adjust 0.05)))
+    ('project
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
+                 'display (all-the-icons-octicon "briefcase" :height 1.05 :v-adjust 0.05)))
+    ('review
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "rate_review" :height 0.95 :v-adjust -0.15)))
+    ('stop
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
+                 'display (all-the-icons-octicon "stop" :height 1.05 :v-adjust -0.05)))
+    ('timer
+     (propertize "--"
+                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
+                 'display (all-the-icons-material "timer" :height 0.95 :v-adjust -0.15)))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-description (&rest args)
+  "Returns a string to be used as the description of a capture
+item.
+
+ARGS is a declarative builder for the new description:
+
+`:text' (required) - The string displayed on the capture item.
+`:icon' (optional) - A cons cell with the icon symbol (check
+    `+org-capture-supported-icons' for supported symbols).
+
+Example:
+
+  (+org-capture-description :text \"Add journal entry\"
+                            :icon '(journal . \"#ff00ff\"))"
+  (let ((text (plist-get args :text))
+        (icon (plist-get args :icon)))
+    (when (or (null text)
+                (string-blank-p text))
+      (error "A capture description requires a text."))
+    (if icon
+        (progn
+          (unless (and (consp icon)
+                       (memq (car-safe icon) +org-capture-supported-icons)
+                       (stringp (cdr-safe icon)))
+            (error (concat "A capture description icon must be a cons cell with"
+                           " one of +org-capture-supported-icons symbol and a string color.")))
+          (format "%s %s" (+org-capture-get-string-icon (car icon) (cdr icon)) text))
+      text)))
+#+end_src
+
+**** Fleet notes
+
+#+begin_src emacs-lisp
+  (pushnew! org-capture-templates
+            `("n"  ,(+org-capture-description :text "Fleet note" :icon '(notes . "#b5bd68"))
+              plain (function +org-capture-journal-file)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-journal-file ()
+  "Thin wrapper around `+org-journal-new-entry' that adjust the
+capture frame width to `fill-column' before start editing it."
+  (+org-capture--adjust-frame)
+  (+org-journal/new-entry))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--adjust-frame (&optional extended-p frame)
+  "Dinamically adjust the capture FRAME width to WIDTH and
+reposition it on the center of the screen."
+  (when (+org-capture-frame-p)
+    (set-frame-size (or frame (selected-frame))
+                    (+ fill-column 20)
+                    (if extended-p
+                        +org-capture--long-note-frame-height
+                      +org-capture--note-frame-height))
+    (+org-capture--reposition-frame frame)))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--reposition-frame (&optional frame)
+  "Position FRAME around the center of the screen."
+  (let ((frame-w (window-pixel-width))
+        (frame-h (window-pixel-height)))
+    (set-frame-position (or frame (selected-frame))
+                        (/ (- (display-pixel-width) frame-w) 2)     ;; X
+                        (/ (- (display-pixel-height) frame-h) 3)))) ;; Y
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-last-journal-timestamp ()
+  "Returns the last timestamp captured for the org journal,
+already formatted with the format specified on
+  `org-journal-time-format'. If user didn't capture any journal
+  date, returns the current time."
+  (format-time-string org-journal-time-format +org-capture--timestamp))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-template-selection ()
+  "Returns the text selected on the buffer that originated the
+capture. If the selection is the entire buffer, return an org
+link to buffer."
+  (with-current-buffer +org-capture--source-buffer
+    (when (region-active-p)
+      (or (+org-capture--mu4e-headers-selected)
+          (+org-capture--mu4e-view-selected)
+          (+org-capture--buffer-selected)
+          ""))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--mu4e-headers-selected (&optional buf-name)
+  "When on a mu4e-headers buffer, store an org link to each one
+of the selected messages and return them all as a string."
+  (when (and (boundp 'mu4e~headers-buffer-name)
+             (string= (or buf-name (buffer-name)) mu4e~headers-buffer-name))
+    (let* ((beg (region-beginning))
+           (end (region-end))
+           (lines (count-lines beg end)))
+      (save-excursion
+        (goto-char beg)
+        (while (< (point) end)
+          (org-store-link t t)
+          (forward-line 1)))
+      (with-temp-buffer
+        (org-insert-all-links lines)
+        (buffer-string)))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--mu4e-view-selected (&optional buf-name)
+  "When on a mu4e-view buffer, store an org link to the message
+and return it as a string with the selected text as a
+block-quote. If the selection is the entire buffer, just return
+the org link."
+  (when (and (boundp 'mu4e~view-buffer-name)
+             (string= (or buf-name (buffer-name)) mu4e~view-buffer-name))
+    (let* ((beg (region-beginning))
+           (end (region-end))
+           (full-buf-sel-p (and (= beg (point-min))
+                                (= end (point-max))))
+           (buf-quote (when (not full-buf-sel-p) (buffer-substring beg end))))
+      (org-store-link t t)
+      (with-temp-buffer
+        (insert "- ")
+        (org-insert-last-stored-link 1)
+        (when buf-quote
+          (insert "#+BEGIN_QUOTE\n")
+          (insert buf-quote)
+          (insert "#+END_QUOTE\n"))
+        (buffer-string)))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--buffer-selected ()
+  "When there is an active selection in the current buffer,
+returns an org link to the current buffer with the selection as a
+blockquote. If the selection is the entire buffer, just return
+the org link."
+  (let ((sel-text (let* ((beg (region-beginning))
+                         (end (region-end))
+                         (full-buf-sel-p (and (= beg (point-min))
+                                              (= end (point-max))))
+                         (buf-file (expand-file-name (buffer-file-name)))
+                         (buf-name (buffer-name))
+                         (buf-linum (line-number-at-pos beg t))
+                         (buf-quote (when (not full-buf-sel-p) (buffer-substring beg end)))
+                         (quote-what (if (and buf-quote (derived-mode-p 'prog-mode))
+                                         (format "SOURCE %s"
+                                                 (s-chop-suffix "-mode" (symbol-name major-mode)))
+                                       "QUOTE")))
+                    (with-temp-buffer
+                      (when (file-exists-p buf-file)
+                        (insert (format "- [[file:%s::%d][%s]]\n" buf-file buf-linum buf-name)))
+                      (when buf-quote
+                        (insert (format "#+BEGIN_%s\n" quote-what))
+                        (insert buf-quote)
+                        (insert (format "#+END_%s\n" quote-what)))
+                      (buffer-string)))))
+    (unless (s-blank-str-p sel-text) sel-text)))
+#+end_src
+
+**** Journal entries
+
+#+begin_src text :tangle no
+[s]     ● Support
+[m]     ● Meeting
+[c]     ● Code review
+[i]     ● Idea
+[l]     ● Interesting link
+[p]     ● Past entry
+--------------------------------------------------------------------------------
+[q]     ● Abort
+#+end_src
+
+#+begin_src emacs-lisp
+  (pushnew! org-capture-templates
+            `("j"  ,(+org-capture-description :text "Journal" :icon '(journal . "#81a2be")))
+            `("js" ,(+org-capture-description :text "Support" :icon '(help . "#de935f"))
+              plain (function +org-capture-journal-file-for-meeting)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-support)%?\n"
+                       "%(+org-capture-template-selection)")
+              :clock-in t
+              :kill-buffer t)
+            `("jm" ,(+org-capture-description :text "Meeting" :icon '(meeting . "#8abeb7"))
+              plain (function +org-capture-journal-file-for-meeting)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-meeting)%?\n"
+                       "%(+org-capture-template-selection)")
+              :clock-in t
+              :kill-buffer t)
+            `("jc" ,(+org-capture-description :text "Code review" :icon '(review . "#b5bd68"))
+              plain (function +org-capture-journal-file-for-meeting)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-cr)%?\n"
+                       "%(+org-capture-template-selection)")
+              :clock-in t
+              :kill-buffer t)
+            `("ji" ,(+org-capture-description :text "Idea" :icon '(idea . "#f0c674"))
+              plain (function +org-capture-journal-file)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-idea)%?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("jl" ,(+org-capture-description :text "Interesting link" :icon '(globe . "#81a2be"))
+              plain (function +org-capture-journal-file)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-link)%?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("jp" ,(+org-capture-description :text "Past entry" :icon '(history . "#b294bb"))
+              plain (function +org-capture-journal-file-for-timestamp)
+              ,(concat "** %(+org-capture-last-journal-timestamp)%?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-journal-file-for-meeting ()
+  "Thin wrapper around `+org-journal-new-entry' that adjust the
+capture frame width to `fill-column', and give a bigger height to
+add meeting notes."
+  (+org-capture--adjust-frame t)
+  (+org-journal/new-entry))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-yasnippet (snippet)
+  "Returns a snippet mark with the given SNIPPET used to expand
+it with yasnippet when the capture finishes.
+
+SNIPPET can be a string or a symbol.
+
+The snippet mark will have the format:
+
+\"--DOOM-ORG-CAPTURE-YAS-PREFIX--:<snippet name>:\""
+  (concat +org-capture--yas-prefix
+          (if (stringp snippet)
+              snippet
+            (symbol-name snippet))
+          ":"))
+#+end_src
+
+#+caption: share/capture/org-journal-mode/capture-meeting
+#+begin_src snippet :tangle share/capture/org-journal-mode/capture-meeting :mkdirp yes
 # -*- mode: snippet -*-
 # name: New meeting notes
 # key: capture-meeting
 # --
-${1:Meeting topic}  ${2:`":"`${3:$$(yas-auto-next
-                                     (yas-completing-read
-                                        "Meeting type? "
-                                        '("meeting" "support")))}`":"`}
+${1:Meeting topic}  ${2:`":"`${3:meeting}`":"`}
 
 ,*** Attendees
--
+-`" "`
 
 ,*** Notes
 - $0
 
 ,*** Action Items
-,**** TODO
+,**** TODO`" "`
 #+end_src
 
-#+begin_src snippet :tangle capture/org-journal-mode/capture-cr :mkdirp yes
+#+caption: config.el
+#+begin_src emacs-lisp
+(defconst +org-capture-yasnippet-dir (expand-file-name "share/capture" doom-private-dir)
+  "Directory containning all capture snippets.")
+(pushnew! yas-snippet-dirs '+org-capture-yasnippet-dir)
+#+end_src
+
+#+caption: share/capture/org-journal-mode/capture-support
+#+begin_src snippet :tangle share/capture/org-journal-mode/capture-support :mkdirp yes
+# -*- mode: snippet -*-
+# name: New support request notes
+# key: capture-support
+# --
+Support about ${1:Support topic}  ${2:`":"`${3:support}`":"`}
+- Requested by ${4:Coworker Name}
+- $0
+
+,*** Action Items
+,**** TODO`" "`
+#+end_src
+
+#+caption: share/capture/org-journal-mode/capture-cr
+#+begin_src snippet :tangle share/capture/org-journal-mode/capture-cr :mkdirp yes
 # -*- mode: snippet -*-
 # name: New code review started
 # key: capture-cr
@@ -3875,8 +4495,8 @@ Started code review for ${1:Coworker Name}  ${2:`":"`${3:cr}`":"`}
 - $0
 #+end_src
 
-#+caption: capture/org-journal-mode/capture-idea
-#+begin_src snippet :tangle capture/org-journal-mode/capture-idea :mkdirp yes
+#+caption: share/capture/org-journal-mode/capture-idea
+#+begin_src snippet :tangle share/capture/org-journal-mode/capture-idea :mkdirp yes
 # -*- mode: snippet -*-
 # name: New Idea
 # key: capture-idea
@@ -3885,19 +4505,419 @@ ${1:Idea!}  :idea:
 k$0
 #+end_src
 
-#+caption: capture/org-journal-mode/capture-link
-#+begin_src snippet :tangle capture/org-journal-mode/capture-link :mkdirp yes
+#+caption: share/capture/org-journal-mode/capture-link
+#+begin_src snippet :tangle share/capture/org-journal-mode/capture-link :mkdirp yes
 # -*- mode: snippet -*-
 # name: Interesting link
 # key: capture-link
 # --
 Check out ${1:Title}
-- Link: [[${2:url}][$1]]
+- Link: ${2:url}
 ${3:- ${4:note}}
 $0
 #+end_src
 
-#+begin_src snippet :tangle capture/org-mode/capture-contact :mkdirp yes
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-journal-file-for-timestamp ()
+  "Asks user for a specific timestamp and returns the journal
+  file for it. It also position the cursor on the correct place
+  for a new entry, and adjust the capture frame width to
+  `fill-column' before start editing."
+  (+org-capture--adjust-frame)
+  (+org-journal/new-entry t nil '+org-capture-timestamp))
+#+end_src
+
+**** Tasks
+
+#+begin_src text :tangle no
+[t]     ● General task
+[d]     ● Task with deadline
+[s]     ● Scheduled task
+--------------------------------------------------------------------------------
+[q]     ● Abort
+#+end_src
+
+#+begin_src emacs-lisp
+  (pushnew! org-capture-templates
+            `("t"  ,(+org-capture-description :text "Tasks" :icon '(inbox . "#de935f")))
+            `("tt" ,(+org-capture-description :text "General task" :icon '(inbox . "#b5bd68"))
+              plain (function +org-capture-journal-file)
+              ,(concat "** TODO %?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("td" ,(+org-capture-description :text "Task with deadline" :icon '(timer . "#f0c674"))
+              plain (function +org-capture-journal-file-for-task-with-deadline)
+              ,(concat "** TODO %?\n"
+                       "DEADLINE: %(+org-capture-last-time-read)\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("ts" ,(+org-capture-description :text "Scheduled task" :icon '(calendar . "#de935f"))
+              plain (function +org-capture-journal-file-for-task-with-schedule)
+              ,(concat "** TODO %?\n"
+                       "SCHEDULED: %(+org-capture-last-time-read)\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture-journal-file-for-task-with-date (title)
+  "Asks user for a timestamp and store it for template use. It
+also position the cursor on the correct place for a new entry,
+and adjust the capture frame width to `fill-column' before start
+editing."
+  (+org-capture--adjust-frame)
+  (setq +org-capture-timestamp (org-read-date t t nil title))
+  (+org-journal/new-entry))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-journal-file-for-task-with-deadline ()
+  "Asks user for a timestamp for the task's deadline."
+  (+org-capture-journal-file-for-task-with-date "Deadline"))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-journal-file-for-task-with-schedule ()
+  "Asks user for a timestamp for the task's start time"
+  (+org-capture-journal-file-for-task-with-date "Start time"))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-last-time-read ()
+  "Returns the last timestamp captured,formatted with the format
+specified on `org-time-stamp-formats'. If user didn't capture any
+journal date, returns the current time."
+  (format-time-string (cdr-safe org-time-stamp-formats)
+                      (when (boundp '+org-capture-timestamp) +org-capture-timestamp)))
+#+end_src
+
+**** Contacts
+
+#+begin_src emacs-lisp
+  (pushnew! org-capture-templates
+            `("c" ,(+org-capture-description :text "Contact" :icon '(contact-add . "#f0c674"))
+              plain (file (+org-capture-contacts-file))
+              ,(concat "* %(+org-capture-yasnippet 'capture-contact)\n"
+                       "%?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-contacts-file ()
+  "Expand `+org-capture-todo-file' from `org-directory'.
+  If it is an absolute path return `+org-capture-todo-file'
+  verbatim."
+  (+org-capture--adjust-frame)
+  +org-contacts-file)
+#+end_src
+
+**** Project notes
+
+#+begin_src text :tangle no
+[t]     ● New task
+[d]     ● Quick note
+[s]     ● New changelog
+--------------------------------------------------------------------------------
+[q]     ● Abort
+#+end_src
+
+#+begin_src emacs-lisp
+  (pushnew! org-capture-templates
+            `("p"  ,(+org-capture-description :text "Projct" :icon '(project . "#b294bb")))
+            `("pt" ,(+org-capture-description :text "New task" :icon '(checklist . "#b5bd68"))
+              entry (file+headline +org-capture-project-notes-file-wrapper "Tasks")
+              ,(concat "* TODO %?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("pn" ,(+org-capture-description :text "Quick note" :icon '(postit . "#f0c674"))
+              entry (file+headline +org-capture-project-notes-file-wrapper "Notes")
+              ,(concat "* %U %?\n"
+                       "%(+org-capture-template-selection)")
+              :kill-buffer t)
+            `("pc" ,(+org-capture-description :text "New changelog" :icon '(list . "#b294bb"))
+              item (function +org-capture-project-changelog-file-with-headings)
+              "- %?"
+              :prepend t
+              :kill-buffer t))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-project-notes-file-wrapper ()
+  "Returns an org file to hold notes and tasks for the current
+  project."
+  (+org-capture--adjust-frame)
+  (+org-capture-project-notes-file))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture-project-changelog-file-with-headings ()
+  (let ((entry-path (+org-capture-project-changelog-file))
+        (org-complex-heading-regexp-format "\\* %s"))
+    (unless (file-exists-p entry-path)
+      (make-empty-file entry-path t))
+    (find-file entry-path)
+    (goto-char (point-min))
+    (+org-capture--ensure-heading-prepend (+org-capture-project-target-heading))))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture-project-target-heading ()
+  `("Unreleased" ,(format-time-string "%A, %B %-e, %Y")))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+(defun +org-capture--ensure-heading-prepend (headings &optional initial-level)
+  (if (not headings)
+      (widen)
+    (let ((initial-level (or initial-level 1)))
+      (if (and (re-search-forward (format org-complex-heading-regexp-format
+                                          (regexp-quote (car headings)))
+                                  nil t)
+               (= (org-current-level) initial-level))
+          (progn
+            (message "Found heading '%s'" (car headings))
+            (beginning-of-line)
+            (org-narrow-to-subtree))
+        (message "Could not find heading '%s'" (car headings))
+        (if (= initial-level 1)
+            (goto-char (point-max))
+          (end-of-line))
+        (unless (and (bolp) (eolp)) (insert "\n"))
+        (insert (make-string initial-level ?*) " " (car headings) "\n"))
+      (+org-capture--ensure-heading-prepend (cdr headings) (1+ initial-level)))))
+#+end_src
+
+**** Finalize capture templates
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (setq org-capture-templates (reverse org-capture-templates))
+#+end_src
+
+#+begin_src emacs-lisp
+  (map! :leader
+        :desc "Org Capture"           "X" #'+org-capture/same-frame
+        (:prefix-map ("n" . "notes")
+         :desc "Org capture"          "n" #'+org-capture/open-frame
+         ))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defadvice! +org-capture-open-frame-get-info-a (&rest _)
+  "Store the buffer object where the user initiated the capture."
+  :before '+org-capture/open-frame
+  (setq +org-capture--source-buffer (current-buffer)
+        +org-capture--source-selection (evil-visual-range)))
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defun +org-capture/same-frame()
+  (interactive)
+  (+org-capture-open-frame-get-info-a)
+  (org-capture))
+#+end_src
+
+#+begin_src emacs-lisp
+) ;; use-package! org-capture
+#+end_src
+
+#+caption: autoload/capture.el
+#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
+;;;###autoload
+(defadvice! +org-capture-select-template-prettier-a (&optional keys)
+  "Select a capture template, in a prettier way than default Lisp
+programs can force the template by setting KEYS to a string."
+  :override 'org-capture-select-template
+  (let ((org-capture-templates
+         (or (org-contextualize-keys (org-capture-upgrade-templates org-capture-templates)
+                                     org-capture-templates-contexts)
+             '(("t" "Task"
+                entry (file+headline "" "Tasks")
+                "* TODO %?\n  %u\n  %a")))))
+    (if keys
+        (or (assoc keys org-capture-templates)
+            (error "No capture template referred to by \"%s\" keys" keys))
+      (org-mks org-capture-templates
+               (propertize (if (+org-capture-frame-p)
+                               (concat (s-center 50 "Doom Capture") "\n"
+                                       (s-center 50 "━━━━━━━━━━━━"))
+                             (concat "Doom Capture\n"
+                                     "━━━━━━━━━━━━"))
+                           'face 'font-lock-type-face)
+               " "
+               `(("q" ,(+org-capture-description :text "Abort" :icon '(stop . "#d54e53"))))))))
+
+
+;;;###autoload
+(defadvice! +org-capture-mks-prettier-a (table title &optional prompt specials)
+  "Select a member of an alist with multiple keys. Prettified.
+
+TABLE is the alist which should contain entries where the car is
+a string. There should be two types of entries.
+
+1. prefix descriptions like (\"a\" \"Description\") This
+   indicates that `a' is a prefix key for multi-letter selection,
+   and that there are entries following with keys like \"ab\",
+   \"ax\"…
+
+2. Select-able members must have more than two elements, with the
+   first being the string of keys that lead to selecting it, and
+   the second a short description string of the item.
+
+The command will then make a temporary buffer listing all entries
+that can be selected with a single key, and all the single key
+prefixes. When you press the key for a single-letter entry, it is
+selected. When you press a prefix key, the commands (and maybe
+further prefixes) under this key will be shown and offered for
+selection.
+
+TITLE will be placed over the selection in the temporary buffer,
+PROMPT will be used when prompting for a key. SPECIALS is an
+alist with (\"key\" \"description\") entries. When one of these
+is selected, only the bare key is returned."
+  :override 'org-mks
+  (save-window-excursion
+    (let ((inhibit-quit t)
+          (buffer (org-switch-to-buffer-other-window "*Org Select*"))
+          (prompt (or prompt "Select: "))
+          case-fold-search
+          current)
+      (unwind-protect
+          (catch 'exit
+            (while t
+              (erase-buffer)
+              (insert title "\n\n")
+              (let ((original-evil-normal-state-cursor evil-normal-state-cursor)
+                    (evil-normal-state-cursor (list nil))
+                    (des-keys nil)
+                    (allowed-keys '("\C-g"))
+                    (tab-alternatives '("\s" "\t" "\r"))
+                    (cursor-type nil))
+                ;; Populate allowed keys and descriptions keys
+                ;; available with CURRENT selector.
+                (let ((re (format "\\`%s\\(.\\)\\'"
+                                  (if current (regexp-quote current) "")))
+                      (prefix (if current (concat current " ") "")))
+                  (dolist (entry table)
+                    (pcase entry
+                      ;; Description.
+                      (`(,(and key (pred (string-match re))) ,desc)
+                       (let ((k (match-string 1 key)))
+                         (push k des-keys)
+                         ;; Keys ending in tab, space or RET are equivalent.
+                         (if (member k tab-alternatives)
+                             (push "\t" allowed-keys)
+                           (push k allowed-keys))
+                         (insert (+org-capture--item-entry k desc current t) "\n")))
+                      ;; Usable entry.
+                      (`(,(and key (pred (string-match re))) ,desc . ,_)
+                       (let ((k (match-string 1 key)))
+                         (insert (+org-capture--item-entry k desc current) "\n")
+                         (push k allowed-keys)))
+                      (_ nil))))
+                ;; Insert special entries, if any.
+                (when specials
+                  (insert "\n")
+                  (pcase-dolist (`(,key ,description) specials)
+                    (insert (+org-capture--item-entry key
+                                                      description
+                                                      (when current
+                                                        (s-repeat (length current) " "))
+                                                      nil
+                                                      'all-the-icons-red))
+                    (push key allowed-keys)))
+                ;; Display UI and let user select an entry or
+                ;; a sub-level prefix.
+                (goto-char (point-min))
+                (+org-capture--refresh-capture-frame)
+                (let ((pressed (org--mks-read-key
+                                allowed-keys prompt
+                                (not (pos-visible-in-window-p (1- (point-max)))))))
+                  (set-frame-name (alist-get 'name +org-capture-frame-parameters))
+                  (setq evil-normal-state-cursor original-evil-normal-state-cursor)
+                  (setq current (concat current pressed))
+                  (cond
+                   ((equal pressed "\C-g") (user-error "Abort"))
+                   ;; Selection is a prefix: open a new menu.
+                   ((member pressed des-keys))
+                   ;; Selection matches an association: return it.
+                   ((let ((entry (assoc current table)))
+                      (and entry (throw 'exit entry))))
+                   ;; Selection matches a special entry: return the
+                   ;; selection prefix.
+                   ((assoc current specials) (throw 'exit current))
+                   (t (error "No entry available")))))))
+        (when buffer
+          (kill-buffer buffer))))))
+
+
+(defun +org-capture--item-entry (key description &optional prefix parent-option-p key-face-extras)
+  "Returns a string representing an Org Capture item with the
+given KEY and DESCRIPTION.
+
+PREFIX is the character sequences already pressed during the
+capture process.
+
+If PARENT-OPTION-P is non-nil, it means the this entry has
+sub-entries and some sort of indication should be displayed
+
+The KEY-FACE-EXTRAS is one or more simbols to be added to the KEY
+face on the entry."
+  (let ((parent-option-p (when parent-option-p "›"))
+        (prefix (when prefix (concat prefix " "))))
+    (concat
+     (when prefix (propertize prefix 'face 'font-lock-comment-face))
+     (propertize key 'face (append '(bold) key-face-extras))
+     (propertize (or parent-option-p " ") 'face 'font-lock-comment-face)
+     "  " description (when parent-option-p "…"))))
+
+
+(defun +org-capture--refresh-capture-frame ()
+  "This function is called right after all the capture options
+were written in the capture buffer."
+  (when (+org-capture-frame-p)
+    (let ((frame (selected-frame)))
+    (set-frame-parameter frame 'left-fringe 30)
+    (set-frame-parameter frame 'right-fringe 30)
+    (set-frame-name " ")
+    (set-frame-size frame
+                    +org-capture--menu-width
+                    (+ (line-number-at-pos (point-max)) 3))
+    (+org-capture--reposition-frame)
+    (message ""))))
+#+end_src
+
+
+
+
+
+
+
+
+
+#+begin_src snippet :tangle share/capture/org-mode/capture-contact :mkdirp yes
 # -*- mode: snippet -*-
 # name: New Contact
 # key: capture-contact
