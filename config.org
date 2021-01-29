@@ -1762,9 +1762,8 @@ And configure it with ~use-package!~:
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! orderless
-  :demand t
+  :defer t
   :init
-  (icomplete-mode)
   (setq orderless-component-separator "[ &]"
         orderless-matching-styles '(orderless-prefixes
                                     orderless-initialism
@@ -2289,6 +2288,262 @@ Don't forget to close the =use-package!= sexp:
 #+begin_src emacs-lisp
 ) ;; use-package! perspective
 #+end_src
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+(defun project-bookmark-alist ()
+  (seq-filter
+   (lambda (bm)
+     (when-let ((proj-root (doom-project-root)))
+       (not (cl-search ".." (file-relative-name (bookmark-get-filename bm) proj-root)))))
+   bookmark-alist))
+
+
+;;;###autoload
+(defun project-bookmark-completing-read (prompt &optional default)
+  "Prompting with PROMPT, read a bookmark name in completion.
+PROMPT will get a \": \" stuck on the end no matter what, so you
+probably don't want to include one yourself.
+Optional arg DEFAULT is a string to return if the user input is empty.
+If DEFAULT is nil then return empty string for empty input."
+  (bookmark-maybe-load-default-file)    ; paranoia
+  (if (listp last-nonmenu-event)
+      (bookmark-menu-popup-paned-menu t prompt
+                                      (if bookmark-sort-flag
+                                          (sort (bookmark-all-names)
+                                                'string-lessp)
+                                        (bookmark-all-names)))
+    (let* ((completion-ignore-case bookmark-completion-ignore-case)
+           (default (unless (equal "" default) default))
+           (prompt (concat prompt (if default
+                                      (format " (%s): " default)
+                                    ": "))))
+      (completing-read prompt
+                       (lambda (string pred action)
+                         (if (eq action 'metadata)
+                             '(metadata (category . bookmark))
+                           (complete-with-action
+                            action
+                            (project-bookmar-alist)
+                            string
+                            pred)))
+                       nil 0 nil 'bookmark-history default))))
+
+
+;;;###autoload
+(defun project-bookmark-jump (bookmark &optional display-func)
+  "Jump to bookmark BOOKMARK (a point in some file).
+You may have a problem using this function if the value of variable
+`bookmark-alist' is nil.  If that happens, you need to load in some
+bookmarks.  See help on function `bookmark-load' for more about
+this.
+
+If the file pointed to by BOOKMARK no longer exists, you will be asked
+if you wish to give the bookmark a new location, and `bookmark-jump'
+will then jump to the new location, as well as recording it in place
+of the old one in the permanent bookmark record.
+
+BOOKMARK is usually a bookmark name (a string).  It can also be a
+bookmark record, but this is usually only done by programmatic callers.
+
+If DISPLAY-FUNC is non-nil, it is a function to invoke to display the
+bookmark.  It defaults to `pop-to-buffer-same-window'.  A typical value for
+DISPLAY-FUNC would be `switch-to-buffer-other-window'."
+  (interactive
+   (list (project-bookmark-completing-read "Jump to bookmark"
+                                           bookmark-current-bookmark)))
+  (unless bookmark
+    (error "No bookmark specified"))
+  (bookmark-maybe-historicize-string bookmark)
+  ;; Don't use `switch-to-buffer' because it would let the
+  ;; window-point override the bookmark's point when
+  ;; `switch-to-buffer-preserve-window-point' is non-nil.
+  (bookmark--jump-via bookmark (or display-func 'pop-to-buffer-same-window)))
+#+end_src
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+
+;;;###autoload
+(defun project-recentf-list ()
+  (seq-filter
+   (lambda (fname)
+     (when-let ((proj-root (doom-project-root)))
+       (not (cl-search ".." (file-relative-name fname proj-root)))))
+   recentf-list))
+
+;;;###autoload
+(defun persp-current-real-buffers ()
+  "Return a list of names of all living buffers in the current perspective."
+  (let ((ignore-rx (persp--make-ignore-buffer-rx)))
+    (cl-loop for buf in (persp-current-buffers)
+             if (and (doom-real-buffer-p buf)
+                     (not (string-match-p ignore-rx (buffer-name buf))))
+             collect buf)))
+
+;;;###autoload
+(defun persp-current-real-buffer-names ()
+  "Return a list of names of all living buffers in the current perspective."
+  (let ((ignore-rx (persp--make-ignore-buffer-rx)))
+    (cl-loop for buf in (persp-current-buffers)
+             if (and (doom-real-buffer-p buf)
+                     (not (string-match-p ignore-rx (buffer-name buf))))
+             collect (buffer-name buf))))
+
+;;;###autoload
+(defun persp-switch-to-real-buffer* (buffer-or-name)
+  "Like `switch-to-buffer', restricted to the current perspective.
+This respects ido-ignore-buffers, since we automatically add
+buffer filtering to ido-mode already (see use of
+PERSP-SET-IDO-BUFFERS)."
+  (interactive
+   (list
+    (if (or current-prefix-arg (not persp-mode))
+        (let ((read-buffer-function nil))
+          (read-buffer-to-switch "Switch to buffer"))
+      (let* ((candidates (persp-current-real-buffer-names))
+             (other (buffer-name (persp-other-buffer))))
+        ;; NB: This intentionally calls completing-read instead of
+        ;; persp-interactive-completion-function, since it is expected to have
+        ;; been replaced by a completion framework.
+        (completing-read (format "Switch to buffer%s: "
+                                 (if other
+                                     (format " (default %s)" other)
+                                   ""))
+                         candidates
+                         nil nil nil nil
+                         (buffer-name (persp-other-buffer)))))))
+  (let ((buffer (window-normalize-buffer-to-switch-to buffer-or-name)))
+    (switch-to-buffer buffer)))
+#+end_src
+
+
+#+caption: autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/workspaces.el :mkdirp yes
+;;;###autoload
+(defun persp-consult-buffer ()
+  "Enhanced `switch-to-buffer' command with support for perspectives.
+
+The command supports recent files, bookmarks, views and project
+files as virtual buffers. Buffers are previewed. Furthermore
+narrowing to buffers (b), files (f), bookmarks (m), views (v) and
+project files (p) is supported via the corresponding keys. In
+order to determine the project-specific files and buffers, the
+`consult-project-root-function' is used. The list of available
+views is obtained by calling `consult-view-list-function'."
+  (interactive)
+  (require 'consult)
+  (persp-consult--buffer #'switch-to-buffer
+                         #'find-file
+                         #'bookmark-jump))
+
+(defun persp-consult--buffer (open-buffer open-file open-bookmark)
+  "Backend implementation of `consult-buffer'.
+
+Depending on the selected item OPEN-BUFFER, OPEN-FILE or
+OPEN-BOOKMARK will be used to display the item."
+  (let* ((curr-buf (current-buffer))
+         (all-bufs (append (delq curr-buf (persp-current-real-buffers)) (list curr-buf)))
+         (buf-file-hash (let ((ht (make-hash-table :test #'equal :size (length all-bufs))))
+                          (dolist (buf all-bufs ht)
+                            (when-let (file (buffer-file-name buf))
+                              (puthash file t ht)))))
+         (buf-filter (consult--regexp-filter consult-buffer-filter))
+         (bufs (mapcar (lambda (x)
+                         (let ((name (buffer-name x)))
+                           (consult--buffer-candidate
+                            (if (string-match-p buf-filter name) ?h ?b)
+                            name 'consult-buffer)))
+                       all-bufs))
+         (views (when consult-view-list-function
+                  (mapcar (lambda (x)
+                            (consult--buffer-candidate ?v x 'consult-view))
+                          (funcall consult-view-list-function))))
+         (bookmarks (progn
+                      (bookmark-maybe-load-default-file)
+                      (mapcar (lambda (x)
+                                (consult--buffer-candidate ?m (car x) 'consult-bookmark))
+                              (project-bookmark-alist))))
+         (all-files (seq-remove (lambda (x) (gethash x buf-file-hash)) (project-recentf-list)))
+         (files (mapcar (lambda (x)
+                          (consult--buffer-candidate ?f (abbreviate-file-name x) 'consult-file))
+                        all-files))
+         (proj-root (and consult-project-root-function (funcall consult-project-root-function)))
+         (proj-bufs (when proj-root
+                      (mapcar (lambda (x)
+                                (consult--buffer-candidate ?p (buffer-name x) 'consult-buffer))
+                              (seq-filter (lambda (x)
+                                            (when-let (file (buffer-file-name x))
+                                              (string-prefix-p proj-root file)))
+                                          all-bufs))))
+         (proj-files (when proj-root
+                       (let ((len (length proj-root))
+                             (hidden-root (propertize proj-root 'invisible t)))
+                         (mapcar (lambda (x)
+                                   (consult--buffer-candidate
+                                    ?q
+                                    (concat hidden-root (substring x len))
+                                    'consult-file))
+                                 (seq-filter (lambda (x) (string-prefix-p proj-root x)) all-files)))))
+         (selected
+          (consult--read
+           "Switch to: " (append bufs files proj-bufs proj-files views bookmarks)
+           :history 'consult--buffer-history
+           :sort nil
+           :predicate
+           (lambda (cand)
+             (let ((type (- (aref cand 0) consult--tofu-char)))
+               (when (= type ?q) (setq type ?p)) ;; q=project files
+               (if (eq consult--narrow 32) ;; narrowed to hidden buffers
+                   (= type ?h)
+                 (and
+                  (/= type ?h) ;; non-hidden buffers
+                  (or (not consult--narrow) ;; narrowed
+                      (= type consult--narrow))))))
+           :narrow `((32 . "Hidden")
+                     (?b . "Buffer")
+                     (?f . "File")
+                     (?m . "Bookmark")
+                     ,@(when proj-root '((?p . "Project")))
+                     ,@(when consult-view-list-function '((?v . "View"))))
+           :category 'consult-buffer
+           :lookup
+           (lambda (_ candidates cand)
+             (if (member cand candidates)
+                 (cons (pcase-exhaustive (- (aref cand 0) consult--tofu-char)
+                         (?b open-buffer)
+                         (?h open-buffer)
+                         (?m open-bookmark)
+                         (?v consult-view-open-function)
+                         (?p open-buffer)
+                         (?q open-file)
+                         (?f open-file))
+                       (substring cand 1))
+               ;; When candidate is not found in the alist,
+               ;; default to creating a new buffer.
+               (and (not (string-blank-p cand)) (cons open-buffer cand))))
+           :preview
+           (lambda (cand restore)
+             (cond
+              (restore)
+              ;; In order to avoid slowness and unnecessary complexity, we
+              ;; only preview buffers. Loading recent files, bookmarks or
+              ;; views can result in expensive operations.
+              ((and (or (eq (car cand) #'switch-to-buffer)
+                        (eq (car cand) #'switch-to-buffer-other-window))
+                    (get-buffer (cdr cand)))
+               (funcall (car cand) (cdr cand) 'norecord)))))))
+    (when selected (funcall (car selected) (cdr selected)))))
+#+end_src
+
+#+begin_src emacs-lisp
+(map!
+ (:leader
+   :desc "Switch buffer" :nvm "," #'persp-consult-buffer
+   :desc "Switch to any buffer" :nvm "<" #'consult-buffer
+   ))
+#+end_src
+
 
 Now we can install the =projectile= extension for =perspective.el=:
 
