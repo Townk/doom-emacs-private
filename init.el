@@ -97,7 +97,9 @@
        syntax            ; tasing you for every semicolon you forget
        (spell            ; tasing you for misspelling mispelling
         ;; +flyspell
-        +enchant
+        +aspell
+        ;; +hunspell
+        ;; +enchant
         +everywhere
         )
        grammar           ; tasing grammar mistake every you make

@@ -3478,10 +3478,95 @@ Let's look into my list of requirements for writing:
 - Inline images :: If I add an image to a text, I want the image to show up right away. Also, if I open a file containing an image, Emacs should display the image automatically. I also want to auto-split the image into chunks so when navigate the text with the cursor, the screen does not jump over the image.
 - Inline formulas :: As with images, I want to render math formulas automatically;
 - Formatted tables :: Tables on my Org files should stay aligned all the time, and render with proper borders;
-- Focus writting :: When I need to dive deep into creating a document, it's useful to remove distractions from my writing environment. Besides getting rid of UI elements, I would like to have the same /Focus Mode/ behavior from [[https://ia.net/writer][iA Writer]];
+- Focus writing :: When I need to dive deep into creating a document, it's useful to remove distractions from my writing environment. Besides getting rid of UI elements, I would like to have the same /Focus Mode/ behavior from [[https://ia.net/writer][iA Writer]];
 - Snippets :: I like to have a snippet system to help me with boilerplate writing for Org;
 
 Although we already covered most of this list of the previous section, we still need to configure /File templates,/ some personal /Snippets/, and /Focus Writing/, so let's get to it.
+
+*** Dictionary and writing helpers
+
+#+begin_src shell :tangle no
+λ> cd $TMPDIR
+λ> curl 'http://app.aspell.net/create?'\
+        'max_size=95&'\
+        'spelling=GBs&'\
+        'spelling=AU&'\
+        'max_variant=0&'\
+        'diacritic=keep&'\
+        'special=hacker&'\
+        'special=roman-numerals&'\
+        'encoding=utf-8&'\
+        'format=inline&'\
+        'download=aspell' | tar -xj
+λ> cd aspell6-en-custom
+λ> ./configure --vars DESTDIR=$XDG_DATA_HOME/aspell && make && make install
+λ> cd ..
+λ> rm -rf aspell6-en-custom
+#+end_src
+
+#+caption: ~/.aspell.conf
+#+begin_src conf :tangle ~/.aspell.conf :mkdirp yes
+personal       ~/.local/share/aspell/personal.en.pws
+local-data-dir ~/.local/share/aspell
+master         en-custom
+sug-mode       ultra
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defconst +spell-aspell-local-data-dir (expand-file-name "~/.local/share/aspell")
+  "Directory of Aspell dictionaries.")
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defconst +spell-aspell--personal-dictionary (expand-file-name "personal.en.pws" +spell-aspell-local-data-dir)
+  "File path for my personal word dictionaries.")
+
+(when (not (file-exists-p +spell-aspell--personal-dictionary))
+  (append-to-file "personal_ws-1.1 en 0 utf-8" nil +spell-aspell--personal-dictionary))
+#+end_src
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +spell-get-aspell-cmd-flags (&optional camel-case &rest extra-args)
+  "Return the list of arguments Emacs should use to run aspell.
+
+You can use this list of arguments directly as the value of
+`ispell-extra-args'. If CAMEL-CASE is a non-nil value, the list
+of arguments will include the \"--camel-case\" option.
+
+If EXTRA-ARGS is not nil, this function will append its value
+to the result."
+  (append '("--sug-mode=ultra") extra-args (when camel-case '("--camel-case"))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! ispell
+  (setq ispell-personal-dictionary +spell-aspell--personal-dictionary)
+  (setq ispell-really-aspell t)
+  (setq ispell-extra-args (+spell-get-aspell-cmd-flags t))
+
+  (add-hook! org-mode
+    (defun +spell-add-extra-ignores-to-org-h ()
+      "Configure `ispell-skip-region-alist' for `org-mode'."
+      (make-local-variable 'ispell-skip-region-alist)
+      (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+      (add-to-list 'ispell-skip-region-alist '("~" "~"))
+      (add-to-list 'ispell-skip-region-alist '("=" "="))
+      (add-to-list 'ispell-skip-region-alist '("\\[\\[" . "]\\["))
+      (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+      (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+
+      (setq-local ispell-extra-args (+spell-get-aspell-cmd-flags nil
+                                                                 "--lset-filter=url:email:context"
+                                                                 "--context-visible-first=true"
+                                                                 "--add-context-delimiters=~ ~"
+                                                                 "--add-context-delimiters== ="
+                                                                 "--add-context-delimiters=[[ ][")))))
+#+end_src
 
 *** Templates
 
