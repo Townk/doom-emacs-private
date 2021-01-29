@@ -571,7 +571,7 @@ To make Emacs turn =smartparens= and related packages correctly, make sure that 
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! smartparens
-  :init (add-hook 'smartparens-enabled-hook #'evil-cleverparens-mode)
+  :init (add-hook 'smartparens-strict-mode-hook #'evil-cleverparens-mode)
   :hook ((prog-mode . smartparens-strict-mode)))
 #+end_src
 
