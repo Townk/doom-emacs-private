@@ -262,8 +262,8 @@
 ;; I need this hook here to make sure my tangle runs this autoloaded function.
 (add-hook 'org-babel-post-tangle-hook
           #'(lambda ()
-              (when-let ((make-backup-files nil)
-                         (last))
+              (let ((make-backup-files nil)
+                    (last))
                 (goto-char (point-max))
                 (when (equal (char-before) ?\n)
                   (delete-char -1)
