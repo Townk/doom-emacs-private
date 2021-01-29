@@ -5972,6 +5972,21 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 ** TODO Emails
 ** TODO Calendars
 ** TODO Contacts
+TBD
+
+#+begin_src emacs-lisp
+(defvar +org-contacts-file (concat org-directory "/contacts.org")
+  "Path to the org file that will store all contacts.")
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! org-contacts
+  :after (org-capture)
+  :init
+  (setq org-contacts-icon-property "PICTURE"
+        org-contacts-icon-use-gravatar t))
+#+end_src
+
 * Appendix
 
 ** The =init.el= file
