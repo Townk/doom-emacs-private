@@ -50,7 +50,7 @@ Since this document is about a text editor configuration, I have to highlight co
 
 The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
-* Standard features [5/12]
+* Standard features [5/13]
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve the same results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
 
 ** DONE Requirements
@@ -63,6 +63,9 @@ By default, Doom starts a fresh emacs process fast, but it take its sweet time t
 
 *** Modal editing
 I need to come clean to the reader about my past experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
+
+*** Snippets
+Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some book keeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
 
 *** At point completions
 Also know as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
@@ -351,8 +354,74 @@ A quick trick to make Evil understand the meaning of /"word"/ as I just describe
 (defalias #'forward-evil-word #'forward-evil-symbol)
 #+end_src
 
+** TODO Snippets
+TBD
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +snippets/delete-backward-char-or-field (&optional field)
+  "Delete backward, or skip the current field if it's empty.
+Prevents Yas from interfering with backspace deletion."
+  (interactive)
+  (let ((field (or field (and (overlayp yas--active-field-overlay)
+                              (overlay-buffer yas--active-field-overlay)
+                              (overlay-get yas--active-field-overlay 'yas--field)))))
+    (cond ((not (yas--field-p field))
+           (call-interactively #'delete-backward-char))
+          ((and (not (yas--field-modified-p field))
+                (eq (point) (marker-position (yas--field-start field))))
+           (yas--skip-and-clear field)
+           (yas-next-field 1))
+          ((eq (point) (marker-position (yas--field-start field))) nil)
+          ((call-interactively #'delete-backward-char)))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! yasnippet
+  :defer-incrementally eldoc easymenu help-mode
+  :config (yas-reload-all))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+ (:after yasnippet
+ 
+  (:leader :prefix "h"
+   :desc "Show snippets" :n "y" #'yas-describe-tables)
+
+  (:map yas-keymap
+   :g [backspace] #'+snippets/delete-backward-char-or-field
+   :g [deletechar] #'+snippets/delete-forward-char-or-field
+   :g [s-return] #'yas-exit-snippet)))
+#+end_src
+
 ** TODO Inline completion
 TBD
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +completion/yasnippet-or-completion ()
+  (interactive)
+  (if (or (not yas-minor-mode)
+          (null (yas-expand)))
+      (company-complete-common-or-cycle)
+    (company-abort)))
+#+end_src
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defun +completion/complete-selection-or-return ()
+  (interactive)
+  (if company-selection
+      (company-complete-selection)
+    (company-abort)
+    (execute-kbd-macro (read-kbd-macro "<return>"))))
+#+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -360,13 +429,37 @@ TBD
   (setq company-idle-delay 0.5)
   (setq company-minimum-prefix-length 2)
   (setq company-show-numbers t)
+  (setq company-box-doc-enable nil)
   (add-hook 'evil-normal-state-entry-hook #'company-abort)
 
-  (company-tng-mode 1)
-  (setq company-frontends (delq 'company-pseudo-tooltip-frontend company-frontends)))
+  (setq company-frontends (delq 'company-pseudo-tooltip-frontend company-frontends))
+
+  (map! :map company-active-map
+        :g [tab] #'+completion/yasnippet-or-completion
+        :g [backtab] #'company-select-previous
+        :g [down] #'company-select-next
+        :g [up] #'company-select-previous
+        :g [return] #'+completion/complete-selection-or-return
+        :g "C-S-j" #'company-next-page
+        :g "C-S-k" #'company-previous-page
+        :g "C-/" #'company-show-doc-buffer))
 #+end_src
 
 ** TODO Auto-indentation
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! aggressive-indent)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! aggressive-indent
+ :defer t
+ :init
+ (add-hook 'prog-mode-hook 'aggressive-indent-mode))
+#+end_src
+
 ** DONE Smart backspace
 As part of my day job, I had to do a lot of Android development, and inevitably I used [[https://www.jetbrains.com/][JetBrains]]
 IDE [[https://www.jetbrains.com/idea/][IntelliJ IDEA]]. I bring this up not to chastise who uses or to complain about it. In face, IntelliJ the best IDE for Java and Kotlin out there. It has some features that are so good, that I want to implement on any text editor I use. One of these features is what I call /Smart Backspace/.
@@ -3519,7 +3612,7 @@ I also need to adjust the window navigation keys that clash with default Org bin
   (:map org-mode-map
    :v "s-k" #'(lambda()
                 (interactive)
-                (yas-expand-snippet "link"
+                (yas-expand-snippet (yas-lookup-snippet "Link")
                                     (region-beginning)
                                     (region-end)))
    )))
@@ -3664,7 +3757,28 @@ to the result."
 
 *** Templates
 
-**** TODO Append Yasnippet directories to include the =.templates= from my Org infrastructure
+#+begin_src emacs-lisp
+(defconst +file-templates-yasnippet-dir (expand-file-name "share/templates" doom-private-dir))
+(pushnew! yas-snippet-dirs '+file-templates-yasnippet-dir)
+#+end_src
+
+
+#+caption: share/templates/org-mode/__
+#+begin_src snippet :tangle share/templates/org-mode/__ :mkdirp yes
+# -*- mode: snippet -*-
+# name: Blank Org File
+# key: __
+# --
+#+TITLE: ${1:`(s-titleized-words (file-name-sans-extension (buffer-name)))`}
+#+AUTHOR: `user-full-name`
+#+EMAIL: `user-mail-address`
+#+DATE: `(format (format-time-string "%B %%s, %Y") (string-to-number (format-time-string "%d")))`
+#+LANGUAGE: ${2:en}
+
+`%`$0
+#+end_src
+
+
 **** TODO Define a Hydra for /new documents/ to use my templates
 
 *** Focus Writing
@@ -3678,16 +3792,6 @@ This section shows the snippets I decide to use for writing.
 
 Before defining the snippets though, I need to adjust the ~yas-keymap~ to behave properly with evil:
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(map!
- (:after yasnippet
-  (:map yas-keymap
-   :i [backspace] #'+snippets/delete-backward-char
-   :i [delete] #'+snippets/delete-forward-char-or-field
-   :i [s-return] #'yas-exit-snippet
-   :i [M-tab] #'yas-skip-and-clear-field)))
-#+end_src
 
 **** Source blocks
 This journey of literate configuration made me realize how much faster is to /prepare/ source blocks using snippets.
@@ -3801,12 +3905,22 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 ;;;###autoload
 (defun +org-link--links-in-kill-ring ()
   "Return a list of links in kill ring."
-  (let ((kill-ring-kills (mapcar #'substring-no-properties kill-ring))
-        (potential-links))
+  (require 'goto-addr)
+  (let* ((kill-ring-kills (mapcar #'substring-no-properties kill-ring))
+         (clipboard (gui-get-selection 'CLIPBOARD 'NSStringPboardType))
+         (clipboard-url (when (string-match goto-address-url-regexp clipboard)
+                          (list (match-string 0 clipboard))))
+         (potential-links))
     (dolist (kill kill-ring-kills)
-      (when (string-match-p ffap-url-regexp kill)
-        (push kill potential-links)))
-    (nreverse potential-links)))
+      (let (last-match)
+        (while
+            (prog1
+                (string-match goto-address-url-regexp
+                              kill last-match)
+              (setq last-match (match-end 0)))
+          (cl-pushnew (match-string 0 kill) potential-links)
+          )))
+    (append clipboard-url (delete-dups potential-links))))
 #+end_src
 
 #+begin_src snippet :tangle snippets/org-mode/link :mkdirp yes
@@ -3815,9 +3929,11 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 # key: link
 # --
 [[${1:$$(unless (or yas-moving-away-p yas-modified-p)
-  (yas-auto-next
-    (yas-choose-value (+org-link--links-in-kill-ring))))}][${2:`(or yas-selected-text
-                                                                    "description")`}]${0:$$(insert "]")}
+  (let ((links (+org-link--links-in-kill-ring)))
+    (if links
+        (yas-auto-next
+          (completing-read "Choose the URL to link: " links))
+      "url")))}][${2:`(or yas-selected-text "description")`}]]$0
 #+end_src
 
 ** TODO Reading or reviewing
