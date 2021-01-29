@@ -1,3 +1,5 @@
+# -*- eval: (org-num-mode 1); -*-
+
 #+TITLE: Thiago's Emacs Configuration
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
@@ -3184,6 +3186,12 @@ But before we dive in each one of these usages, there are some things I like to 
 
 The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
 
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(unpin! org-mode)
+#+end_src
+
+
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq org-directory (expand-file-name "~/depot/Dropbox/org"))
@@ -3275,7 +3283,7 @@ Then I like to have some indentation indicating which header level I am:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  (setq org-startup-indented t)
+  (setq org-startup-indented nil)
 #+end_src
 
 I also like to display text formatting as close to WYSIWYG as I can have. This means that if I mark a word as italic, instead of showing =/word/=, I want to display /word/:
@@ -3292,6 +3300,12 @@ When Org collapse a header, it displays an ellipsis right after the header text.
 #+begin_src emacs-lisp
   (setq org-ellipsis "  ")
 #+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+  (setq org-adapt-indentation nil)
+#+end_src
+
 
 In some documents, I need to write math formulas and Org can render them pretty well using LaTeX, but I like to adjust their render to use SVG instead of image, and use a transparent background to match the overall theme of Emacs
 
@@ -3368,7 +3382,7 @@ I will use the ='current-window= option to have the source block behaving like a
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  (setq org-src-window-setup 'current-window)
+  (setq org-src-window-setup 'split-window-right)
 #+end_src
 
 After all these tweaks, we can close our parenthesis:
@@ -3384,17 +3398,6 @@ First we add the plugin on our =packages.el= file:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! org-mode
-  :recipe (:host github
-           :repo "yantar92/org"
-           :branch "feature/org-fold"
-           :files ("*.el" "lisp/*.el" "contrib/lisp/*.el")
-           :pre-build (with-temp-file (expand-file-name "org-version.el" (straight--repos-dir "org"))
-                        (insert "(fset 'org-release (lambda () \"9.5\"))\n"
-                                "(fset 'org-git-version #'ignore)\n"
-                                "(provide 'org-version)\n")))
-  :shadow 'org)
-
 (package! org-fragtog)
 #+end_src
 
