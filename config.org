@@ -105,7 +105,6 @@ This section will cover some changes I like to do on the Emacs (or Doom) default
 It's important we let Emacs know who we are, and also, according to Doom's comments on the sample =config.el= available upon installation, some functionality uses this identification (e.g. GPG configuration, email clients, file templates and snippets).
 
 #+caption: config.el
-#+name: source
 #+begin_src emacs-lisp
 ;;; DOOMDIR/config.el -*- lexical-binding: t; -*-
 
@@ -292,7 +291,7 @@ I said /should/, because I disliked this behavior since I first used Vim. I neve
 
 To fix the moving back the cursor annoyance, set the variable ~evil-move-cursor-back~ to ~nil~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq evil-move-cursor-back nil)
 #+end_src
@@ -307,7 +306,7 @@ I'm sure that, at some point, this behavior made sense for a lot of developers, 
 
 And just like with the previous annoyance, Evil also offers an option to change this behavior. If you want to *not* copy the content of a selection you just paste something on top of it, set the variable ~evil-kill-on-visual-paste~ to ~nil~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq evil-kill-on-visual-paste nil)
 #+end_src
@@ -322,7 +321,7 @@ However, Evil is an Emacs package, and it also tries to integrate with existent 
 
 If you want Evil to synchronize its visual selection with the Emacs region, set the variable ~evil-visual-region-expanded~ to a non-~nil~ value:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq evil-visual-region-expanded t)
 #+end_src
@@ -345,7 +344,7 @@ If you're editing a text file for blog, the meaning of /"word"/ is most likely t
 
 A quick trick to make Evil understand the meaning of /"word"/ as I just described, is to create an alias for the function ~forward-evil-symbol~, and name it ~forward-evil-word~. This way, we override the normal function to act as if it is the ~forward-evil-symbol~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (defalias #'forward-evil-word #'forward-evil-symbol)
 #+end_src
@@ -353,7 +352,7 @@ A quick trick to make Evil understand the meaning of /"word"/ as I just describe
 ** TODO Inline completion
 TBD
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! company
   (setq company-idle-delay 0.5)
@@ -474,7 +473,7 @@ The simplest explanation is that you don't really need pair balance protection i
 
 To make Emacs turn =smartparens= and related packages correctly, make sure that you turn on =evil-cleverparens-mode= on the =smartparens-enabled-hook=, and only enable the strict mode when editing a =prog-mode= buffer:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! smartparens
   :init (add-hook 'smartparens-enabled-hook #'evil-cleverparens-mode)
@@ -485,7 +484,7 @@ Doom will turn on =smartparens= appropriately, so we don't need to hook anything
 
 To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! smartparens
   (show-smartparens-global-mode 1))
@@ -530,7 +529,7 @@ And to help us with this workflow, let's create couple /auto-loaded/ functions t
 
 And then, after loading Evil, we can hook thes functions to a mode switch:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! evil
   (add-hook! '(evil-emacs-state-entry-hook
@@ -541,7 +540,7 @@ And then, after loading Evil, we can hook thes functions to a mode switch:
 
 Also, let's make sure we are displaying line numbers on any coding buffer:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq-hook! 'prog-mode-hook display-line-numbers-type 'visual))
 #+end_src
@@ -549,7 +548,7 @@ Also, let's make sure we are displaying line numbers on any coding buffer:
 ** TODO Auto-Save
 First of all, since I'm going to save my work constantly, I don't want Emacs to ask me if it should really exit, or if it should kill outstanding processes while doing it. For me, if I'm telling Emacs to quit, I want it to do it, regardless its state, but I don't want to lose any content of my current work. So, the first thing I'm going to do, is to disable questions when I'm quitting Emacs:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq confirm-kill-emacs nil
       confirm-kill-processes nil)
@@ -571,21 +570,21 @@ Emacs allows you to define some /advices/ to any function you want. This allows 
 
 And to wrap up this configuration, I enable the auto-save mode:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (auto-save-visited-mode 1)
 #+end_src
 
 Call the same advice as a normal function when Emacs executes the auto-save hook:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-hook! 'auto-save-hook #'+doom-save-all-buffers-a)
 #+end_src
 
 And add the advice function to the ~after-focus-change-function~ as well, just to make sure Emacs save any outstanding buffer as soon as possible if it loses focus:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-function :after after-focus-change-function #'+doom-save-all-buffers-a)
 #+end_src
@@ -594,7 +593,7 @@ The aggressive auto-save will work as expected, but it will crate a side effect 
 
 Doom documentation offers a partial solution to this problem asking us to remove the auto-tangle function from the save hook, so let's do it:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
@@ -603,7 +602,7 @@ That works, but now we have to do a =doom sync= for every change on our config. 
 
 This got me thinking: I have to restart Emacs if I want my change to take effect. Why don't I add the tangle operation when Emacs is exiting?
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 ;; (add-hook 'kill-emacs-hook
 ;;           #'(lambda()
@@ -619,7 +618,7 @@ Another core behavior that does not play well with my aggressive auto-save confi
 
 To adjust that, let's make =ws-butler= behave how I expect it:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! ws-butler
   (setq ws-butler-keep-whitespace-before-point t))
@@ -665,7 +664,7 @@ Then, I like to have the analog function to call when we create a frame:
 
 With the function defined, I just need to connect them to the correct hooks:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-hook 'kill-emacs-hook #'+doom/save-frame-dimensions-h)
 (+doom/restore-frame-dimensions-h)
@@ -692,12 +691,12 @@ Doom offers =evil-escape= as a default package, but was never able to adjust my 
 
 The last Evil tweak I have is not really on Evil, but is tightly coupled with it. I like =evil-goggles= to be more prominent than the Doom's default:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! evil-matchit :defer t)
 #+end_src
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! evil-goggles
   (evil-goggles-use-magit-faces)
@@ -707,7 +706,7 @@ The last Evil tweak I have is not really on Evil, but is tightly coupled with it
     '(evil-goggles-undo-redo-change-face :inherit magit-diff-base)))
 #+end_src
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! evil-goggles
   :hook (doom-first-input . evil-goggles-mode)
@@ -780,14 +779,14 @@ The last Evil tweak I have is not really on Evil, but is tightly coupled with it
 ** TODO Keybindings
 As a general rule, I'm pretty happy with the default Evil keybindings, but I still like to make some changes overall. So, let's change some keybindings:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
 #+end_src
 
 When I have more than one window opened on Emacs, I like to move my cursor using the default movement keys (=h=, =j=, =k=, and =l=) plus =Ctrl=:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   :gn "C-h" #'evil-window-left
   :gn "C-j" #'evil-window-down
@@ -795,7 +794,7 @@ When I have more than one window opened on Emacs, I like to move my cursor using
   :gn "C-l" #'evil-window-right
 #+end_src
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   :gn "s-d" #'evil-mc-make-and-goto-next-match
   :gn "s-u" #'evil-mc-skip-and-goto-prev-cursor
@@ -805,7 +804,7 @@ When I have more than one window opened on Emacs, I like to move my cursor using
   :gn "C-M-j" #'evil-mc-make-cursor-move-next-line
 #+end_src
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   (:prefix "g"
      :desc "Eval last sexp" :n ")" #'eval-last-sexp)
@@ -813,7 +812,7 @@ When I have more than one window opened on Emacs, I like to move my cursor using
 
 Unfortunately, =outline= also defines actions for these keys, so I have to /unbind/ them to make sure they work as expected:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   (:after outline
     (:map outline-mode-map
@@ -825,7 +824,7 @@ Unfortunately, =outline= also defines actions for these keys, so I have to /unbi
 
 And since we're on the window navigation subject, let me adjust couple bindings related to selecting which window to keep:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   (:leader
     (:prefix "w"
@@ -835,7 +834,7 @@ And since we're on the window navigation subject, let me adjust couple bindings 
 
 Another /nice to have/ binding I got used to, is to move blocks of text up and down, using =j= and =k=, plus the =Meta= (a.k.a. =Alt=, =option=, or  =⌥=):
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   :nvi "M-j" #'drag-stuff-down
   :nvi "M-k" #'drag-stuff-up
@@ -843,7 +842,7 @@ Another /nice to have/ binding I got used to, is to move blocks of text up and d
 
 You might have noticed that I use the =undo-tree= package to manage action history. This package offer a visual navigation of your file history jumps, allowing you too navigate between forks of /undo/ commands, and I like to map this tree visualization to the key =U= (uppercase u):
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   :n "U" #'undo-tree-visualize
 #+end_src
@@ -862,7 +861,7 @@ I like to have a dedicated prefix key to bring back some popup buffers I might h
 
 Something that I really like but usually forget to use is the ability to insert a new line above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
   :gi [s-return]   #'+default/newline-below
   :gi [s-S-return] #'+default/newline-above
@@ -870,7 +869,7 @@ Something that I really like but usually forget to use is the ability to insert 
 
 And now we can close our mapping:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp :padline no
 ) ;; map!
 #+end_src
@@ -887,7 +886,7 @@ I spend too much time thinking that I should preserve the =C-x= keybinding for E
 
 Now that we installed the package, let's configure it with ~use-package!~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! plus-minus :defer t)
 #+end_src
@@ -921,7 +920,7 @@ Doom ships with the =rotate-text= package by default, but I need couple helper f
 
 And I also like to define some extra words for rotation:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! rotate-text
   (add-to-list 'rotate-text-words '("yes" "no"))
@@ -931,7 +930,7 @@ And I also like to define some extra words for rotation:
 
 With all in place, we just need to define the keybindings:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
   :n "C-a" #'+doom/inc-or-rotate-at-point
@@ -948,14 +947,14 @@ The first step into this unspecified requirement, is to have a good theme.
 
 For a long time I tried to avoid this theme, but didn't mater how much I try to use a different one, I always end up installing the /Tomorrow Night/ theme; and according to Doom's files, there are two ways to load a theme. Both assume we have the theme installed and available. You can either set ~doom-theme~ or manually load a theme with the ~load-theme~ function. I prefer to use the Doom's variable:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq doom-theme 'doom-tomorrow-night)
 #+end_src
 
 And just to add a bit more differentiation to the theme's fonts, let's allow the theme to use bolds and italics:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t)
@@ -1005,7 +1004,7 @@ They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =
 
 Since I'm adding a different font for UI elements, I'll create a custom font just for this purpose:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (defface variable-pitch-ui `((t :font ,(font-spec :family "Roboto" :size 16)))
   "Extra face used on UI elements.")
@@ -1013,7 +1012,7 @@ Since I'm adding a different font for UI elements, I'll create a custom font jus
 
 I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =variable-pitch-ui= when we need it down the road):
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
       doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32)
@@ -1022,7 +1021,7 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
 
 I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (set-face-attribute 'fill-column-indicator nil
                     :font "Arial Unicode MS"
@@ -1032,7 +1031,7 @@ I found that on macOS, the ~fill-column-indicator~ face, can't render unicode ch
 
 And since we just fix the fill column indication, let's turn it on and set the appropriate character to it:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq-default fill-column 100
               display-fill-column-indicator-column 100
@@ -1041,7 +1040,7 @@ And since we just fix the fill column indication, let's turn it on and set the a
 
 Another indicator I like to turn on, is the indentation guide. As with the fill column indicator, I don't like the character set to it by default, so I'll also fix it:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq-default highlight-indent-guides-character 9482
               highlight-indent-guides-responsive 'dynamic)
@@ -1051,7 +1050,7 @@ Now, to tidy the appearance, I like to set some minor tweaks to have a pretty go
 
 I like to remove the title from the app window.
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq frame-title-format nil
       ns-use-proxy-icon nil)
@@ -1060,7 +1059,7 @@ I like to remove the title from the app window.
 
 And make scroll not jumpy:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq ns-use-thin-smoothing t)
 #+end_src
@@ -2935,7 +2934,7 @@ Returns t if successful, nil otherwise."
 
 And bind this command to its key:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
    :desc "Load session from file"         "l"   #'+workspace/load-session
 #+end_src
@@ -2975,14 +2974,14 @@ And we need a function to restore the last saved session:
 
 With the restore command done, we can associate it with its key:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
    :desc "Restore last session"           "R"   #'+workspace/restore-last-session
 #+end_src
 
 Now that we defined all /leader/ keys, we can close our /leader/ mapping:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   )  ;; :prefix-map ("TAB" . "workspace")
  )  ;; :leader
@@ -2991,7 +2990,7 @@ Now that we defined all /leader/ keys, we can close our /leader/ mapping:
 *** Other shortcuts
 Doom also offers nice shortcuts for us to access our workspace. They're all bound to =Meta= plus a number:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
  :n "C-t"   #'+workspace/new
  :n "C-S-t" #'+workspace/display
@@ -3009,7 +3008,7 @@ Doom also offers nice shortcuts for us to access our workspace. They're all boun
 
 And to really copy Doom's setup, let's add the same shortcuts for Mac:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
  (:when IS-MAC
   :n "s-1"   #'+workspace/switch-to-0
@@ -3026,14 +3025,14 @@ And to really copy Doom's setup, let's add the same shortcuts for Mac:
 
 These shortcuts close the majority of workspace binding we may need:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 )  ;; map!
 #+end_src
 
 There are couple shortcuts that are not defined with the ~map!~ function, so we can tackle them here:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (define-key! persp-mode-map
   [remap delete-window] #'+workspace/close-window-or-workspace
@@ -3071,7 +3070,7 @@ frame, if one exists) and move to the next."
 
 When we have the feature =workspaces= on our =init.el=, Doom will add an option on its dashboard to allow us to recover the last saved session. Since we disabled that feature, we need to add this option again:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-to-list
  '+doom-dashboard-menu-sections
@@ -3084,7 +3083,7 @@ When we have the feature =workspaces= on our =init.el=, Doom will add an option 
 
 The only thing remaining on our refactor, is to connect our auto-save function to the hook ~kill-emacs-hook~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
@@ -3144,7 +3143,7 @@ But before we dive in each one of these usages, there are some things I like to 
 
 The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (setq org-directory (expand-file-name "~/depot/Dropbox/org"))
 
@@ -3172,28 +3171,28 @@ Notice that we crated these variables before loading anything related to Org. Th
 
 Now we can wait Org to load to  continue our configuration:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! org
 #+end_src
 
 I like to /beautify/ Org buffers with some tweaks. First I want header tags to be close to the header text:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq org-tags-column 0)
 #+end_src
 
 Then I like to have some indentation indicating which header level I am:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq org-startup-indented t)
 #+end_src
 
 I also like to display text formatting as close to WYSIWYG as I can have. This means that if I mark a word as italic, instead of showing =/word/=, I want to display /word/:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq org-hide-emphasis-markers t
         org-pretty-entities t)
@@ -3201,14 +3200,14 @@ I also like to display text formatting as close to WYSIWYG as I can have. This m
 
 When Org collapse a header, it displays an ellipsis right after the header text. Although this is not "bad", I like to have a better indication of a collapsed header:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq org-ellipsis "  ")
 #+end_src
 
 In some documents, I need to write math formulas and Org can render them pretty well using LaTeX, but I like to adjust their render to use SVG instead of image, and use a transparent background to match the overall theme of Emacs
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (plist-put! org-format-latex-options
               :scale 1.55
@@ -3276,7 +3275,7 @@ And to close out my /beautification/, I want to render some unicode characters i
 
 And I also want to have better bullet marks:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (font-lock-add-keywords 'org-mode
                           `(("^#\\+TITLE: *"
@@ -3301,14 +3300,14 @@ Besides /beautification/, there are some configurations I like to have as a defa
 
 I will use the ='current-window= option to have the source block behaving like a normal buffer:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq org-src-window-setup 'current-window)
 #+end_src
 
 After all these tweaks, we can close our parenthesis:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 ) ;; after! org
 #+end_src
@@ -3335,7 +3334,7 @@ First we add the plugin on our =packages.el= file:
 
 Then, we use =use-package!= to defer its loading (we will load it manually later):
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! org-fragtog :defer t)
 #+end_src
@@ -3351,7 +3350,7 @@ As with the =org-fragtog=, let's first add it to our =packages.el=:
 
 Then, we use =use-package!= to defer its loading as we did with =org-fragtog=, but for this plugin, we want to set the ~valign-fancy-bar~ to ~t~, to have even nicer renders of tables:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! valign
   :defer t
@@ -3371,7 +3370,7 @@ Let's add it to our =packages.el=:
 
 Defer its loading on our configuration, and as with the =valign= package, we will use this time to also set the maximum width for our text:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! olivetti
   :defer t
@@ -3382,7 +3381,7 @@ Now that I have a narrower width, the text will wrap more often, but the normal 
 
 To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in =org-moode=, we want it bound to ~evil-next-visual-line~:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
  (:after org
@@ -3404,7 +3403,7 @@ While I'm sure I'm missing a command or two, these will get me started.
 
 I also need to adjust the window navigation keys that clash with default Org bindings:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
  (:after org
@@ -3418,7 +3417,7 @@ I also need to adjust the window navigation keys that clash with default Org bin
    )))
 #+end_src
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
  (:after org
@@ -3456,7 +3455,7 @@ To separate my configuration from initialization logic, let's create another aut
 
 With this function in place, we can /hook/ it to our Org major mode:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook #'+doom-org-config-h)
 #+end_src
@@ -3932,14 +3931,14 @@ In order to help me achieve my desired behavior, I'll  create another /autoload/
 
 We can now, configure Treemacs properly:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! treemacs
 #+end_src
 
 First we need to tell Treemacs to use the new autoload function when I press =<ENTER>= on a file:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (treemacs-define-RET-action 'file-node-open #'+doom--visit-node-and-close-h)
   (treemacs-define-RET-action 'file-node-closed #'+doom--visit-node-and-close-h)
@@ -3947,7 +3946,7 @@ First we need to tell Treemacs to use the new autoload function when I press =<E
 
 Then, I like Treemacs to collapse directory into one when possible:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (setq treemacs-collapse-dirs (if (executable-find "python3") 3 0))
 #+end_src
@@ -3978,14 +3977,14 @@ https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspa
 
 And finally, we can close our Treemacs configuration
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   )
 #+end_src
 
 I also like to make sure it behaves as expected if I use the mouse:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
  (:after treemacs
@@ -4017,7 +4016,7 @@ project that is not the current one."
 
 And to finalize the Treemacs configuration, let's make it respect my window navigation keys:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
  (:after treemacs-evil
   (:map evil-treemacs-state-map
@@ -4282,7 +4281,7 @@ In general, I really like the setup Doom has for the terminal. There are 3 thing
 
 One are some aliases that I'm used to use when working on the terminal:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! eshell
   (set-eshell-alias!
@@ -4307,7 +4306,7 @@ One are some aliases that I'm used to use when working on the terminal:
 
 Two is the window navigation mapping:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (map!
  (:after eshell
@@ -4331,7 +4330,7 @@ I like to have a hint of the next possible completion while I'm working on shell
 
 The only configuration we need to get this mode working, is to let Emacs enable it when =eshell-mode= is up.
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
 (use-package! esh-autosuggest
   :defer t
