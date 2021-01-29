@@ -1204,27 +1204,125 @@ background is COLOR. The foreground is computed using
   '(font-lock-comment-face :inherit fixed-pitch))
 #+end_src
 
+
+
+Mixed pitch
+
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
-(package! svg-icon
-  :recipe (:host github
-           :repo "rougier/emacs-svg-icon"))
+(package! mixed-pitch)
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
-
-(use-package! svg-icon
-  :commands svg-icon
+(use-package! mixed-pitch
+  :defer t
+  :init
+  (add-hook! (wordnut-mode Info-mode lexic-mode)
+    (defun +doom-mixed-pitch-setup-h ()
+      (mixed-pitch-mode 1)
+      (let ((var-pitch (face-attribute 'variable-pitch :family))
+            (var-height (face-attribute 'variable-pitch :height))
+            (fix-pitch (face-attribute 'default :family))
+            (fix-height (face-attribute 'default :height)))
+        (setq mixed-pitch-variable-cookie
+              (face-remap-add-relative 'default
+                                       :family var-pitch
+                                       :height var-height))
+        (setq mixed-pitch-fixed-cookie nil)
+        ;; keep fonts in `mixed-pitch-fixed-pitch-faces' as fixed-pitch.
+        (dolist (face mixed-pitch-fixed-pitch-faces)
+          (add-to-list 'mixed-pitch-fixed-cookie
+                       (face-remap-add-relative face
+                                                :family fix-pitch
+                                                :height fix-height))))))
   :config
-  (setq
-   svg-icon-collections
-   '(("bootstrap" . "https://icons.getbootstrap.com/icons/%s.svg")
-     ("material" . "https://raw.githubusercontent.com/Templarian/MaterialDesign/master/svg/%s.svg")
-     ("file" . "https://raw.githubusercontent.com/file-icons/icons/master/svg/%s.svg")
-     ("octicons" . "https://raw.githubusercontent.com/primer/octicons/master/icons/%s-24.svg")
-     ("boxicons" . "https://boxicons.com/static/img/svg/regular/bx-%s.svg"))))
- ;
+  (setq mixed-pitch-fixed-pitch-faces (append mixed-pitch-fixed-pitch-faces '(font-lock-comment-face))))
+#+end_src
+
+Info
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+;; (package! info-colors)
+(package! info-plus)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+;; (use-package! info-colors
+;;   :commands (info-colors-fontify-node))
+
+(use-package! info-plus
+  :commands Info-toggle-fontify-all
+  :init
+  (add-hook! 'Info-selection-hook
+    (defun +doom-info--fontify-info-h ()
+      (let ((Info-fontify-angle-bracketed-flag nil)
+            (Info-fontify-bookmarked-xrefs-flag nil)
+            (Info-fontify-emphasis-flag nil)
+            (Info-fontify-glossary-words nil)
+            (Info-fontify-isolated-quote-flag nil)
+            (Info-fontify-quotations nil)
+            (Info-fontify-reference-items-flag nil)
+            (Info-fontify-visited-nodes nil))
+        (call-interactively 'Info-toggle-fontify-all)))))
+
+;; (add-hook! 'Info-selection-hook 'info-colors-fontify-node)
+#+end_src
+
+#+begin_src emacs-lisp
+(after! info
+  (map!
+   (:map Info-mode-map
+    :gn "s-k" #'Info-backward-node
+    :gn "s-j" #'Info-forward-node
+    :gn "C-k" #'evil-window-up
+    :gn "C-j" #'evil-window-down))
+
+  (custom-theme-set-faces! 'doom-tomorrow-night
+    '(info-title-1 :foreground "#81a2be" :height 1.8 :weight normal :slant normal :inherit variable-pitch)
+    '(info-title-2 :foreground "#c9b4cf" :height 1.7 :weight normal :slant italic :inherit variable-pitch)
+    '(info-title-3 :foreground "#b294bb" :height 1.6 :weight normal :slant italic :inherit variable-pitch)
+    '(info-title-4 :foreground "#a0b9ce" :height 1.5 :weight bold   :slant normal :inherit variable-pitch)
+    '(info-menu-header :foreground "#c9b4cf" :height 1.3 :weight bold   :slant normal :inherit variable-pitch)
+    '(info-quoted-name :inherit font-lock-constant-face)
+    '(info-isolated-quote :inherit info-quoted-name)
+    '(info-isolated-backquote :inherit info-quoted-name)
+    '(info-glossary-word :foreground "#f0c674"
+                         :background "#362C18"
+                         :box (:line-width -1 :color "#f0c674" :style released-button)
+                         :inherit fixed-pitch)
+    '(link-visited :foreground "#b294bb")
+    '(info-double-quoted-name :inherit font-lock-string-face)
+    '(info-string :inherit font-lock-string-face)
+    '(info-header-node :height 160 :inherit info-node)
+    '(info-header-xref :height 160 :inherit info-xref))
+
+  (font-lock-add-keywords
+   'Info-mode
+   `(("^[\t ]*\\(\\*\\)\\(?:[^(]+([^)]+)\\.\\|[^:]+::\\)"
+      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
+     ("^[\t ]*\\(\\*\\) Menu\\(:\\)"
+      (0 (prog1 ()
+           (compose-region (match-beginning 1) (match-end 1) "☰")
+           (put-text-property (match-beginning 2) (match-end 2) 'invisible t)
+           )))) t)
+  )
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook! (wordnut-mode helpful-mode Info-mode lexic-mode)
+  (defun +popup-format-info-side-pannel-h ()
+    (setq-local olivetti-body-width 90)
+    (olivetti-mode 1)
+    (hl-line-mode -1)))
+
+(map!
+ (:map wordnut-mode-map
+  :n "q" #'quit-window))
+#+end_src
 
 ** TODO Editor Tabs
 TBD
@@ -3672,6 +3770,11 @@ Although we already covered most of this list of the previous section, we still 
 
 *** Dictionary and writing helpers
 
+(package! lexic
+  :recipe (:host github
+           :repo "tecosaur/lexic"))
+#+end_src
+
 #+begin_src shell :tangle no
 λ> cd $TMPDIR
 λ> curl 'http://app.aspell.net/create?'\
@@ -3753,6 +3856,47 @@ to the result."
                                                                  "--add-context-delimiters=~ ~"
                                                                  "--add-context-delimiters== ="
                                                                  "--add-context-delimiters=[[ ][")))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! lexic
+  :commands lexic-search lexic-list-dictionary
+  :config
+  (pushnew! lexic-dictionary-specs
+            '("GNU Collaborative International Dictionary of English"
+              :short "Definition"
+              :formatter lexic-format-webster
+              :priority 1))
+  (map! :map lexic-mode-map
+        :n "q" #'lexic-return-from-lexic
+        :nv "RET" #'lexic-search-word-at-point
+        :n "a" #'outline-show-all
+        :n "o" #'lexic-toggle-entry
+        :n "n" #'lexic-next-entry
+        :n "N" (cmd! (lexic-next-entry t))
+        :n "p" #'lexic-previous-entry
+        :n "P" (cmd! (lexic-previous-entry t))
+        :n "E" (cmd! (lexic-return-from-lexic) ; expand
+                     (switch-to-buffer (lexic-get-buffer)))
+        :n "M" (cmd! (lexic-return-from-lexic) ; minimise
+                     (lexic-goto-lexic))
+        :n "C-p" #'lexic-search-history-backwards
+        :n "C-n" #'lexic-search-history-forwards
+        :n "/" (cmd! (call-interactively #'lexic-search))))
+#+end_src
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +lookup/dictionary-definition-lexic (identifier &optional arg)
+  "Look up the definition of the word at point (or selection) using `lexic-search'."
+  :override #'+lookup/dictionary-definition
+  (interactive
+   (list (or (doom-thing-at-point-or-region 'word)
+             (read-string "Look up in dictionary: "))
+         current-prefix-arg))
+  (lexic-search identifier nil nil t))
 #+end_src
 
 *** Templates
