@@ -82,7 +82,7 @@ The common behavior you might see on text editors is to complete a character pai
 My requirement is to my editor to keep any of these character pairs balanced. If I try to delete a line with a closing pair character that would make the pairs of such character unbalanced, the editor would delete the line content, but would leave the closing character for the pair, preventing the file from getting on an unbalanced state.
 
 *** Rich keybindings
-Any half-decent text editor these days supports an infinite pletora of shortcuts. What I believe an editor should support to be ahead of the game, is the ability to bind *any* editor action to a key, and to offer to the user some sort of guidance while one uses the editor.
+Any half-decent text editor these days supports an infinite plethora of shortcuts. What I believe an editor should support to be ahead of the game, is the ability to bind *any* editor action to a key, and to offer to the user some sort of guidance while one uses the editor.
 
 For instance, if you configure your editor to search for files when you press '=SPC f f=', when you press '=SPC f=' and wait, I want the editor to display all the possible options for you to complete your key sequence.
 
@@ -275,7 +275,7 @@ As I mentioned on section [[Modal editing]], I do consider /Modal Editing/ far s
 
 I decided to use Doom as the base of my configuration because it has good reasonable defaults, and its author is also an ex-/Vimer/ like me, so he tailored this distribution with a Vim user in mind.
 
-On Emacs, the package responsible to provide Vim inside Emacs is [[https://github.com/emacs-evil/evil][Evil]], and from all Vim plugins for other editors that I use (and they were not few), Evil is by far the best. So much that compare it with other Vim plugins is do injustice to Evil developers. More often than not, we call Evil the Vim inside Emacs.
+On Emacs, the package responsible to provide Vim inside Emacs is [[https://github.com/emacs-evil/evil][Evil]], and from all Vim plugins for other editors that I use, Evil is by far the best. So much that compare it with other Vim plugins is do injustice to Evil developers. More often than not, we call Evil the Vim inside Emacs.
 
 In this section, I will go through configurations and other packages related directly to Evil, so if you don't use Evil or modal editing, feel free to skip this one.
 
@@ -336,7 +336,7 @@ Vim (therefore also Evil) has this notion of a grammar to execute actions on tex
 {operation}{operator}{target object}
 #+end_src
 
-Where /operation/ is the command you're executing, operator can be /i/ (inside) or /a/ (also), and the /target object/ can be any of the targets defined Evil (e.g. /s/ for /sentense/, /p/ for /paragraph/, /[/ for /square brackets content/, etc. ).
+Where /operation/ is the command you're executing, operator can be /i/ (inside) or /a/ (also), and the /target object/ can be any of the targets defined Evil (e.g. /s/ for /sentence/, /p/ for /paragraph/, /[/ for /square brackets content/, etc. ).
 
 One of these target object is /w/ for /word/ and in my experience, the meaning of /"word"/ varies according to context. Let me explain...
 
@@ -367,7 +367,7 @@ TBD
 ** TODO Auto-indentation
 ** DONE Smart backspace
 As part of my day job, I had to do a lot of Android development, and inevitably I used [[https://www.jetbrains.com/][JetBrains]]
-IDE [[https://www.jetbrains.com/idea/][IntelliJ IDEA]]. I bring this up not to chastise who uses or to complain about it. In face, InjelliJ the best IDE for Java and Kotlin out there. It has some features that are so good, that I want to implement on any text editor I use. One of these features is what I call /Smart Backspace/.
+IDE [[https://www.jetbrains.com/idea/][IntelliJ IDEA]]. I bring this up not to chastise who uses or to complain about it. In face, IntelliJ the best IDE for Java and Kotlin out there. It has some features that are so good, that I want to implement on any text editor I use. One of these features is what I call /Smart Backspace/.
 
 On both, Doom and IntelliJ, when you type an open pair, the editor completes with the closing one:
 
@@ -527,7 +527,7 @@ And to help us with this workflow, let's create couple /auto-loaded/ functions t
       (setq display-line-numbers 'visual)))
 #+end_src
 
-And then, after loading Evil, we can hook thes functions to a mode switch:
+And then, after loading Evil, we can hook this functions to a mode switch:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -589,7 +589,7 @@ And add the advice function to the ~after-focus-change-function~ as well, just t
 (add-function :after after-focus-change-function #'+doom-save-all-buffers-a)
 #+end_src
 
-The aggressive auto-save will work as expected, but it will crate a side effect with my literate config. Since Doom tangles the Org file every time we save it, the aggressive auto-save will make this tangle happen more often than we want.
+The aggressive auto-save will work as expected, but it will crate a side effect with my literate configuration. Since Doom tangles the Org file every time we save it, the aggressive auto-save will make this tangle happen more often than we want.
 
 Doom documentation offers a partial solution to this problem asking us to remove the auto-tangle function from the save hook, so let's do it:
 
@@ -598,7 +598,7 @@ Doom documentation offers a partial solution to this problem asking us to remove
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
 
-That works, but now we have to do a =doom sync= for every change on our config. Even if the change didn't modified anything on =packages.el=, =init.el=, or any of the /autoload/ files.
+That works, but now we have to do a =doom sync= for every change on our configuration. Even if the change didn't modified anything on =packages.el=, =init.el=, or any of the /autoload/ files.
 
 This got me thinking: I have to restart Emacs if I want my change to take effect. Why don't I add the tangle operation when Emacs is exiting?
 
@@ -1537,7 +1537,7 @@ one face."
 #+end_src
 
 *** Sorting
-I'm really enjoying =orderless= but there is one aspect of it that botters me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
+I'm really enjoying =orderless= but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
 
 Then it hit me: why not use both?
 
@@ -2270,7 +2270,7 @@ returns nil."
                                                                                           t))))))
 #+end_src
 
-This last function needs another helper one, to make sure it returns the correct name for a session on a given indes:
+This last function needs another helper one, to make sure it returns the correct name for a session on a given index:
 
 #+caption: autoload/workspaces.el
 #+begin_src emacs-lisp :tangle autoload/workspaces.el
@@ -3738,7 +3738,6 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 (package! nov)
 #+end_src
 
-
 ** TODO Publishing
 - Blog or site post
 - Email document
@@ -3757,10 +3756,8 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 #+END_MACRO
 #+end_src
 
-
-
 ** TODO Presenting
-- Use =reveal.js= inside a WebKit XWidget in fullscreen
+- Use =reveal.js= inside a WebKit XWidget in full screen
 
 ** TODO Note Taking
 I need to come clean to you. I'm a horrible note taker! I have ADHD and my capacity to keep up with any system to take notes is as short as a pigeon's attention span. That said, using Org Mode was as close as a success as I can desire. I believe if I have a setup that makes taking notes effortless, I might be able to finally start taking notes and refer to them when needed.
@@ -3858,7 +3855,7 @@ $0
 ** TODO Time Management
 
 - Triage :: This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
-  + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have amore accurate record of my work day;
+  + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have a more accurate record of my work day;
   + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
 
 * Development [0/9]
@@ -4234,7 +4231,7 @@ The actions I expect are:
   + =CHANGELOG=
   + =NEWS=
   + =README=
-- If none of the recognizeable files is present, run ~project-find-file~;
+- If none of the recognizable files is present, run ~project-find-file~;
 
 Let's create such function as an /autoload/ function:
 
