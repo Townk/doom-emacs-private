@@ -3603,7 +3603,7 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
-* Writing [0/7]
+* Writing [0/8]
 Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
 
 My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
@@ -3614,7 +3614,6 @@ I come up with a directory infrastructure for my writings that will hold all typ
    org
   ├──  .archives
   ├──  .attach
-  ├──  .templates
   ├──  agenda
   │  ├──  calendars
   │  │  ├──  personal.org
@@ -3634,7 +3633,6 @@ Most of these directories are straightforward to understand their purpose, but I
 
 - =.archives= :: Any Org task archived on my system will end up in this directory. After a while, this directory should be a shadow copy of the root =org= directory, but containing only files with archived tasks;
 - =.attach= :: This is the Doom's directory to store attached files;
-- =.templates= :: A snippets directory that I will include on my Yasnippet configuration to allow me to use Doom's file template system;
 - =agenda= :: The root folder for task management:
   + =calendars= :: Here is where I will add the events for my calendars. Each calendar I have will have its own file here. These files are not intended to manage my calendars, and I will consider them as /read-only files/. Outside Emacs, I will have process running and synchronizing these files;
   + =tasks= :: Directory to store Org files with tasks. The main file, which I will track on Org Agenda is thee =todo.org=, but I have this extra file called =someday.org= as a dump for tasks I wish to accomplish but are not essentials;
@@ -3654,6 +3652,8 @@ Regarding my configuration for Org mode, I will split it into 6 distinct section
 - Note Taking
 - Time Management
 
+** TODO Requirements
+** TODO Common Org configurations
 But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
 
 The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
@@ -4001,7 +4001,6 @@ With this function in place, we can /hook/ it to our Org major mode:
 (add-hook 'org-mode-hook #'+doom-org-config-h)
 #+end_src
 
-** TODO Requirements
 ** TODO Prose writing
 I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
 
@@ -5484,12 +5483,6 @@ $0
 
 *** TODO Deft
 
-** TODO Time Management
-
-- Triage :: This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
-  + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have a more accurate record of my work day;
-  + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
-
 * Development [0/9]
 TBD
 
@@ -5986,6 +5979,12 @@ TBD
   (setq org-contacts-icon-property "PICTURE"
         org-contacts-icon-use-gravatar t))
 #+end_src
+
+** TODO Time Management
+
+- Triage :: This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
+  + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have a more accurate record of my work day;
+  + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
 
 * Appendix
 
