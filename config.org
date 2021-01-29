@@ -4025,9 +4025,52 @@ Although we already covered most of this list of the previous section, we still 
 
 *** Dictionary and writing helpers
 
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
 (package! lexic
   :recipe (:host github
            :repo "tecosaur/lexic"))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! lexic
+  :commands lexic-search lexic-list-dictionary
+  :config
+  (pushnew! lexic-dictionary-specs
+            '("GNU Collaborative International Dictionary of English"
+              :short "Definition"
+              :formatter lexic-format-webster
+              :priority 1))
+  (map! :map lexic-mode-map
+        :n "q" #'lexic-return-from-lexic
+        :nv "RET" #'lexic-search-word-at-point
+        :n "a" #'outline-show-all
+        :n "o" #'lexic-toggle-entry
+        :n "n" #'lexic-next-entry
+        :n "N" (cmd! (lexic-next-entry t))
+        :n "p" #'lexic-previous-entry
+        :n "P" (cmd! (lexic-previous-entry t))
+        :n "E" (cmd! (lexic-return-from-lexic) ; expand
+                     (switch-to-buffer (lexic-get-buffer)))
+        :n "M" (cmd! (lexic-return-from-lexic) ; minimise
+                     (lexic-goto-lexic))
+        :n "C-p" #'lexic-search-history-backwards
+        :n "C-n" #'lexic-search-history-forwards
+        :n "/" (cmd! (call-interactively #'lexic-search))))
+#+end_src
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+;;;###autoload
+(defadvice! +lookup/dictionary-definition-lexic (identifier &optional arg)
+  "Look up the definition of the word at point (or selection) using `lexic-search'."
+  :override #'+lookup/dictionary-definition
+  (interactive
+   (list (or (doom-thing-at-point-or-region 'word)
+             (read-string "Look up in dictionary: "))
+         current-prefix-arg))
+  (lexic-search identifier nil nil t))
 #+end_src
 
 #+begin_src shell :tangle no
@@ -4111,47 +4154,6 @@ to the result."
                                                                  "--add-context-delimiters=~ ~"
                                                                  "--add-context-delimiters== ="
                                                                  "--add-context-delimiters=[[ ][")))))
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! lexic
-  :commands lexic-search lexic-list-dictionary
-  :config
-  (pushnew! lexic-dictionary-specs
-            '("GNU Collaborative International Dictionary of English"
-              :short "Definition"
-              :formatter lexic-format-webster
-              :priority 1))
-  (map! :map lexic-mode-map
-        :n "q" #'lexic-return-from-lexic
-        :nv "RET" #'lexic-search-word-at-point
-        :n "a" #'outline-show-all
-        :n "o" #'lexic-toggle-entry
-        :n "n" #'lexic-next-entry
-        :n "N" (cmd! (lexic-next-entry t))
-        :n "p" #'lexic-previous-entry
-        :n "P" (cmd! (lexic-previous-entry t))
-        :n "E" (cmd! (lexic-return-from-lexic) ; expand
-                     (switch-to-buffer (lexic-get-buffer)))
-        :n "M" (cmd! (lexic-return-from-lexic) ; minimise
-                     (lexic-goto-lexic))
-        :n "C-p" #'lexic-search-history-backwards
-        :n "C-n" #'lexic-search-history-forwards
-        :n "/" (cmd! (call-interactively #'lexic-search))))
-#+end_src
-
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
-;;;###autoload
-(defadvice! +lookup/dictionary-definition-lexic (identifier &optional arg)
-  "Look up the definition of the word at point (or selection) using `lexic-search'."
-  :override #'+lookup/dictionary-definition
-  (interactive
-   (list (or (doom-thing-at-point-or-region 'word)
-             (read-string "Look up in dictionary: "))
-         current-prefix-arg))
-  (lexic-search identifier nil nil t))
 #+end_src
 
 *** Templates
