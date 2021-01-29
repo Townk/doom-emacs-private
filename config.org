@@ -1016,7 +1016,9 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
 #+begin_src emacs-lisp
 (setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
       doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32)
-      doom-variable-pitch-font (font-spec :family "ETBembo" :size 22))
+      doom-variable-pitch-font (font-spec :family "iMWritingQuattroS Nerd Font" :size 18)
+      ;; doom-variable-pitch-font (font-spec :family "ETBembo" :size 22)
+      )
 #+end_src
 
 I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
@@ -1510,13 +1512,11 @@ And configure it with ~use-package!~:
   :custom
   (completion-styles '(orderless))
   :config
-  (custom-set-faces!
+  (custom-theme-set-faces! 'doom-tomorrow-night
     '('orderless-match-face-0 :background "#435300" :foreground "#b5bd68")
     '('orderless-match-face-1 :background "#4C2E60" :foreground "#b294bb")
     '('orderless-match-face-2 :background "#644E00" :foreground "#f0c674")
-    '('orderless-match-face-3 :background "#1B2E47" :foreground "#81a2be"))
-
-  (add-hook 'minibuffer-exit-hook #'orderless-remove-transient-configuration))
+    '('orderless-match-face-3 :background "#1B2E47" :foreground "#81a2be")))
 #+end_src
 
 On company, the matching portions of candidates are not highlighted. That’s because ~company-capf~ is hard-coded to look for the ~completions-common-part~ face, and it only use one face (~company-echo-common~) to highlight candidates.
@@ -1668,7 +1668,7 @@ The cursor line on Selectrum, is a bit too much for me. I like to have it with a
 
 #+caption: config.el
 #+begin_src emacs-lisp :padline no
-  (custom-set-faces! '(selectrum-current-candidate :background "#3c3c3c"))
+  (custom-theme-set-faces! 'doom-tomorrow-night '(selectrum-current-candidate :background "#3c3c3c"))
 #+end_src
 
 And last, but not least, let's set some Vim friendly keybindings:
@@ -3171,6 +3171,53 @@ Notice that we crated these variables before loading anything related to Org. Th
 
 Now we can wait Org to load to  continue our configuration:
 
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +doom-adjust-outline-fonts-h ()
+  (after! outline
+    (custom-theme-set-faces! 'doom-tomorrow-night
+     '(outline-1 :foreground "#81a2be" :height 2.0 :weight normal :slant normal :inherit variable-pitch)
+     '(outline-2 :foreground "#c9b4cf" :height 1.8 :weight normal :slant italic :inherit variable-pitch)
+     '(outline-3 :foreground "#b294bb" :height 1.6 :weight normal :slant italic :inherit variable-pitch)
+     '(outline-4 :foreground "#a0b9ce" :height 1.4 :weight bold   :slant normal :inherit variable-pitch)
+     '(outline-5 :foreground "#d6c6db" :height 1.4 :weight bold   :slant normal :inherit variable-pitch)
+     '(outline-6 :foreground "#c0d0de" :height 1.2 :weight bold   :slant normal :inherit variable-pitch)
+     '(outline-7 :foreground "#e3d9e7" :height 1.2 :weight bold   :slant normal :inherit variable-pitch)
+     '(outline-8 :foreground "#e5ecf2" :height 1.1 :weight bold   :slant normal :inherit variable-pitch))
+))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! outline
+  (if (daemonp)
+      (add-hook! 'server-after-make-frame-hook #'+doom-adjust-outline-fonts-h)
+    (+doom-adjust-outline-fonts-h)))
+#+end_src
+
+#+begin_src emacs-lisp
+(defconst +doom-org-font-lock-beautify-keywords
+  `(("^#\\+TITLE: *"
+     (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+    ("^\\*+ "
+     (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+    ("^ *\\([-+*] \\[ \\]\\) "
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☐ "))))
+    ("^ *\\([-+*] \\[-\\]\\) "
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
+    ("^ *\\([-+*] \\[[xX]\\]\\) "
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☑ "))))
+    ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "•"))))
+    ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "‣"))))
+    ("^ *\\(\\*\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⁍")))))
+  "This is a list of text elements fontification for Org. It
+beautifies title, check-boxes, and list bullets.")
+#+end_src
+
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! org
@@ -3227,38 +3274,32 @@ In some documents, I need to write math formulas and Org can render them pretty 
 ;;;###autoload
 (defun +doom-adjust-org-fonts-h ()
   (after! org
-    (set-face-attribute 'org-document-title nil :height 2.0 :weight 'light)
-    (set-face-attribute 'org-document-info nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-property-value nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-drawer nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil :inherit 'org-table)
-    (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-verbatim nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block-begin-line nil :inherit 'fixed-pitch :height 0.8)
-    (set-face-attribute 'org-block-end-line nil :inherit 'org-block-begin-line)
-    (set-face-attribute 'org-tag nil :height 150)
-    (set-face-attribute 'org-level-1 nil :height 1.4 :weight 'normal :slant 'normal)
-    (set-face-attribute 'org-level-2 nil :height 1.3 :weight 'normal :slant 'italic)
-    (set-face-attribute 'org-level-3 nil :height 1.2 :weight 'normal :slant 'italic)
-    (set-face-attribute 'org-level-4 nil :height 1.1 :weight 'bold   :slant 'normal)
-    (set-face-attribute 'org-level-5 nil :height 1.1 :weight 'bold   :slant 'normal)
-    (set-face-attribute 'org-level-6 nil :height 1.1 :weight 'bold   :slant 'normal)
-    (set-face-attribute 'org-level-7 nil :height 1.1 :weight 'bold   :slant 'normal)
-    (set-face-attribute 'org-level-8 nil :height 1.1 :weight 'bold   :slant 'normal))
+    (custom-set-faces!
+      '(org-document-title :height 2.2 :weight light :inherit variable-pitch)
+      '(org-document-info :inherit fixed-pitch)
+      '(org-document-info-keyword :inherit fixed-pitch)
+      '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
+      '(org-property-value :inherit fixed-pitch)
+      '(org-special-keyword :inherit font-lock-comment-face)
+      '(org-drawer :inherit fixed-pitch)
+      '(org-table :inherit fixed-pitch)
+      '(org-formula :inherit org-table)
+      '(org-block :inherit fixed-pitch)
+      '(org-verbatim :inherit fixed-pitch)
+      '(org-code :inherit fixed-pitch)
+      '(org-date :inherit fixed-pitch)
+      '(org-block-begin-line :height 0.8 :inherit fixed-pitch)
+      '(org-block-end-line :inherit org-block-begin-line)
+      '(org-tag :height 150)))
 
   (after! org-indent
-    (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))))
+    (custom-set-faces!
+      '(org-indent :inherit (org-hide fixed-pitch)))))
 #+end_src
 
 Once we create the function, we can attach it to a hook or execute it right away depending on Emacs running as a daemon or not:
 
-#+caption: config.org
+#+caption: config.el
 #+begin_src emacs-lisp
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'+doom-adjust-org-fonts-h)
@@ -3277,23 +3318,7 @@ And I also want to have better bullet marks:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  (font-lock-add-keywords 'org-mode
-                          `(("^#\\+TITLE: *"
-                             (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
-                            ("^\\*+ "
-                             (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
-                            ("^ *\\([-+*] \\[ \\]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☐ "))))
-                            ("^ *\\([-+*] \\[-\\]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
-                            ("^ *\\([-+*] \\[[xX]\\]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "☑ "))))
-                            ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
-                            ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "‣"))))
-                            ("^ *\\(\\*\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "⁍"))))))
+  (font-lock-add-keywords 'org-mode +doom-org-font-lock-beautify-keywords)
 #+end_src
 
 Besides /beautification/, there are some configurations I like to have as a default behavior. The first one is how I can edit a code block on a separate buffer. By default, Org will edit it using ~switch-to-buffer-other-window~. While this seams to be a popular choice, I just can't stand the two buffers together when I can't touch on the Org file while I have the source block opened.
