@@ -1038,84 +1038,7 @@ With all in place, we just need to define the keybindings:
 ** TODO Appearances
 I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is as important. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
 
-The first step into this unspecified requirement, is to have a good theme.
-
-For a long time I tried to avoid this theme, but didn't mater how much I try to use a different one, I always end up installing the /Tomorrow Night/ theme; and according to Doom's files, there are two ways to load a theme. Both assume we have the theme installed and available. You can either set ~doom-theme~ or manually load a theme with the ~load-theme~ function. I prefer to use the Doom's variable:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(setq doom-theme 'doom-tomorrow-night)
-#+end_src
-
-And just to add a bit more differentiation to the theme's fonts, let's allow the theme to use bolds and italics:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(setq doom-themes-enable-bold t
-      doom-themes-enable-italic t)
-#+end_src
-
-I also start enjoying using Doom without the Solaire mode on. Because of that, I will disable that package on the =packages.el= file:
-
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! solaire-mode :disable t)
-#+end_src
-
-The next step is to use a better font face and size, which I recognize is a bit subjective. Nevertheless, I'll put here my /current/ font selection.
-
-For my configuration, I have selected 3 fonts:
-
-- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like thee italic face for this font.
-- [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
-- [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements. Currently, I only use it on Treemacs.
-
-Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
-
-- Monospace Fonts:
-  + [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]]
-  + [[https://pcaro.es/p/hermit/][Hermit]]
-  + [[https://github.com/tonsky/FiraCode][FiraCode]]
-  + [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]]
-  + [[https://github.com/adobe-fonts/source-code-pro][SourceCode Pro]]
-  + [[https://github.com/googlefonts/robotomono][RobotoMono]]
-- Variable Pitch Fonts:
-  + [[https://en.wikipedia.org/wiki/Bookerly][Bookerly]]
-  + [[https://github.com/impallari/Libre-Baskerville][Libre Baskerville]]
-  + [[https://github.com/adobe-fonts/source-sans-pro][Source Sans Pro]]
-  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]]
-  + [[https://github.com/googlefonts/roboto][Roboto]]
-  + [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]]
-
-Doom exposes five (optional) variables for controlling fonts:
-
-- ~doom-font~ :: The global font used by Emacs;
-- ~doom-big-font~ :: Used for ~doom-big-font-mode~, which you can use for presentations or streaming;
-- ~doom-variable-pitch-font~ :: Font used for prose text (if you configure such modes to accept variable pitch fonts);
-- ~doom-serif-font~ :: The default font to use for the fixed-pitch-serif face;
-- ~doom-unicode-font~ :: Fallback font for Unicode glyphs;
-
-They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =xlfd= font string. You generally only need ~doom-font~ and ~doom-variable-pitch-font~, but I like to set ~doom-big-font~ as well, to make sure any time I switch to a presentation mode, it still feels like my configuration.
-
-Since I'm adding a different font for UI elements, I'll create a custom font just for this purpose:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(defface variable-pitch-ui `((t :font ,(font-spec :family "Roboto" :size 16)))
-  "Extra face used on UI elements.")
-#+end_src
-
-I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =variable-pitch-ui= when we need it down the road):
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
-      doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32)
-      doom-variable-pitch-font (font-spec :family "iMWritingQuattroS Nerd Font" :size 18)
-      ;; doom-variable-pitch-font (font-spec :family "ETBembo" :size 22)
-      )
-#+end_src
-
+*** UI
 I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
 
 #+caption: config.el
@@ -1171,6 +1094,111 @@ Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
 #+end_src
 
+#+caption: config.el
+#+begin_src emacs-lisp
+  (map! :after info
+   (:map Info-mode-map
+    :gn "s-k" #'Info-backward-node
+    :gn "s-j" #'Info-forward-node
+    :gn "C-k" #'evil-window-up
+    :gn "C-j" #'evil-window-down))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix-map ("t" . "toggle")
+       :desc "Rainbow mode" :mvn "R" #'rainbow-mode))
+#+end_src
+
+*** Theme
+The first step into this unspecified requirement, is to have a good theme.
+
+For a long time I tried to avoid this theme, but didn't mater how much I try to use a different one, I always end up installing the /Tomorrow Night/ theme; and according to Doom's files, there are two ways to load a theme. Both assume we have the theme installed and available. You can either set ~doom-theme~ or manually load a theme with the ~load-theme~ function. I prefer to use the Doom's variable:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-tomorrow-night)
+#+end_src
+
+And just to add a bit more differentiation to the theme's fonts, let's allow the theme to use bolds and italics:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq doom-themes-enable-bold t
+      doom-themes-enable-italic t)
+#+end_src
+
+I also start enjoying using Doom without the Solaire mode on. Because of that, I will disable that package on the =packages.el= file:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! solaire-mode :disable t)
+#+end_src
+
+*** Colors
+
+*** Typography
+The next step is to use a better font face and size, which I recognize is a bit subjective. Nevertheless, I'll put here my /current/ font selection.
+
+For my configuration, I have selected 3 fonts:
+
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like thee italic face for this font.
+- [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
+- [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements. Currently, I only use it on Treemacs.
+
+Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
+
+- Monospace Fonts:
+  + [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]]
+  + [[https://pcaro.es/p/hermit/][Hermit]]
+  + [[https://github.com/tonsky/FiraCode][FiraCode]]
+  + [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]]
+  + [[https://github.com/adobe-fonts/source-code-pro][SourceCode Pro]]
+  + [[https://github.com/googlefonts/robotomono][RobotoMono]]
+- Variable Pitch Fonts:
+  + [[https://en.wikipedia.org/wiki/Bookerly][Bookerly]]
+  + [[https://github.com/impallari/Libre-Baskerville][Libre Baskerville]]
+  + [[https://github.com/adobe-fonts/source-sans-pro][Source Sans Pro]]
+  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]]
+  + [[https://github.com/googlefonts/roboto][Roboto]]
+  + [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]]
+
+Doom exposes five (optional) variables for controlling fonts:
+
+- ~doom-font~ :: The global font used by Emacs;
+- ~doom-big-font~ :: Used for ~doom-big-font-mode~, which you can use for presentations or streaming;
+- ~doom-variable-pitch-font~ :: Font used for prose text (if you configure such modes to accept variable pitch fonts);
+- ~doom-serif-font~ :: The default font to use for the fixed-pitch-serif face;
+- ~doom-unicode-font~ :: Fallback font for Unicode glyphs;
+
+They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =xlfd= font string. You generally only need ~doom-font~ and ~doom-variable-pitch-font~, but I like to set ~doom-big-font~ as well, to make sure any time I switch to a presentation mode, it still feels like my configuration.
+
+Since I'm adding a different font for UI elements, I'll create a custom font just for this purpose:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defface variable-pitch-ui `((t :font ,(font-spec :family "Roboto" :size 16)))
+  "Extra face used on UI elements.")
+#+end_src
+
+I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =variable-pitch-ui= when we need it down the road):
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
+      doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32)
+      doom-variable-pitch-font (font-spec :family "iMWritingQuattroS Nerd Font" :size 18)
+      ;; doom-variable-pitch-font (font-spec :family "ETBembo" :size 22)
+      )
+#+end_src
+
+
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '(font-lock-comment-face :inherit fixed-pitch))
+#+end_src
+
 Rainbow mode
 
 #+caption: autoload/editor.el
@@ -1189,22 +1217,6 @@ background is COLOR. The foreground is computed using
              (:background ,color)
              (:inherit fixed-pitch)))))
 #+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(map!
- (:leader
-  (:prefix-map ("t" . "toggle")
-   :desc "Rainbow mode" :mvn "R" #'rainbow-mode
-   )))
-#+end_src
-
-#+begin_src emacs-lisp
-(custom-set-faces!
-  '(font-lock-comment-face :inherit fixed-pitch))
-#+end_src
-
-
 
 Mixed pitch
 
@@ -1244,15 +1256,11 @@ Info
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
-;; (package! info-colors)
 (package! info-plus)
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
-;; (use-package! info-colors
-;;   :commands (info-colors-fontify-node))
-
 (use-package! info-plus
   :commands Info-toggle-fontify-all
   :init
@@ -1273,13 +1281,6 @@ Info
 
 #+begin_src emacs-lisp
 (after! info
-  (map!
-   (:map Info-mode-map
-    :gn "s-k" #'Info-backward-node
-    :gn "s-j" #'Info-forward-node
-    :gn "C-k" #'evil-window-up
-    :gn "C-j" #'evil-window-down))
-
   (custom-theme-set-faces! 'doom-tomorrow-night
     '(info-title-1 :foreground "#81a2be" :height 1.8 :weight normal :slant normal :inherit variable-pitch)
     '(info-title-2 :foreground "#c9b4cf" :height 1.7 :weight normal :slant italic :inherit variable-pitch)
@@ -1311,18 +1312,7 @@ Info
   )
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(add-hook! (wordnut-mode helpful-mode Info-mode lexic-mode)
-  (defun +popup-format-info-side-pannel-h ()
-    (setq-local olivetti-body-width 90)
-    (olivetti-mode 1)
-    (hl-line-mode -1)))
-
-(map!
- (:map wordnut-mode-map
-  :n "q" #'quit-window))
-#+end_src
+*** Iconography
 
 ** TODO Editor Tabs
 TBD
@@ -1671,7 +1661,7 @@ TBD
      :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
      :select t :modeline nil :autosave nil :ttl nil   :quit nil)
     ("^\\*\\(?:Wo\\)?Man "
-     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
+     :slot 2   :vslot -1     :side right  :width 110 :height 0.4
      :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*Calc"
      :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
@@ -1720,6 +1710,20 @@ TBD
      :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*\\(?:Proced\\|timer-list\\|Abbrevs\\|Output\\|Occur\\|unsent mail\\)\\*" :ignore t)
     ))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook! (help-mode
+            org-agenda-mode
+            helpful-mode
+            Info-mode
+            lexic-mode)
+  (defun +popup-format-info-side-pannel-h ()
+    (setq-local olivetti-body-width 90)
+    (olivetti-mode 1)
+    (set-fill-column 90)
+    (hl-line-mode -1)))
 #+end_src
 
 ** TODO Completion framework
