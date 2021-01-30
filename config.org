@@ -589,8 +589,14 @@ To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=
 
 #+begin_src emacs-lisp
 (after! which-key
+  (setq which-key-allow-multiple-replacements t)
   (setq which-key-min-display-lines 10)
-  (setq which-key-max-description-length 40))
+  (setq which-key-max-description-length 40)
+
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "☠ \\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "⇌ \\1"))))
 #+end_src
 
 ** TODO Line numbers
