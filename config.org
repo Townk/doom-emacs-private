@@ -386,16 +386,15 @@ Prevents Yas from interfering with backspace deletion."
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:after yasnippet
- 
-  (:leader :prefix "h"
-   :desc "Show snippets" :n "y" #'yas-describe-tables)
+(map! :after yasnippet
 
-  (:map yas-keymap
-   :g [backspace] #'+snippets/delete-backward-char-or-field
-   :g [deletechar] #'+snippets/delete-forward-char-or-field
-   :g [s-return] #'yas-exit-snippet)))
+      (:leader :prefix "h"
+       :desc "Show snippets" :n "y" #'yas-describe-tables)
+
+      (:map yas-keymap
+       :g [backspace] #'+snippets/delete-backward-char-or-field
+       :g [deletechar] #'+snippets/delete-forward-char-or-field
+       :g [s-return] #'yas-exit-snippet))
 #+end_src
 
 ** TODO Inline completion
@@ -1102,12 +1101,12 @@ Used in various places to avoid getting wrong line height when
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  (map! :after info
-   (:map Info-mode-map
-    :gn "s-k" #'Info-backward-node
-    :gn "s-j" #'Info-forward-node
-    :gn "C-k" #'evil-window-up
-    :gn "C-j" #'evil-window-down))
+(map! :after info
+      (:map Info-mode-map
+       :gn "s-k" #'Info-backward-node
+       :gn "s-j" #'Info-forward-node
+       :gn "C-k" #'evil-window-up
+       :gn "C-j" #'evil-window-down))
 #+end_src
 
 #+caption: config.el
@@ -1500,10 +1499,9 @@ text if needed. You can set the minimal width with
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  (map!
-   (:prefix "g"
-    :desc "" :n "t" #'tab-line-switch-to-next-tab
-    :desc "" :n "T" #'tab-line-switch-to-prev-tab))
+(map! :prefix "g"
+      :desc "" :n "t" #'tab-line-switch-to-next-tab
+      :desc "" :n "T" #'tab-line-switch-to-prev-tab)
 #+end_src
 
 #+caption: autoload/tabs.el
@@ -2547,11 +2545,9 @@ OPEN-BOOKMARK will be used to display the item."
 #+end_src
 
 #+begin_src emacs-lisp
-(map!
- (:leader
-   :desc "Switch buffer" :nvm "," #'persp-consult-buffer
-   :desc "Switch to any buffer" :nvm "<" #'consult-buffer
-   ))
+(map! :leader
+      :desc "Switch buffer" :nvm "," #'persp-consult-buffer
+      :desc "Switch to any buffer" :nvm "<" #'consult-buffer)
 #+end_src
 
 
@@ -2632,9 +2628,8 @@ The next sections will cover each one of these commands, but before we begin, le
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:leader
-  (:prefix-map ("TAB" . "workspace")
+(map! :leader
+      (:prefix-map ("TAB" . "workspace")
 #+end_src
 
 Now we can start with the /Display tab bar/ binding, since it is the foundation of Doom's workspace system.
@@ -2699,7 +2694,7 @@ And we can simply bind it to our shortcut key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Display tab bar"           "TAB" #'+workspace/display
+      :desc "Display tab bar"           "TAB" #'+workspace/display
 #+end_src
 
 *** Switch workspace
@@ -2967,7 +2962,7 @@ With all the functions necessary to switch between workspaces, I can bind it to 
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Switch workspace"          "."   #'+workspace/switch-to
+      :desc "Switch workspace"          "."   #'+workspace/switch-to
 #+end_src
 
 *** Switch to N^{th} workspace
@@ -2990,15 +2985,15 @@ This will create 9 functions to switch to their respective workspace, so let's b
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Switch to 1st workspace"   "1"   #'+workspace/switch-to-0
-   :desc "Switch to 2nd workspace"   "2"   #'+workspace/switch-to-1
-   :desc "Switch to 3rd workspace"   "3"   #'+workspace/switch-to-2
-   :desc "Switch to 4th workspace"   "4"   #'+workspace/switch-to-3
-   :desc "Switch to 5th workspace"   "5"   #'+workspace/switch-to-4
-   :desc "Switch to 6th workspace"   "6"   #'+workspace/switch-to-5
-   :desc "Switch to 7th workspace"   "7"   #'+workspace/switch-to-6
-   :desc "Switch to 8th workspace"   "8"   #'+workspace/switch-to-7
-   :desc "Switch to 9th workspace"   "9"   #'+workspace/switch-to-8
+      :desc "Switch to 1st workspace"   "1"   #'+workspace/switch-to-0
+      :desc "Switch to 2nd workspace"   "2"   #'+workspace/switch-to-1
+      :desc "Switch to 3rd workspace"   "3"   #'+workspace/switch-to-2
+      :desc "Switch to 4th workspace"   "4"   #'+workspace/switch-to-3
+      :desc "Switch to 5th workspace"   "5"   #'+workspace/switch-to-4
+      :desc "Switch to 6th workspace"   "6"   #'+workspace/switch-to-5
+      :desc "Switch to 7th workspace"   "7"   #'+workspace/switch-to-6
+      :desc "Switch to 8th workspace"   "8"   #'+workspace/switch-to-7
+      :desc "Switch to 9th workspace"   "9"   #'+workspace/switch-to-8
 #+end_src
 
 *** Switch to final workspace
@@ -3017,7 +3012,7 @@ Now we just need to bind this function:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-:desc "Switch to final workspace" "0"   #'+workspace/switch-to-final
+      :desc "Switch to final workspace" "0"   #'+workspace/switch-to-final
 #+end_src
 
 *** Switch to last used workspace
@@ -3025,7 +3020,7 @@ The next binding is the /Switch to last workspace/, which luckily has a function
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Switch to last used workspace"  "`"   #'persp-switch-last
+      :desc "Switch to last used workspace"  "`"   #'persp-switch-last
 #+end_src
 
 *** Previous and next workspace
@@ -3076,8 +3071,8 @@ Then, we can bind both functions to their proper keys:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Previous workspace"        "["   #'+workspace/switch-previous
-   :desc "Next workspace"            "]"   #'+workspace/switch-next
+      :desc "Previous workspace"        "["   #'+workspace/switch-previous
+      :desc "Next workspace"            "]"   #'+workspace/switch-next
 #+end_src
 
 *** New workspace
@@ -3123,7 +3118,7 @@ Now, we just need to bind the main function with its keys:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "New workspace"             "n"   #'+workspace/new
+      :desc "New workspace"             "n"   #'+workspace/new
 #+end_src
 
 *** Rename workspace
@@ -3198,7 +3193,7 @@ Now, with all the functions in place, we can bind the main command to its key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Rename workspace"               "r"   #'+workspace/rename
+      :desc "Rename workspace"               "r"   #'+workspace/rename
 #+end_src
 
 *** Delete this workspace
@@ -3251,7 +3246,7 @@ Now we can bind the command to its proper key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Delete this workspace"          "d"   #'+workspace/delete
+      :desc "Delete this workspace"          "d"   #'+workspace/delete
 #+end_src
 
 *** Delete session
@@ -3281,7 +3276,7 @@ And since we only used functions we already have implemented, we can bind it to 
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Delete session"                 "x"   #'+workspace/delete-session
+      :desc "Delete session"                 "x"   #'+workspace/delete-session
 #+end_src
 
 *** Delete session and quit
@@ -3312,7 +3307,7 @@ And since we only used functions we already have implemented, we can bind it to 
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Delete session and quit"        "X"   #'+workspace/delete-session-and-quit
+      :desc "Delete session and quit"        "X"   #'+workspace/delete-session-and-quit
 #+end_src
 
 *** Save session to file
@@ -3410,7 +3405,7 @@ And now we can add the command to its key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Save session to file"           "s"   #'+workspace/save-session
+      :desc "Save session to file"           "s"   #'+workspace/save-session
 #+end_src
 
 *** Load session from file
@@ -3461,7 +3456,7 @@ And bind this command to its key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Load session from file"         "l"   #'+workspace/load-session
+      :desc "Load session from file"         "l"   #'+workspace/load-session
 #+end_src
 
 *** Restore last session
@@ -3501,15 +3496,14 @@ With the restore command done, we can associate it with its key:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-   :desc "Restore last session"           "R"   #'+workspace/restore-last-session
+      :desc "Restore last session"           "R"   #'+workspace/restore-last-session
 #+end_src
 
 Now that we defined all /leader/ keys, we can close our /leader/ mapping:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  )  ;; :prefix-map ("TAB" . "workspace")
- )  ;; :leader
+      )  ;; :prefix-map ("TAB" . "workspace")
 #+end_src
 
 *** Other shortcuts
@@ -3517,35 +3511,35 @@ Doom also offers nice shortcuts for us to access our workspace. They're all boun
 
 #+caption: config.el
 #+begin_src emacs-lisp
- :n "C-t"   #'+workspace/new
- :n "C-S-t" #'+workspace/display
- :n "M-1"   #'+workspace/switch-to-0
- :n "M-2"   #'+workspace/switch-to-1
- :n "M-3"   #'+workspace/switch-to-2
- :n "M-4"   #'+workspace/switch-to-3
- :n "M-5"   #'+workspace/switch-to-4
- :n "M-6"   #'+workspace/switch-to-5
- :n "M-7"   #'+workspace/switch-to-6
- :n "M-8"   #'+workspace/switch-to-7
- :n "M-9"   #'+workspace/switch-to-8
- :n "M-0"   #'+workspace/switch-to-final
+      :n "C-t"   #'+workspace/new
+      :n "C-S-t" #'+workspace/display
+      :n "M-1"   #'+workspace/switch-to-0
+      :n "M-2"   #'+workspace/switch-to-1
+      :n "M-3"   #'+workspace/switch-to-2
+      :n "M-4"   #'+workspace/switch-to-3
+      :n "M-5"   #'+workspace/switch-to-4
+      :n "M-6"   #'+workspace/switch-to-5
+      :n "M-7"   #'+workspace/switch-to-6
+      :n "M-8"   #'+workspace/switch-to-7
+      :n "M-9"   #'+workspace/switch-to-8
+      :n "M-0"   #'+workspace/switch-to-final
 #+end_src
 
 And to really copy Doom's setup, let's add the same shortcuts for Mac:
 
 #+caption: config.el
 #+begin_src emacs-lisp
- (:when IS-MAC
-  :n "s-1"   #'+workspace/switch-to-0
-  :n "s-2"   #'+workspace/switch-to-1
-  :n "s-3"   #'+workspace/switch-to-2
-  :n "s-4"   #'+workspace/switch-to-3
-  :n "s-5"   #'+workspace/switch-to-4
-  :n "s-6"   #'+workspace/switch-to-5
-  :n "s-7"   #'+workspace/switch-to-6
-  :n "s-8"   #'+workspace/switch-to-7
-  :n "s-9"   #'+workspace/switch-to-8
-  :n "s-0"   #'+workspace/switch-to-final)
+      (:when IS-MAC
+       :n "s-1"   #'+workspace/switch-to-0
+       :n "s-2"   #'+workspace/switch-to-1
+       :n "s-3"   #'+workspace/switch-to-2
+       :n "s-4"   #'+workspace/switch-to-3
+       :n "s-5"   #'+workspace/switch-to-4
+       :n "s-6"   #'+workspace/switch-to-5
+       :n "s-7"   #'+workspace/switch-to-6
+       :n "s-8"   #'+workspace/switch-to-7
+       :n "s-9"   #'+workspace/switch-to-8
+       :n "s-0"   #'+workspace/switch-to-final)
 #+end_src
 
 These shortcuts close the majority of workspace binding we may need:
@@ -3613,7 +3607,7 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
-* Writing [0/8]
+* Writing [0/7]
 Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
 
 My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
@@ -3934,20 +3928,19 @@ To fix this behavior, we just need to re-bind some of the movement keys to the /
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:after org
-  (:map org-mode-map
-   :nvm "j" #'evil-next-visual-line
-   :nvm "k" #'evil-previous-visual-line
-   :nv "0" #'evil-beginning-of-visual-line
-   :nvm "^" #'evil-first-non-blank-of-visual-line
-   :nvm "$" #'evil-end-of-visual-line
-   (:prefix "g"
-    :desc "Next real line" :nvm "j" #'evil-next-line
-    :desc "Previous real line" :nvm "k" #'evil-previous-line
-    :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
-    :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
-    :desc "End of real line" :nvm "$" #'evil-end-of-line))))
+(map! :after org
+      (:map org-mode-map
+       :nvm "j" #'evil-next-visual-line
+       :nvm "k" #'evil-previous-visual-line
+       :nv "0" #'evil-beginning-of-visual-line
+       :nvm "^" #'evil-first-non-blank-of-visual-line
+       :nvm "$" #'evil-end-of-visual-line
+       (:prefix "g"
+        :desc "Next real line" :nvm "j" #'evil-next-line
+        :desc "Previous real line" :nvm "k" #'evil-previous-line
+        :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
+        :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
+        :desc "End of real line" :nvm "$" #'evil-end-of-line)))
 #+end_src
 
 While I'm sure I'm missing a command or two, these will get me started.
@@ -3956,29 +3949,31 @@ I also need to adjust the window navigation keys that clash with default Org bin
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:after org
-  (:map org-mode-map
-   :n "s-j" #'org-next-visible-heading
-   :n "s-k" #'org-previous-visible-heading
-   :n "C-s-j" #'org-forward-heading-same-level
-   :n "C-s-k" #'org-backward-heading-same-level
-   :n "C-j" #'evil-window-down
-   :n "C-k" #'evil-window-up
-   )))
+(map! :after org
+      (:map org-mode-map
+       :n "s-j" #'org-next-visible-heading
+       :n "s-k" #'org-previous-visible-heading
+       :n "C-s-j" #'org-forward-heading-same-level
+       :n "C-s-k" #'org-backward-heading-same-level
+       :n "C-j" #'evil-window-down
+       :n "C-k" #'evil-window-up))
+#+end_src
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +org/link-snippet-in-place ()
+  (interactive)
+  (yas-expand-snippet (yas-lookup-snippet "Link")
+                      (region-beginning)
+                      (region-end)))
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:after org
-  (:map org-mode-map
-   :v "s-k" #'(lambda()
-                (interactive)
-                (yas-expand-snippet (yas-lookup-snippet "Link")
-                                    (region-beginning)
-                                    (region-end)))
-   )))
+(map! :after org
+      (:map org-mode-map
+       :v "s-k" #'+org/link-snippet-in-place))
 #+end_src
 
 At this point we can tight up everything and setup our buffer when we open an org file.
@@ -4594,10 +4589,9 @@ capture you're not inputting old values from your template."
                           (setq default-minibuffer-frame (org-capture))))
   (setq org-capture-templates `())
 
-  (map!
-   (:map org-capture-mode-map
-    :gin "C-RET" #'org-capture-finalize
-    :gin [s-escape] #'org-capture-kill))
+  (map! :map org-capture-mode-map
+        :gin "C-RET" #'org-capture-finalize
+        :gin [s-escape] #'org-capture-kill)
 #+end_src
 
 #+caption: autoload/capture.el
@@ -5268,8 +5262,7 @@ journal date, returns the current time."
   (map! :leader
         :desc "Org Capture"           "X" #'+org-capture/same-frame
         (:prefix-map ("n" . "notes")
-         :desc "Org capture"          "n" #'+org-capture/open-frame
-         ))
+         :desc "Org capture"          "n" #'+org-capture/open-frame))
 #+end_src
 
 #+caption: autoload/capture.el
@@ -5506,7 +5499,7 @@ TBD
 ** TODO Kotlin
 ** TODO Java
 
-* Non-editor features [0/7]
+* Non-editor features [0/8]
 TBD
 
 ** TODO Requirements
@@ -5790,57 +5783,56 @@ is no active narrow, quit Dired."
 #+end_src
 
 #+begin_src emacs-lisp
-(map!
- (:after dired
-         (:map dired-mode-map
-               :ne "t"        nil
-               :ne "y"        nil
-               :ne "c"        nil
-               :ne "o"        nil
-               :ne "m"        nil
-               :ne "/"        #'+dired/narrow
-               :ne "<escape>" #'+dired/widen-or-quit-all
-               :ne "q"        #'+dired/widen-or-quit-all
-               :ne "RET"      #'dired-find-file
-               :ne "TAB"      #'+dired/open-directory
-               :ne "<tab>"    #'+dired/open-directory
-               :ne "l"        #'+dired/open-directory
-               :ne "h"        #'dired-up-directory
-               :ne "U"        #'dired-up-directory
-               :ne "R"        #'dired-do-rename
-               :ne "d"        #'dired-do-delete
-               :ne "x"        #'+dired/toggle-mark
-               (:prefix "t"
-                        :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
-                        :desc "Toggle git info"       :ne "g" #'+dired/toggle-git-mode
-                        :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
-                        :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks)
-               (:prefix "y"
-                        :desc "Copy absolut path"     :ne "a" #'+dired/yank-absolute-path
-                        :desc "Copy file"             :ne "f" #'dired-do-copy
-                        :desc "Copy with regexp"      :ne "r" #'dired-do-copy-regexp
-                        :desc "Copy relative path"    :ne "y" #'+dired/yank-relative-path)
-               (:prefix "c"
-                        :desc "Create empty file"     :ne "f" #'dired-do-touch
-                        :desc "Create directory"      :ne "d" #'dired-create-directory
-                        :desc "Create project"        :ne "p" #'xxx)
-               (:prefix "o"
-                        :desc "Open no split"         :ne "o" #'dired-find-alternate-file
-                        :desc "Quick view"            :ne "p" #'+dired/mac-quick-view
-                        :desc "Reveal on Finder"      :ne "f" #'+dired/reveal-on-finder
-                        :desc "Open vertically"       :ne "s" #'+dired/open-split-bellow
-                        :desc "Open horizontally"     :ne "v" #'+dired/open-split-right
-                        :desc "Open externally"       :ne "x" #'+dired/open-externally)
-               (:prefix "m"
-                        :ne "h" nil
-                        :desc "Mark directories"  :ne "d" #'dired-mark-directories
-                        :desc "Mark extension"    :ne "e" #'dired-mark-extension
-                        :desc "Mark hidden files" :ne "h" #'dired-mark-omitted
-                        :desc "Mark with regexp"  :ne "r" #'dired-mark-files-regexp
-                        :desc "Mark subdir files" :ne "s" #'dired-mark-omitted
-                        :desc "Unmark all files"  :ne "u" #'dired-unmark-all-files
-                        :desc "Remove all marks"  :ne "U" #'dired-unmark-all-marks
-                        :desc "Mark executables"  :ne "x" #'dired-mark-executables))))
+(map! :after dired
+      (:map dired-mode-map
+       :ne "t"        nil
+       :ne "y"        nil
+       :ne "c"        nil
+       :ne "o"        nil
+       :ne "m"        nil
+       :ne "/"        #'+dired/narrow
+       :ne "<escape>" #'+dired/widen-or-quit-all
+       :ne "q"        #'+dired/widen-or-quit-all
+       :ne "RET"      #'dired-find-file
+       :ne "TAB"      #'+dired/open-directory
+       :ne "<tab>"    #'+dired/open-directory
+       :ne "l"        #'+dired/open-directory
+       :ne "h"        #'dired-up-directory
+       :ne "U"        #'dired-up-directory
+       :ne "R"        #'dired-do-rename
+       :ne "d"        #'dired-do-delete
+       :ne "x"        #'+dired/toggle-mark
+       (:prefix "t"
+        :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
+        :desc "Toggle git info"       :ne "g" #'+dired/toggle-git-mode
+        :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
+        :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks)
+       (:prefix "y"
+        :desc "Copy absolut path"     :ne "a" #'+dired/yank-absolute-path
+        :desc "Copy file"             :ne "f" #'dired-do-copy
+        :desc "Copy with regexp"      :ne "r" #'dired-do-copy-regexp
+        :desc "Copy relative path"    :ne "y" #'+dired/yank-relative-path)
+       (:prefix "c"
+        :desc "Create empty file"     :ne "f" #'dired-do-touch
+        :desc "Create directory"      :ne "d" #'dired-create-directory
+        :desc "Create project"        :ne "p" #'xxx)
+       (:prefix "o"
+        :desc "Open no split"         :ne "o" #'dired-find-alternate-file
+        :desc "Quick view"            :ne "p" #'+dired/mac-quick-view
+        :desc "Reveal on Finder"      :ne "f" #'+dired/reveal-on-finder
+        :desc "Open vertically"       :ne "s" #'+dired/open-split-bellow
+        :desc "Open horizontally"     :ne "v" #'+dired/open-split-right
+        :desc "Open externally"       :ne "x" #'+dired/open-externally)
+       (:prefix "m"
+        :ne "h" nil
+        :desc "Mark directories"  :ne "d" #'dired-mark-directories
+        :desc "Mark extension"    :ne "e" #'dired-mark-extension
+        :desc "Mark hidden files" :ne "h" #'dired-mark-omitted
+        :desc "Mark with regexp"  :ne "r" #'dired-mark-files-regexp
+        :desc "Mark subdir files" :ne "s" #'dired-mark-omitted
+        :desc "Unmark all files"  :ne "u" #'dired-unmark-all-files
+        :desc "Remove all marks"  :ne "U" #'dired-unmark-all-marks
+        :desc "Mark executables"  :ne "x" #'dired-mark-executables)))
 #+end_src
 
 ** TODO Project management
@@ -5940,13 +5932,12 @@ Two is the window navigation mapping:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map!
- (:after eshell
-  (:map eshell-mode-map
-   :in "C-h" #'evil-window-left
-   :in "C-j" #'evil-window-down
-   :in "C-k" #'evil-window-up
-   :in "C-l" #'evil-window-right)))
+(map! :after eshell
+      (:map eshell-mode-map
+       :in "C-h" #'evil-window-left
+       :in "C-j" #'evil-window-down
+       :in "C-k" #'evil-window-up
+       :in "C-l" #'evil-window-right))
 #+end_src
 
 And three is to fix =magit-status=. When I'm on the terminal, if I open =magit-status=, everything works as expected, but when I exit back to the terminal, Emacs switch the buffer on my terminal window to something else.
