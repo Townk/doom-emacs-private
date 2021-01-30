@@ -1235,7 +1235,7 @@ Mixed pitch
 (use-package! mixed-pitch
   :defer t
   :init
-  (add-hook! (wordnut-mode Info-mode lexic-mode)
+  (add-hook! (Info-mode lexic-mode)
     (defun +doom-mixed-pitch-setup-h ()
       (mixed-pitch-mode 1)
       (let ((var-pitch (face-attribute 'variable-pitch :family))
