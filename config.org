@@ -6170,19 +6170,10 @@ TBD
   (remove-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-workspace-h)
   (remove-hook 'org-agenda-finalize-hook '+org-defer-mode-in-agenda-buffers-h)
   (add-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-perspective-h)
-
-  (map! (:map evil-org-agenda-mode-map
-        :gn "C-h" #'evil-window-left
-        :gn "C-j" #'evil-window-down
-        :gn "C-k" #'evil-window-up
-        :gn "C-l" #'evil-window-right
-        :n "j" #'org-agenda-next-item
-        :n "k" #'org-agenda-previous-item
-        :n "h" nil
-        :n "l" nil
-        ))
   )
 #+end_src
+
+*** TODO Modify org agenda key map to use 'j' and 'k' to move between items
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el :mkdirp yes
