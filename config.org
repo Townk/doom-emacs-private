@@ -1366,6 +1366,7 @@ Info
 
 #+caption: autoload/appearances.el
 #+begin_src emacs-lisp :tangle autoload/appearances.el :mkdirp yes
+;;;###autoload
 (defconst +doom-supported-icons
   '(assign
     bug
