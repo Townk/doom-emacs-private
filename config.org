@@ -2806,7 +2806,7 @@ The next sections will cover each one of these commands, but before we begin, le
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map! :leader
+(map! (:leader
       (:prefix-map ("TAB" . "workspace")
 #+end_src
 
@@ -3682,6 +3682,7 @@ Now that we defined all /leader/ keys, we can close our /leader/ mapping:
 #+caption: config.el
 #+begin_src emacs-lisp
       )  ;; :prefix-map ("TAB" . "workspace")
+      )  ;; :leader
 #+end_src
 
 *** Other shortcuts
