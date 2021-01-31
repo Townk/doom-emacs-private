@@ -6094,6 +6094,52 @@ TBD
   + Daily :: Should be a quick 5 min check on the tasks done during the day. I will use this time to also add unexpected tasks on my list so I can have a more accurate record of my work day;
   + Weekly :: Should be a more in-depth review, where I will evaluate if I need to change or amend any of the tasks I'm tracking. This process shouldn't take more than 30 minutes;
 
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! org
+  (setq org-agenda-files (list (concat org-directory "/agenda/tasks/todo.org" )
+                               (concat +org-journal-dir (format-time-string +org-journal-file-format)))
+        org-archive-location (concat org-directory "/.archives/%s::datetree/* Archived From %s")
+        org-archive-tag "ARCHIVED"
+        org-log-done t
+        org-todo-keywords '((sequence
+                             "TODO(t)"  ; This task needs to be done.
+
+                             "NEXT(n)"  ; I committed to work on this task next. This can be used to
+                                        ; plan my next day, or to indicate in a project the next
+                                        ; logical step.
+
+                             "STRT(s)"  ; This task is actively in progress. Ideally you only have
+                                        ; one task marked as started, but in some cases you can
+                                        ; start a task, and while you wait for something to
+                                        ; complete, you can start another task.
+
+                             "WAIT(w)"  ; This task is waiting some external condition to happen,
+                                        ; like waiting for an authorization, waiting for account to
+                                        ; be created, etc.
+
+                             "HOLD(h)"  ; This task is paused. This state can mean many different
+                                        ; things. A task can be paused because I simply don't want
+                                        ; to continue doing it, or it is paused because I want to
+                                        ; make sure I understand I shouldn't be work on this task.
+
+                             "DELG(g)"  ; This task is delegated to someone else. Usually, a
+                                        ; delegated task has a property indicating to whom it is
+                                        ; delegated and when is the tentative ETA. This state is not
+                                        ; considered final because I want to follow up with the
+                                        ; person about the outcome.
+                             "|"
+                             "DONE(d)"  ; Task successfully completed
+
+                             "KILL(k)"  ; Task was cancelled, aborted or is no longer applicable,
+                                        ; but I want to keep it as a record instead of simply
+                                        ; remove it from the file.
+                             ))
+        org-todo-keyword-faces '(("STRT" . +org-todo-active)
+                                 ("DELG" . +org-todo-active)
+                                 ("WAIT" . +org-todo-onhold)
+                                 ("HOLD" . +org-todo-onhold))))
+#+end_src
 * Appendix
 
 ** The =init.el= file
