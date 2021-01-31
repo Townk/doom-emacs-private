@@ -5027,13 +5027,13 @@ the org link."
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
             `("j"  ,(+org-capture-description :text "Journal" :icon `(journal . ,(doom-color 'blue 256))))
-            `("js" ,(+org-capture-description :text "Support" :icon `(help . ,(doom-color 'orange 256))
+            `("js" ,(+org-capture-description :text "Support" :icon `(help . ,(doom-color 'orange 256)))
               plain (function +org-capture-journal-file-for-meeting)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-support)%?\n"
                        "%(+org-capture-template-selection)")
               :clock-in t
               :kill-buffer t)
-            `("jm" ,(+org-capture-description :text "Meeting" :icon `(meeting . ,(doom-color 'cyan 256))))
+            `("jm" ,(+org-capture-description :text "Meeting" :icon `(meeting . ,(doom-color 'cyan 256)))
               plain (function +org-capture-journal-file-for-meeting)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-meeting)%?\n"
                        "%(+org-capture-template-selection)")
@@ -5413,7 +5413,7 @@ programs can force the template by setting KEYS to a string."
                                      "━━━━━━━━━━━━"))
                            'face 'font-lock-type-face)
                " "
-               `(("q" ,(+org-capture-description :text "Abort" :icon `(stop . ,(doom-color red 256)))))))))
+               `(("q" ,(+org-capture-description :text "Abort" :icon `(stop . ,(doom-color 'red 256)))))))))
 
 
 ;;;###autoload
