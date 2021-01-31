@@ -1727,6 +1727,7 @@ TBD
     (setq-local olivetti-body-width 90)
     (olivetti-mode 1)
     (set-fill-column 90)
+    (tab-line-mode -1)
     (hl-line-mode -1)))
 #+end_src
 
