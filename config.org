@@ -6098,6 +6098,10 @@ TBD
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! org
+  (setq org-agenda-window-setup 'other-window)
+  (set-popup-rule! "^\\*Org Agenda"
+    :slot 2   :vslot -1     :side 'right   :width 100 :height 0.4
+    :select t :modeline nil :autosave t   :ttl nil   :quit 'current)
   (setq org-agenda-files (list (concat org-directory "/agenda/tasks/todo.org" )
                                (concat +org-journal-dir (format-time-string +org-journal-file-format)))
         org-archive-location (concat org-directory "/.archives/%s::datetree/* Archived From %s")
@@ -6141,6 +6145,164 @@ TBD
                                  ("WAIT" . +org-todo-onhold)
                                  ("HOLD" . +org-todo-onhold))))
 #+end_src
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +org-exclude-agenda-buffers-from-perspective-h nil
+  "Don't associate temporary agenda buffers with current workspace."
+  (if
+      (and org-agenda-new-buffers
+           (and (boundp 'persp-mode) persp-mode)
+           (not org-agenda-sticky))
+      (progn
+        (let (persp-autokill-buffer-on-remove)
+          (mapc 'persp-remove-buffer org-agenda-new-buffers)))))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! org-agenda
+  (custom-theme-set-faces! 'doom-tomorrow-night
+    `(org-agenda-current-time :foreground ,(doom-color 'red 256)))
+  (setq org-agenda-block-separator " ")
+
+  (remove-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-workspace-h)
+  (remove-hook 'org-agenda-finalize-hook '+org-defer-mode-in-agenda-buffers-h)
+  (add-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-perspective-h)
+
+  (map! (:map evil-org-agenda-mode-map
+        :gn "C-h" #'evil-window-left
+        :gn "C-j" #'evil-window-down
+        :gn "C-k" #'evil-window-up
+        :gn "C-l" #'evil-window-right
+        :n "j" #'org-agenda-next-item
+        :n "k" #'org-agenda-previous-item
+        :n "h" nil
+        :n "l" nil
+        ))
+  )
+#+end_src
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el :mkdirp yes
+(package! org-super-agenda)
+(package! org-ql)
+#+end_src
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defadvice! +org-agenda-make-agenda-icon-header-a (func name)
+  :around 'org-super-agenda--make-agenda-header
+  (let ((icon (get-text-property 0 'icon name))
+        (icon-color (get-text-property 0 'icon-color name))
+        (header (s-trim (funcall func name))))
+    (concat
+     "\n"
+     (when icon
+       (format "%s " (+doom-get-icon icon icon-color)))
+     header
+     "\n"
+     (if icon
+         (s-repeat (+ 3 (length header)) "─")
+       (s-repeat (length header) "─")))))
+#+end_src
+
+#+caption: autoload/org.el
+#+begin_src emacs-lisp :tangle autoload/org.el :mkdirp yes
+;;;###autoload
+(defun +org-agenda-group-title (text &optional icon icon-color)
+  (propertize text 'icon icon 'icon-color icon-color))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! org-super-agenda
+  :after org-agenda
+  :init
+  (add-hook! org-agenda-mode
+    (setq-local wrap-prefix (s-repeat 22 " "))
+    (variable-pitch-mode 1))
+  (setq org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-include-deadlines t
+        org-agenda-compact-blocks nil
+        ;; org-agenda-restore-windows-after-quit nil
+        org-agenda-window-setup 'other-window
+        )
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          (700 800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800)
+          "······"
+          "╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌")
+        org-agenda-current-time-string
+        "←— now - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -"
+        org-agenda-custom-commands
+        '(("c" "Super view"
+           ((agenda "" ((org-agenda-span 'day)
+                        (org-agenda-start-day "today")
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'deadline))
+                        (org-agenda-show-all-dates t)
+                        (org-agenda-use-time-grid t)
+                        (org-agenda-overriding-header "")
+                        (org-super-agenda-groups '((:name "Agenda"
+                                                    :time-grid t
+                                                    :and (:date today
+                                                          :todo nil))))))
+            (alltodo "" ((org-agenda-overriding-header "")
+                         (org-super-agenda-groups
+                          `(
+                            (:name ,(+org-agenda-group-title "Inbox" 'inbox (doom-color 'orange))
+                             :category "journal"
+                             :order 15)
+                            (:name ,(+org-agenda-group-title "Delegated" 'assign (doom-color 'orange))
+                             :todo "DELG"
+                             :order 45)
+                            (:name ,(+org-agenda-group-title "Waiting" 'wait  (doom-color 'yellow))
+                             :todo "WAIT"
+                             :order 35)
+                            (:name ,(+org-agenda-group-title "On Hold" 'pause (doom-color 'yellow))
+                             :todo "HOLD"
+                             :order 40)
+                            (:name ,(+org-agenda-group-title "Issues" 'bug (doom-color 'red))
+                             :tag "issue"
+                             :order 30)
+                            (:name ,(+org-agenda-group-title "Habits" 'loop (doom-color 'blue))
+                             :habit t
+                             :order 1)
+                            (:name ,(+org-agenda-group-title "Overdue" 'busy (doom-color 'red))
+                             :deadline past
+                             :face 'all-the-icons-dpink
+                             :order 4)
+                            (:name ,(+org-agenda-group-title "Due Today" 'new (doom-color 'orange))
+                             :deadline today
+                             :face 'all-the-icons-orange
+                             :order 5)
+                            (:name ,(+org-agenda-group-title "Actionable" 'checked (doom-color 'green))
+                             :and (:todo ("TODO" "STRT")
+                                   :scheduled (past today)
+                                   :deadline nil)
+                             :order 21)
+                            (:name ,(+org-agenda-group-title "Due Soon" 'snooze (doom-color 'yellow))
+                             :deadline future
+                             :face 'all-the-icons-yellow
+                             :order 10)
+                            (:name ,(+org-agenda-group-title "Important" 'error (doom-color 'red))
+                             :priority "A"
+                             :order 15)
+                            (:name ,(+org-agenda-group-title "Next to do" 'visibility (doom-color 'yellow))
+                             :todo "NEXT"
+                             :order 20)
+                            (:name ,(+org-agenda-group-title "To do" 'checked (doom-color 'green))
+                             :anything t
+                             :order 23)
+                            ))))))))
+  :config
+  (setq org-super-agenda-header-map nil)
+  (org-super-agenda-mode))
+#+end_src
+
 * Appendix
 
 ** The =init.el= file
