@@ -5920,7 +5920,7 @@ project."
 And attach it to the =projectile= hook:
 
 #+begin_src emacs-lisp
-(setq projectile-switch-project-action #'+doom-after-switch-project-action-h)
+  (setq projectile-switch-project-action #'+doom-after-switch-project-action-h)
 #+end_src
 
 As usual, don't forget to close the =after!= sexp:
