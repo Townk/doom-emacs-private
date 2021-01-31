@@ -1206,8 +1206,10 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
 
 Rainbow mode
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el :mkdirp yes
+#+caption: autoload/appearances.el
+#+begin_src emacs-lisp :tangle autoload/appearances.el :mkdirp yes
+;;; autoload/appearances.el -*- lexical-binding: t; -*-
+
 ;;;###autoload
 (defadvice! +doom-fontify-rainbow-colorize-match-a (color &optional match)
   "Return a matched string propertized with a face whose
@@ -1313,11 +1315,141 @@ Info
       (0 (prog1 ()
            (compose-region (match-beginning 1) (match-end 1) "☰")
            (put-text-property (match-beginning 2) (match-end 2) 'invisible t)
-           )))) t)
-  )
+           )))) t))
 #+end_src
 
 *** Iconography
+
+#+caption: autoload/appearances.el
+#+begin_src emacs-lisp :tangle autoload/appearances.el :mkdirp yes
+(defconst +doom-supported-icons
+  '(assign
+    bug
+    busy
+    calendar
+    checked
+    checklist
+    contact-add
+    error
+    globe
+    help
+    history
+    idea
+    inbox
+    journal
+    list
+    loop
+    meeting
+    new
+    notes
+    pause
+    postit
+    project
+    review
+    semi-checked
+    snooze
+    stop
+    timer
+    unchecked
+    visibility
+    wait)
+  "List of all iconse supported on captur templates.")
+#+end_src
+
+
+#+caption: autoload/appearances.el
+#+begin_src emacs-lisp :tangle autoload/appearances.el :mkdirp yes
+;;;###autoload
+(defun +doom-get-raw-icon (icon)
+  "This function returns the requested ICON as if you're calling
+the `all-the-icons-'* functions directly.
+
+Currrently, supported icons are:
+
+- 'assign
+- 'bug
+- 'busy
+- 'calendar
+- 'checked
+- 'checklist
+- 'contact-add
+- 'error
+- 'globe
+- 'help
+- 'history
+- 'idea
+- 'inbox
+- 'journal
+- 'list
+- 'loop
+- 'meeting
+- 'new
+- 'notes
+- 'pause
+- 'postit
+- 'project
+- 'review
+- 'semi-checked
+- 'snooze
+- 'stop
+- 'timer
+- 'unchecked
+- 'visibility
+- 'wait
+"
+  (pcase icon
+    ('assign (all-the-icons-material "assignment_ind" :height 0.95 :v-adjust -0.17))
+    ('bug (all-the-icons-material "bug_report" :height 0.95 :v-adjust -0.17))
+    ('busy (all-the-icons-material "event_busy" :height 0.95 :v-adjust -0.17))
+    ('calendar (all-the-icons-octicon "calendar" :height 1.05 :v-adjust 0.1))
+    ('checked (all-the-icons-material "check_box" :height 0.95 :v-adjust -0.17))
+    ('checklist (all-the-icons-octicon "checklist" :height 0.95 :v-adjust 0.1))
+    ('contact-add (all-the-icons-material "person_add" :height 0.95 :v-adjust -0.17))
+    ('error (all-the-icons-material "error_outline" :height 0.95 :v-adjust -0.17))
+    ('globe (all-the-icons-faicon "globe" :height 1.15 :v-adjust -0.05))
+    ('help (all-the-icons-material "live_help" :height 0.95 :v-adjust -0.22))
+    ('history (all-the-icons-material "history" :height 0.95 :v-adjust -0.17))
+    ('idea (all-the-icons-material "lightbulb_outline" :height 0.95 :v-adjust -0.17))
+    ('inbox (all-the-icons-material "inbox" :height 0.95 :v-adjust -0.15))
+    ('journal (all-the-icons-material "book" :height 0.95 :v-adjust -0.15))
+    ('list (all-the-icons-faicon "list" :height 0.93 :v-adjust -0.05))
+    ('loop (all-the-icons-material "loop" :height 0.95 :v-adjust -0.17))
+    ('meeting (all-the-icons-material "date_range" :height 0.95 :v-adjust -0.15))
+    ('new (all-the-icons-material "new_releases" :height 0.95 :v-adjust -0.17))
+    ('notes (all-the-icons-material "library_books" :height 0.95 :v-adjust -0.1))
+    ('pause (all-the-icons-material "pause_circle_outline" :height 0.95 :v-adjust -0.17))
+    ('postit (all-the-icons-faicon "sticky-note" :height 1.15 :v-adjust 0.05))
+    ('project (all-the-icons-octicon "briefcase" :height 1.05 :v-adjust 0.05))
+    ('review (all-the-icons-material "rate_review" :height 0.95 :v-adjust -0.15))
+    ('semi-checked (all-the-icons-material "indeterminate_check_box" :height 0.95 :v-adjust -0.17))
+    ('snooze (all-the-icons-material "snooze" :height 0.95 :v-adjust -0.17))
+    ('stop (all-the-icons-octicon "stop" :height 1.05 :v-adjust -0.05))
+    ('timer (all-the-icons-material "timer" :height 0.95 :v-adjust -0.15))
+    ('unchecked (all-the-icons-material "check_box_outline_blank" :height 0.95 :v-adjust -0.17))
+    ('visibility (all-the-icons-material "visibility" :height 0.95 :v-adjust -0.17))
+    ('wait (all-the-icons-material "hourglass_empty" :height 0.95 :v-adjust -0.17))
+    ))
+#+end_src
+
+#+caption: autoload/appearances.el
+#+begin_src emacs-lisp :tangle autoload/appearances.el :mkdirp yes
+;;;###autoload
+(defun +doom-get-icon (icon &optional color)
+  "This function returns the requested ICON as a 2-characters
+string, propertized to dieplsy the associated icon frorm the
+`all-the-icons' package. It uses the COLOR arg to 'paint' the
+icon.
+
+Check documentation of the function `+doom-get-raw-icon' for a
+list of supported icons."
+  (cond ((eq color 'raw) (+doom-get-raw-icon icon))
+        (color (propertize "--"
+                   'face `(:foreground ,color)
+                   'display (+doom-get-raw-icon icon)))
+        (t (propertize "--"
+                   'face `(:foreground ,(face-attribute 'default :foreground))
+                   'display (+doom-get-raw-icon icon)))))
+#+end_src
 
 ** TODO Editor Tabs
 TBD
@@ -4624,128 +4756,6 @@ capture you're not inputting old values from your template."
 
 #+caption: autoload/capture.el
 #+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
-(defconst +org-capture-supported-icons
-  '(calendar
-    checklist
-    contact-add
-    globe
-    help
-    history
-    idea
-    inbox
-    journal
-    list
-    meeting
-    notes
-    postit
-    project
-    review
-    stop
-    timer)
-  "List of all iconse supported on captur templates.")
-#+end_src
-
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
-(defun +org-capture-get-string-icon (icon color)
-  "This function returns the requested ICON as a 2-characters
-string, propertized to dieplsy the associated icon frorm the
-`all-the-icons' package. It uses the COLOR arg to 'paint' the
-icon.
-
-Currrently, supported icons are:
-
-- 'calendar
-- 'checklist
-- 'contact-add
-- 'globe
-- 'help
-- 'history
-- 'idea
-- 'inbox
-- 'journal
-- 'list
-- 'meeting
-- 'notes
-- 'postit
-- 'project
-- 'review
-- 'stop
-- 'timer
-"
-  (pcase icon
-    ('calendar
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-octicon "calendar" :height 1.05 :v-adjust 0.1)))
-    ('checklist
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
-                 'display (all-the-icons-octicon "checklist" :height 0.95 :v-adjust 0.1)))
-    ('contact-add
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "person_add" :height 0.95 :v-adjust -0.17)))
-    ('globe
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
-                 'display (all-the-icons-faicon "globe" :height 1.15 :v-adjust -0.05)))
-    ('help
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "live_help" :height 0.95 :v-adjust -0.22)))
-    ('history
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "history" :height 0.95 :v-adjust -0.17)))
-    ('idea
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "lightbulb_outline" :height 0.95 :v-adjust -0.17)))
-    ('inbox
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "inbox" :height 0.95 :v-adjust -0.15)))
-    ('journal
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "book" :height 0.95 :v-adjust -0.15)))
-    ('list
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
-                 'display (all-the-icons-faicon "list" :height 0.93 :v-adjust -0.05)))
-    ('meeting
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "date_range" :height 0.95 :v-adjust -0.15)))
-    ('notes
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "library_books" :height 0.95 :v-adjust -0.1)))
-    ('postit
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-faicon-family) :foreground ,color)
-                 'display (all-the-icons-faicon "sticky-note" :height 1.15 :v-adjust 0.05)))
-    ('project
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
-                 'display (all-the-icons-octicon "briefcase" :height 1.05 :v-adjust 0.05)))
-    ('review
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "rate_review" :height 0.95 :v-adjust -0.15)))
-    ('stop
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-octicon-family) :foreground ,color)
-                 'display (all-the-icons-octicon "stop" :height 1.05 :v-adjust -0.05)))
-    ('timer
-     (propertize "--"
-                 'face `(:family ,(all-the-icons-material-family) :foreground ,color)
-                 'display (all-the-icons-material "timer" :height 0.95 :v-adjust -0.15)))))
-#+end_src
-
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el :mkdirp yes
 ;;;###autoload
 (defun +org-capture-description (&rest args)
   "Returns a string to be used as the description of a capture
@@ -4769,11 +4779,11 @@ Example:
     (if icon
         (progn
           (unless (and (consp icon)
-                       (memq (car-safe icon) +org-capture-supported-icons)
+                       (memq (car-safe icon) +doom-supported-icons)
                        (stringp (cdr-safe icon)))
             (error (concat "A capture description icon must be a cons cell with"
-                           " one of +org-capture-supported-icons symbol and a string color.")))
-          (format "%s %s" (+org-capture-get-string-icon (car icon) (cdr icon)) text))
+                           " one of +doom-supported-icons symbol and a string color.")))
+          (format "%s %s" (+doom-get-icon (car icon) (cdr icon)) text))
       text)))
 #+end_src
 
@@ -5858,6 +5868,12 @@ Projectile is a great package. It usually provides more features that one partic
 #+end_src
 
 To make =projectile= work with =selectrum=, we need to tell it to use the default Emacs completion system:
+
+#+begin_src emacs-lisp
+  (setq projectile-ignored-projects `("~/"
+                                      "/tmp"
+                                      ,(expand-file-name "straight/repos" doom-local-dir)))
+#+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
