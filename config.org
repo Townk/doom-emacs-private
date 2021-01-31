@@ -1051,7 +1051,7 @@ I found that on macOS, the ~fill-column-indicator~ face, can't render unicode ch
 (set-face-attribute 'fill-column-indicator nil
                     :font "Arial Unicode MS"
                     :height 140
-                    :foreground "#2c2c2c")
+                    :foreground (doom-color 'base3 256))
 #+end_src
 
 And since we just fix the fill column indication, let's turn it on and set the appropriate character to it:
@@ -1142,6 +1142,28 @@ I also start enjoying using Doom without the Solaire mode on. Because of that, I
 #+end_src
 
 *** Colors
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(pushnew! doom-themes--colors
+          '(green-bg "#435300" "#435300" "black")
+          '(violet-bg "#4C2E60" "#4C2E60" "black")
+          '(yellow-bg "#644E00" "#644E00" "black")
+          '(blue-bg "#1B2E47" "#1B2E47" "black")
+          '(orange-bg "#492812" "#492812" "black")
+          '(red-bg "#360F0F" "#360F0F" "black")
+          '(magenta-bg "#645867" "#645867" "black")
+          '(light-blue "#a0b9ce" "#a0b9ce" "brightblue")
+          '(light-blue-bg "#3B454D" "#3B454D" "black")
+          '(dark-blue-bg "#14232C" "#14232C" "black")
+          '(cyan-bg "#354B48" "#354B48" "black")
+          '(dark-cyan-bg "#1C2725" "#1C2725" "black")
+          '(bright-violet "#d6c6db" "#d6c6db" "brightmagenta")
+          '(bright-blue "#c0d0de" "#c0d0de" "bright")
+          '(bright-magenta "#e3d9e7" "#e3d9e7" "brightmagenta")
+          '(bright-light-blue "#e5ecf2" "#e5ecf2" "brightblue")
+          )
+#+end_src
 
 *** Typography
 The next step is to use a better font face and size, which I recognize is a bit subjective. Nevertheless, I'll put here my /current/ font selection.
@@ -1289,23 +1311,45 @@ Info
 #+begin_src emacs-lisp
 (after! info
   (custom-theme-set-faces! 'doom-tomorrow-night
-    '(info-title-1 :foreground "#81a2be" :height 1.8 :weight normal :slant normal :inherit variable-pitch)
-    '(info-title-2 :foreground "#c9b4cf" :height 1.7 :weight normal :slant italic :inherit variable-pitch)
-    '(info-title-3 :foreground "#b294bb" :height 1.6 :weight normal :slant italic :inherit variable-pitch)
-    '(info-title-4 :foreground "#a0b9ce" :height 1.5 :weight bold   :slant normal :inherit variable-pitch)
-    '(info-menu-header :foreground "#c9b4cf" :height 1.3 :weight bold   :slant normal :inherit variable-pitch)
-    '(info-quoted-name :inherit font-lock-constant-face)
-    '(info-isolated-quote :inherit info-quoted-name)
-    '(info-isolated-backquote :inherit info-quoted-name)
-    '(info-glossary-word :foreground "#f0c674"
-                         :background "#362C18"
-                         :box (:line-width -1 :color "#f0c674" :style released-button)
+    `(info-title-1 :foreground ,(doom-color 'blue 256)
+                   :height 1.8
+                   :weight normal
+                   :slant normal
+                   :inherit variable-pitch)
+    `(info-title-2 :foreground ,(doom-color 'magenta 256)
+                   :height 1.7
+                   :weight normal
+                   :slant italic
+                   :inherit variable-pitch)
+    `(info-title-3 :foreground ,(doom-color 'violet 256)
+                   :height 1.6
+                   :weight normal
+                   :slant italic
+                   :inherit variable-pitch)
+    `(info-title-4 :foreground ,(doom-color 'light-blue 256)
+                   :height 1.5
+                   :weight bold
+                   :slant normal
+                   :inherit variable-pitch)
+    `(info-menu-header :foreground ,(doom-color 'magenta 256)
+                       :height 1.3
+                       :weight bold
+                       :slant normal
+                       :inherit variable-pitch)
+    `(info-quoted-name :inherit font-lock-constant-face)
+    `(info-isolated-quote :inherit info-quoted-name)
+    `(info-isolated-backquote :inherit info-quoted-name)
+    `(info-glossary-word :foreground ,(doom-color 'yellow 256)
+                         :background ,(doom-color 'yellow-bg 256)
+                         :box (:line-width -1 :color ,(doom-color 'yellow 256) :style released-button)
                          :inherit fixed-pitch)
-    '(link-visited :foreground "#b294bb")
-    '(info-double-quoted-name :inherit font-lock-string-face)
-    '(info-string :inherit font-lock-string-face)
-    '(info-header-node :height 160 :inherit info-node)
-    '(info-header-xref :height 160 :inherit info-xref))
+    `(link-visited :foreground ,(doom-color 'violet 256))
+    `(info-double-quoted-name :inherit font-lock-string-face)
+    `(info-string :inherit font-lock-string-face)
+    `(info-header-node :height 160
+                       :inherit info-node)
+    `(info-header-xref :height 160
+                       :inherit info-xref))
 
   (font-lock-add-keywords
    'Info-mode
@@ -1913,10 +1957,10 @@ And configure it with ~use-package!~:
   (completion-styles '(orderless))
   :config
   (custom-theme-set-faces! 'doom-tomorrow-night
-    '('orderless-match-face-0 :background "#435300" :foreground "#b5bd68")
-    '('orderless-match-face-1 :background "#4C2E60" :foreground "#b294bb")
-    '('orderless-match-face-2 :background "#644E00" :foreground "#f0c674")
-    '('orderless-match-face-3 :background "#1B2E47" :foreground "#81a2be")))
+    `('orderless-match-face-0 :background ,(doom-color 'green-bg 256) :foreground ,(doom-color 'green 256))
+    `('orderless-match-face-1 :background ,(doom-color 'violet-bg 256) :foreground ,(doom-color 'violet 256))
+    `('orderless-match-face-2 :background ,(doom-color 'yellow-bg 256) :foreground ,(doom-color 'yellow 256))
+    `('orderless-match-face-3 :background ,(doom-color 'blue-bg 256) :foreground ,(doom-color 'blue 256))))
 #+end_src
 
 On company, the matching portions of candidates are not highlighted. That’s because ~company-capf~ is hard-coded to look for the ~completions-common-part~ face, and it only use one face (~company-echo-common~) to highlight candidates.
@@ -2068,7 +2112,7 @@ The cursor line on Selectrum, is a bit too much for me. I like to have it with a
 
 #+caption: config.el
 #+begin_src emacs-lisp :padline no
-  (custom-theme-set-faces! 'doom-tomorrow-night '(selectrum-current-candidate :background "#3c3c3c"))
+  (custom-theme-set-faces! 'doom-tomorrow-night `(selectrum-current-candidate :background ,(doom-color 'base4)))
 #+end_src
 
 And last, but not least, let's set some Vim friendly keybindings:
@@ -3835,14 +3879,46 @@ Now we can wait Org to load to  continue our configuration:
 (defun +doom-adjust-outline-fonts-h ()
   (after! outline
     (custom-theme-set-faces! 'doom-tomorrow-night
-     '(outline-1 :foreground "#81a2be" :height 2.0 :weight normal :slant normal :inherit variable-pitch)
-     '(outline-2 :foreground "#c9b4cf" :height 1.8 :weight normal :slant italic :inherit variable-pitch)
-     '(outline-3 :foreground "#b294bb" :height 1.6 :weight normal :slant italic :inherit variable-pitch)
-     '(outline-4 :foreground "#a0b9ce" :height 1.4 :weight bold   :slant normal :inherit variable-pitch)
-     '(outline-5 :foreground "#d6c6db" :height 1.4 :weight bold   :slant normal :inherit variable-pitch)
-     '(outline-6 :foreground "#c0d0de" :height 1.2 :weight bold   :slant normal :inherit variable-pitch)
-     '(outline-7 :foreground "#e3d9e7" :height 1.2 :weight bold   :slant normal :inherit variable-pitch)
-     '(outline-8 :foreground "#e5ecf2" :height 1.1 :weight bold   :slant normal :inherit variable-pitch))
+     `(outline-1 :foreground ,(doom-color 'blue 256)
+                 :height 2.0
+                 :weight normal
+                 :slant normal
+                 :inherit variable-pitch)
+     `(outline-2 :foreground ,(doom-color 'magenta 256)
+                 :height 1.8
+                 :weight normal
+                 :slant italic
+                 :inherit variable-pitch)
+     `(outline-3 :foreground ,(doom-color 'violet 256)
+                 :height 1.6
+                 :weight normal
+                 :slant italic
+                 :inherit variable-pitch)
+     `(outline-4 :foreground ,(doom-color 'light-blue 256)
+                 :height 1.4
+                 :weight bold
+                 :slant normal
+                 :inherit variable-pitch)
+     `(outline-5 :foreground ,(doom-color 'bright-violet 256)
+                 :height 1.4
+                 :weight bold
+                 :slant normal
+                 :inherit variable-pitch)
+     `(outline-6 :foreground ,(doom-color 'bright-blue 256)
+                 :height 1.2
+                 :weight bold
+                 :slant normal
+                 :inherit variable-pitch)
+     `(outline-7 :foreground ,(doom-color 'bright-magentann/ 256)
+                 :height 1.2
+                 :weight bold
+                 :slant normal
+                 :inherit variable-pitch)
+     `(outline-8 :foreground ,(doom-color 'bright-light-blue 256)
+                 :height 1.1
+                 :weight bold
+                 :slant normal
+                 :inherit variable-pitch))
 ))
 #+end_src
 
@@ -4791,7 +4867,7 @@ Example:
 
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
-            `("n"  ,(+org-capture-description :text "Fleet note" :icon '(notes . "#b5bd68"))
+            `("n"  ,(+org-capture-description :text "Fleet note" :icon `(notes . ,(doom-color 'green)))
               plain (function +org-capture-journal-file)
               ,(concat "** %(+org-capture-last-journal-timestamp)%?\n"
                        "%(+org-capture-template-selection)")
@@ -4949,36 +5025,36 @@ the org link."
 
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
-            `("j"  ,(+org-capture-description :text "Journal" :icon '(journal . "#81a2be")))
-            `("js" ,(+org-capture-description :text "Support" :icon '(help . "#de935f"))
+            `("j"  ,(+org-capture-description :text "Journal" :icon `(journal . ,(doom-color 'blue 256))))
+            `("js" ,(+org-capture-description :text "Support" :icon `(help . ,(doom-color 'orange 256))
               plain (function +org-capture-journal-file-for-meeting)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-support)%?\n"
                        "%(+org-capture-template-selection)")
               :clock-in t
               :kill-buffer t)
-            `("jm" ,(+org-capture-description :text "Meeting" :icon '(meeting . "#8abeb7"))
+            `("jm" ,(+org-capture-description :text "Meeting" :icon `(meeting . ,(doom-color 'cyan 256))))
               plain (function +org-capture-journal-file-for-meeting)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-meeting)%?\n"
                        "%(+org-capture-template-selection)")
               :clock-in t
               :kill-buffer t)
-            `("jc" ,(+org-capture-description :text "Code review" :icon '(review . "#b5bd68"))
+            `("jc" ,(+org-capture-description :text "Code review" :icon `(review . ,(doom-color 'green 256)))
               plain (function +org-capture-journal-file-for-meeting)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-cr)%?\n"
                        "%(+org-capture-template-selection)")
               :clock-in t
               :kill-buffer t)
-            `("ji" ,(+org-capture-description :text "Idea" :icon '(idea . "#f0c674"))
+            `("ji" ,(+org-capture-description :text "Idea" :icon `(idea . ,(doom-color 'yellow 256)))
               plain (function +org-capture-journal-file)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-idea)%?\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("jl" ,(+org-capture-description :text "Interesting link" :icon '(globe . "#81a2be"))
+            `("jl" ,(+org-capture-description :text "Interesting link" :icon `(globe . ,(doom-color 'blue 256)))
               plain (function +org-capture-journal-file)
               ,(concat "** %(+org-capture-last-journal-timestamp)%(+org-capture-yasnippet 'capture-link)%?\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("jp" ,(+org-capture-description :text "Past entry" :icon '(history . "#b294bb"))
+            `("jp" ,(+org-capture-description :text "Past entry" :icon `(history . ,(doom-color 'violet 256)))
               plain (function +org-capture-journal-file-for-timestamp)
               ,(concat "** %(+org-capture-last-journal-timestamp)%?\n"
                        "%(+org-capture-template-selection)")
@@ -5111,19 +5187,19 @@ $0
 
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
-            `("t"  ,(+org-capture-description :text "Tasks" :icon '(inbox . "#de935f")))
-            `("tt" ,(+org-capture-description :text "General task" :icon '(inbox . "#b5bd68"))
+            `("t"  ,(+org-capture-description :text "Tasks" :icon `(inbox . ,(doom-color 'orange 256))))
+            `("tt" ,(+org-capture-description :text "General task" :icon `(inbox . ,(doom-color 'green 256)))
               plain (function +org-capture-journal-file)
               ,(concat "** TODO %?\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("td" ,(+org-capture-description :text "Task with deadline" :icon '(timer . "#f0c674"))
+            `("td" ,(+org-capture-description :text "Task with deadline" :icon `(timer . ,(doom-color 'yellow 256)))
               plain (function +org-capture-journal-file-for-task-with-deadline)
               ,(concat "** TODO %?\n"
                        "DEADLINE: %(+org-capture-last-time-read)\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("ts" ,(+org-capture-description :text "Scheduled task" :icon '(calendar . "#de935f"))
+            `("ts" ,(+org-capture-description :text "Scheduled task" :icon `(calendar . ,(doom-color 'orange 256)))
               plain (function +org-capture-journal-file-for-task-with-schedule)
               ,(concat "** TODO %?\n"
                        "SCHEDULED: %(+org-capture-last-time-read)\n"
@@ -5174,7 +5250,7 @@ journal date, returns the current time."
 
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
-            `("c" ,(+org-capture-description :text "Contact" :icon '(contact-add . "#f0c674"))
+            `("c" ,(+org-capture-description :text "Contact" :icon `(contact-add . ,(doom-color 'yellow 256)))
               plain (file (+org-capture-contacts-file))
               ,(concat "* %(+org-capture-yasnippet 'capture-contact)\n"
                        "%?\n"
@@ -5205,18 +5281,18 @@ journal date, returns the current time."
 
 #+begin_src emacs-lisp
   (pushnew! org-capture-templates
-            `("p"  ,(+org-capture-description :text "Projct" :icon '(project . "#b294bb")))
-            `("pt" ,(+org-capture-description :text "New task" :icon '(checklist . "#b5bd68"))
+            `("p"  ,(+org-capture-description :text "Projct" :icon `(project . ,(doom-color 'violet 256))))
+            `("pt" ,(+org-capture-description :text "New task" :icon `(checklist . ,(doom-color 'green 256)))
               entry (file+headline +org-capture-project-notes-file-wrapper "Tasks")
               ,(concat "* TODO %?\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("pn" ,(+org-capture-description :text "Quick note" :icon '(postit . "#f0c674"))
+            `("pn" ,(+org-capture-description :text "Quick note" :icon `(postit . ,(doom-color 'yellow 256)))
               entry (file+headline +org-capture-project-notes-file-wrapper "Notes")
               ,(concat "* %U %?\n"
                        "%(+org-capture-template-selection)")
               :kill-buffer t)
-            `("pc" ,(+org-capture-description :text "New changelog" :icon '(list . "#b294bb"))
+            `("pc" ,(+org-capture-description :text "New changelog" :icon `(list . ,(doom-color 'violet 256)))
               item (function +org-capture-project-changelog-file-with-headings)
               "- %?"
               :prepend t
@@ -5336,7 +5412,7 @@ programs can force the template by setting KEYS to a string."
                                      "━━━━━━━━━━━━"))
                            'face 'font-lock-type-face)
                " "
-               `(("q" ,(+org-capture-description :text "Abort" :icon '(stop . "#d54e53"))))))))
+               `(("q" ,(+org-capture-description :text "Abort" :icon `(stop . ,(doom-color red 256)))))))))
 
 
 ;;;###autoload
