@@ -1145,24 +1145,25 @@ I also start enjoying using Doom without the Solaire mode on. Because of that, I
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(pushnew! doom-themes--colors
-          '(green-bg "#435300" "#435300" "black")
-          '(violet-bg "#4C2E60" "#4C2E60" "black")
-          '(yellow-bg "#644E00" "#644E00" "black")
-          '(blue-bg "#1B2E47" "#1B2E47" "black")
-          '(orange-bg "#492812" "#492812" "black")
-          '(red-bg "#360F0F" "#360F0F" "black")
-          '(magenta-bg "#645867" "#645867" "black")
-          '(light-blue "#a0b9ce" "#a0b9ce" "brightblue")
-          '(light-blue-bg "#3B454D" "#3B454D" "black")
-          '(dark-blue-bg "#14232C" "#14232C" "black")
-          '(cyan-bg "#354B48" "#354B48" "black")
-          '(dark-cyan-bg "#1C2725" "#1C2725" "black")
-          '(bright-violet "#d6c6db" "#d6c6db" "brightmagenta")
-          '(bright-blue "#c0d0de" "#c0d0de" "bright")
-          '(bright-magenta "#e3d9e7" "#e3d9e7" "brightmagenta")
-          '(bright-light-blue "#e5ecf2" "#e5ecf2" "brightblue")
-          )
+(add-hook! 'doom-load-theme-hook
+  (defun +doom-themes-add-extra-colors-h ()
+    (pushnew! doom-themes--colors
+              '(green-bg "#435300" "#435300" "black")
+              '(violet-bg "#4C2E60" "#4C2E60" "black")
+              '(yellow-bg "#644E00" "#644E00" "black")
+              '(blue-bg "#1B2E47" "#1B2E47" "black")
+              '(orange-bg "#492812" "#492812" "black")
+              '(red-bg "#360F0F" "#360F0F" "black")
+              '(magenta-bg "#645867" "#645867" "black")
+              '(light-blue "#a0b9ce" "#a0b9ce" "brightblue")
+              '(light-blue-bg "#3B454D" "#3B454D" "black")
+              '(dark-blue-bg "#14232C" "#14232C" "black")
+              '(cyan-bg "#354B48" "#354B48" "black")
+              '(dark-cyan-bg "#1C2725" "#1C2725" "black")
+              '(bright-violet "#d6c6db" "#d6c6db" "brightmagenta")
+              '(bright-blue "#c0d0de" "#c0d0de" "bright")
+              '(bright-magenta "#e3d9e7" "#e3d9e7" "brightmagenta")
+              '(bright-light-blue "#e5ecf2" "#e5ecf2" "brightblue"))))
 #+end_src
 
 *** Typography
@@ -4023,7 +4024,7 @@ In some documents, I need to write math formulas and Org can render them pretty 
       '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
       '(org-property-value :inherit fixed-pitch)
       '(org-special-keyword :inherit font-lock-comment-face)
-      '(org-drawer :inherit fixed-pitch)
+      `(org-drawer :foreground ,(doom-color 'doc-comments) :inherit fixed-pitch)
       '(org-table :inherit fixed-pitch)
       '(org-formula :inherit org-table)
       '(org-block :inherit fixed-pitch)
