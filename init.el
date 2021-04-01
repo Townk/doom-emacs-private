@@ -124,7 +124,9 @@
        (lsp
         +peek
         )
-       magit             ; a git porcelain for Emacs
+       (magit            ; a git porcelain for Emacs
+        +forge
+        )
        ;; make              ; run make tasks from Emacs
        ;; pass              ; password manager for nerds
        pdf               ; pdf enhancements
@@ -161,8 +163,9 @@
        ;; fsharp            ; ML stands for Microsoft's Language
        ;; fstar             ; (dependent) types and (monadic) effects and Z3
        ;; gdscript          ; the language you waited for
-       ;; (go               ; the hipster dialect
-       ;;  +lsp)
+       (go               ; the hipster dialect
+        +lsp
+        )
        ;; (haskell          ; a language that's lazier than I am
        ;;  +dante)
        ;; hy                ; readability of scheme w/ speed of python
@@ -200,16 +203,18 @@
         ;; +pomodoro
         +present
         ;; +pretty
-        ;; +roam
+        +roam
         )
        ;; php               ; perl's insecure younger brother
        plantuml          ; diagrams for confusing people more
        ;; purescript        ; javascript, but functional
        (python           ; beautiful is better than ugly
+        ;; +conda
+        ;; +cython
         +lsp
-        +pyright
-        +pyenv
         +poetry
+        +pyenv
+        +pyright
         )
        ;; qt                ; the 'cutest' gui framework ever
        ;; racket            ; a DSL for DSLs
@@ -219,7 +224,9 @@
        ;; (ruby             ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        ;;  +rails
        ;;  )
-       ;; rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       (rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+        +lsp
+        )
        ;; scala             ; java, but good
        ;; scheme            ; a fully conniving family of lisps
        (sh               ; she sells {ba,z,fi}sh shells on the C xor
@@ -242,7 +249,7 @@
        ;;  )
 
        :app
-       ;; calendar
+       calendar
        ;; irc               ; how neckbeards socialize
        ;; (rss              ; emacs as an RSS reader
        ;;  +org
@@ -264,6 +271,10 @@
           #'(lambda ()
               (let ((make-backup-files nil)
                     (last))
+                (when (string-match-p "\\/\\(share\\/\\(templates\\|capture\\)\\|snippets\\)\\/"
+                                      (buffer-file-name))
+                  (goto-char (point-min))
+                  (insert "# -*- mode: snippet -*-\n"))
                 (goto-char (point-max))
                 (when (equal (char-before) ?\n)
                   (delete-char -1)

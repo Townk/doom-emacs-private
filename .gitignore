@@ -1,5 +1,7 @@
 autoload
+share
 snippets
 capture
 config.el
+custom.el
 packages.el
