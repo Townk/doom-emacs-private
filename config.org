@@ -1995,15 +1995,15 @@ So, while you can’t get different faces for different components, you can at l
 
 #+caption: autoload/selectrum.el
 #+begin_src emacs-lisp :tangle autoload/selectrum.el
-;;;###autoload
-(defadvice! my-orderless-match-with-one-face-a (fn &rest args)
-  "Function to help company to highlight all candidates with just
-one face."
-  :around 'company-capf--candidates
-  (let ((orderless-match-faces-original orderless-match-faces))
-    (setq orderless-match-faces [completions-common-part])
-    (apply fn args)
-    (setq orderless-match-faces orderless-match-faces-original)))
+;; ;;;###autoload
+;; (defadvice! my-orderless-match-with-one-face-a (fn &rest args)
+;;   "Function to help company to highlight all candidates with just
+;; one face."
+;;   :around 'company-capf--candidates
+;;   (let ((orderless-match-faces-original orderless-match-faces))
+;;     (setq orderless-match-faces [completions-common-part])
+;;     (apply fn args)
+;;     (setq orderless-match-faces orderless-match-faces-original)))
 #+end_src
 
 *** Sorting
