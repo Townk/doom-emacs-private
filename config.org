@@ -1058,16 +1058,16 @@ Last, I ned to setup the proper keymaps for the package:
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! aggressive-indent
- :defer t
- :init
- (add-hook! '(emacs-lisp
-              c
-              cpp
-              java
-              kotlin
-              shell
-              javascript
-              typescript) 'aggressive-indent-mode))
+  :hook ((emacs-lisp-mode
+          c-mode
+          cpp-mode
+          rust-mode
+          go-mode
+          java-mode
+          kotlin-mode
+          shell-mode
+          javascript-mode
+          typescript-mode) . aggressive-indent-mode))
 #+end_src
 
 ** Smart backspace
