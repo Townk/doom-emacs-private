@@ -1,6 +1,7 @@
 # -*- eval: (org-num-mode 1); -*-
 
 #+TITLE: Thiago's Emacs Configuration
+#+SUBTITLE: A detailed setup for Emacs using Doom Emacs framework
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
 #+DATE: Fri, Jan 1 2021
@@ -53,9 +54,11 @@ Since this document is about a text editor configuration, I have to highlight co
 
 The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
+** Acknowledgements
+Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
 
-* Standard features [0/8]
-Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve the same results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
+* Standard features
+Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
 
 ** Requirements
 As mentioned on section [[About this document]], this part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all editors.
@@ -68,10 +71,16 @@ By default, Doom starts a fresh emacs process fast, but it take its sweet time t
 *** Modal editing
 I need to come clean to the reader about my past experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
 
-*** Snippets
+*** Text Snippets
 Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some book keeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
+*** Completion framework
+On Emacs (and most of modern editors out there), the user has the ability to interact with the editor interactively. This is what the /Command Palette/ is on Sublime Edit, the /Command Line/ on Vim, and the /minibuffer/ on Emacs.
 
-*** At point completions
+My editor, has to expose APIs and integrate the completion framework with all plugins/packages installed, and its behavior must be consistent throughout the application.
+
+I also like to act on individual results, and have a simple syntax to allow me to narrow my completion options more intelligently.
+
+*** Inline completion
 Also know as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
 *** Automatic indentation
 Here I'm not talking about indent after pressing '=RET='. I'm talking about re-indenting the file as I change it. On the Emacs world, this is also known as /electric indent/.
@@ -101,7 +110,7 @@ I like the text editor to show me line numbers when they mater, and when they do
 *** Auto-saving
 I want to stop saving my files. Any editor has substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
 
-*** UI state persistence
+*** Frame persistent geometry
 I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
 
 *** Remote editing
@@ -1039,7 +1048,7 @@ Last, I ned to setup the proper keymaps for the package:
   :g "C-/" #'company-show-doc-buffer))
 #+end_src
 
-** TODO Auto-indentation
+** TODO Automatic indentation
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1200,7 +1209,7 @@ To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=
    '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "⇌ \\1"))))
 #+end_src
 
-** TODO Line numbers
+** TODO Useful line numbers
 The next behavior is something I read a long time ago on some Vim mailing list. It's how the line numbers displayed on the buffer behave. Since on normal mode is pretty useful to know how the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
 
 So, I can describe this behavior as follows:
@@ -1218,7 +1227,10 @@ And to help us with this workflow, let's create couple /auto-loaded/ functions t
   number type to `absolute.'"
   (if display-line-numbers
       (setq display-line-numbers t)))
+#+end_src
 
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-line-number-visual-h ()
   "If line numbers are visible, set the current line
@@ -1245,7 +1257,7 @@ Also, let's make sure we are displaying line numbers on any coding buffer:
   (setq-hook! 'prog-mode-hook display-line-numbers-type 'visual))
 #+end_src
 
-** TODO Auto-Save
+** TODO Auto-Saving
 First of all, since I'm going to save my work constantly, I don't want Emacs to ask me if it should really exit, or if it should kill outstanding processes while doing it. For me, if I'm telling Emacs to quit, I want it to do it, regardless its state, but I don't want to lose any content of my current work. So, the first thing I'm going to do, is to disable questions when I'm quitting Emacs:
 
 #+caption: config.el
@@ -1372,7 +1384,7 @@ With the function defined, I just need to connect them to the correct hooks:
 
 
 ** TODO Remote editing
-* Personal preferences [0/9]
+* Personal preferences
 ** TODO Requirements
 - In-editor file management ::
 - In-editor project management ::
@@ -1596,8 +1608,8 @@ Before defining the keybindings for this I would like to have an extra behavior 
 
 Doom ships with the =rotate-text= package by default, but I need couple helper functions to define which package should handle the key press:
 
-#+caption: autoload/evil.el
-#+begin_src emacs-lisp :tangle autoload/evil.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-inc-or-rotate-at-point (arg)
   (interactive "p")
@@ -1843,8 +1855,8 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
 
 Rainbow mode
 
-#+caption: autoload/appearances.el
-#+begin_src emacs-lisp :tangle autoload/appearances.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-fontify-rainbow-colorize-match-a (color &optional match)
   "Return a matched string propertized with a face whose background is COLOR.
@@ -1978,8 +1990,8 @@ Info
 
 *** Iconography
 
-#+caption: autoload/appearances.el
-#+begin_src emacs-lisp :tangle autoload/appearances.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defconst my-supported-icons
   '(assign
@@ -2016,8 +2028,8 @@ Info
 #+end_src
 
 
-#+caption: autoload/appearances.el
-#+begin_src emacs-lisp :tangle autoload/appearances.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-get-raw-icon (icon)
   "This function returns the requested ICON as if you're calling
@@ -2090,8 +2102,8 @@ Currrently, supported icons are:
     ))
 #+end_src
 
-#+caption: autoload/appearances.el
-#+begin_src emacs-lisp :tangle autoload/appearances.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-get-icon (icon &optional color)
   "This function returns the requested ICON as a 2-characters
@@ -2123,8 +2135,8 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
   :hook ((after-init . global-tab-line-mode))
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun my-tabs-close-buffer-tab (buffer-or-name &optional window)
   (let ((buffer (get-buffer buffer-or-name))
         (window (or window (get-buffer-window))))
@@ -2188,8 +2200,8 @@ left in the window, it is deleted with `delete-window' function."
   (add-hook 'window-configuration-change-hook #'my-tabs--drop-caches-h)
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs-name-buffer (buffer &rest _buffers)
   "Create name for tab with padding and truncation.
@@ -2224,8 +2236,8 @@ text if needed. You can set the minimal width with
           (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs-mode-persp-window ()
   (let ((win-buffs (tab-line-tabs-window-buffers)))
@@ -2239,8 +2251,8 @@ text if needed. You can set the minimal width with
 
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs-hide-tab-line-maybe-h ()
   (when (not (doom-real-buffer-p (current-buffer)))
@@ -2296,8 +2308,8 @@ text if needed. You can set the minimal width with
       :desc "" :n "T" #'tab-line-switch-to-prev-tab)
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs--drop-caches-h ()
   "Drops `tab-line' cache in every window."
@@ -2305,8 +2317,8 @@ text if needed. You can set the minimal width with
     (set-window-parameter window 'tab-line-cache nil)))
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs--setup-faces-h ()
   (let* ((base (if (and (facep 'solaire-default-face)
@@ -2370,8 +2382,8 @@ text if needed. You can set the minimal width with
   (my-tabs--setup-faces-h)
 #+end_src
 
-#+caption: autoload/tabs.el
-#+begin_src emacs-lisp :tangle autoload/tabs.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-tabs-select-tab-a (&optional e)
   :after 'tab-line-select-tab
@@ -2387,8 +2399,8 @@ text if needed. You can set the minimal width with
 ** TODO Windows
 TBD
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-window-single-buffer-p (&optional win)
   (let ((win (or win (selected-window))))
@@ -2601,8 +2613,8 @@ As mentioned before, Doom has the /workspaces/ module tight coupled with other a
 
 To workaround this, we need to define or alias some functions that Doom expects to be available when /workspaces/ is on:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun persp-parameter (param-name &optional persp)
   (alist-get param-name (persp-local-variables (or persp (persp-curr)))))
@@ -2621,8 +2633,8 @@ Don't forget to close the =use-package!= sexp:
 ) ;; use-package! perspective
 #+end_src
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun project-bookmark-alist ()
   (seq-filter
    (lambda (bm)
@@ -2693,8 +2705,8 @@ DISPLAY-FUNC would be `switch-to-buffer-other-window'."
   (bookmark--jump-via bookmark (or display-func 'pop-to-buffer-same-window)))
 #+end_src
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun project-recentf-list ()
   (seq-filter
@@ -2749,8 +2761,8 @@ PERSP-SET-IDO-BUFFERS)."
 #+end_src
 
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun persp-consult-buffer ()
   "Enhanced `switch-to-buffer' command with support for perspectives.
@@ -2960,8 +2972,8 @@ Now we can start with the /Display tab bar/ binding, since it is the foundation 
 *** Display tab bar
 We know Doom uses two special font faces to draw the workspace tab bar (~+workspace-tab-selected-face~ and ~+workspace-tab-face~), but we removed the =workspace= module from our =init.el=. To keep our configuration as close to Doom as possible we need to redefine these faces. Let's use our /autoload/ file =autoload/workspace.el=:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defface +workspace-tab-selected-face '((t (:inherit highlight)))
   "The face for selected tabs displayed by `+workspace/display'"
@@ -2976,8 +2988,8 @@ We know Doom uses two special font faces to draw the workspace tab bar (~+worksp
 
 With the faces defined, we can create a helper function to build the tab bar string using a propertized string so we can simply use it when we need it:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace--tabline (&optional names)
   "Returns the given NAMES list as a propertied string
 representing each name as a tab for the current workspace
@@ -3002,8 +3014,8 @@ Notice that we use ~reverse~ when we call ~(persp-names)~. This is to fix the or
 
 This helper function allows us to build the interactive function we need:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/display ()
   "Display a list of workspaces (like tabs) in the echo area."
@@ -3035,8 +3047,8 @@ Let's list the requirements for such function:
 
 And here is the implementation for such function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/switch-to (index &optional auto-create-p)
   "Switch to a workspace at a given INDEX. A negative number will start from the
@@ -3076,8 +3088,8 @@ If you analyze this function, you'll realize we don't have some of the functions
 
 We can start with the last workspace name:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-last-name ()
   (when-let ((last-used-persp (persp-last)))
     (persp-name last-used-persp)))
@@ -3085,8 +3097,8 @@ We can start with the last workspace name:
 
 Then we can add the function to resolve a workspace name from any type of reference:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-name-from-reference (ref)
   "Returns the name of a workspace referenced by REF.
 
@@ -3115,8 +3127,8 @@ returns nil."
 
 This last function needs another helper one, to make sure it returns the correct name for a session on a given index:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-name-from-index (index &optional noerror)
   "Return the workspace name on INDEX.
 
@@ -3139,8 +3151,8 @@ index 3)."
 
 And then we can add the low-level API:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace-switch (name &optional auto-create-p)
   "Switch to another workspace named NAME (a string).
@@ -3167,8 +3179,8 @@ In this function, there are three functions we still don't have on our configura
 
 Let's start with the ~+workspace-exists-p~ function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-exists-p (name)
   "Returns t if NAME is the name of an existing workspace."
   (member name (persp-names)))
@@ -3176,8 +3188,8 @@ Let's start with the ~+workspace-exists-p~ function:
 
 Then, we can implement the ~workspace-new~ function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-new (name)
   "Create a new workspace named NAME. If one already exists, return nil.
 otherwise return t on success, nil otherwise."
@@ -3190,8 +3202,8 @@ otherwise return t on success, nil otherwise."
 
 The ~+workspace-new~ function have to block the creation of a workspace if the given name is the one used by the main workspace, or if it is the same used on the auto-save feature. These workspace names are what we consider /protected/ names. So let's create a function to check it:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace--protected-p (name)
   "Return non nil if the given NAME is the default initial
 workspace name."
@@ -3201,8 +3213,8 @@ workspace name."
 
 Let's also define those two variables in case we just want to change them later:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defvaralias #'+workspaces-main #'persp-initial-frame-name)
 
@@ -3216,8 +3228,9 @@ Now we need to define our workspaces messaging API. To stay in parity with Doom,
 
 Since we already have a function to display the tabs for us, lets use that function to build a /message body/ for our API:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
 (defun +workspace--message-body (text &optional type)
   "Returns a propertied string representing a workspace
 message.
@@ -3252,8 +3265,9 @@ font face."
 
 With this last function we can implement a generic message function that we can associate to the right calls later:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
 (defun +workspace-message (text &optional type)
   "Displays the given TEXT message on the echo area, formatted as
 a workspace message (see `+workspace--message-body' for details
@@ -3272,8 +3286,8 @@ And now we can define all the /end functions/ for the messaging API.
 
 All these functions have the same pattern. Instead of us defining each one of them, we can loop through the list of possible message types, and create a function for each one:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (mapc (lambda (type)
         (defalias (intern (format "+workspace-%s" type))
           (lambda (text &rest args)
@@ -3294,8 +3308,8 @@ Doom allows you to switch workspaces by their index numbers, and since we alread
 
 As  with the message API, the /switch to workspace N/ is repetitive, and we can automate the creation of every one of these functions:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (dotimes (i 9)
   (defalias (intern (format "+workspace/switch-to-%d" i))
@@ -3323,8 +3337,8 @@ This will create 9 functions to switch to their respective workspace, so let's b
 *** Switch to final workspace
 Doom also provides a shortcut to get to the last opened workspace (last in the sense of order we created them):
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/switch-to-final ()
   "Switch to the final workspace in open workspaces."
@@ -3352,8 +3366,8 @@ I'm bundling these two commands together because usually in emacs, you have a fu
 
 Let's create our /cycle/ function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/cycle (n)
   "Cycle n workspaces to the right (default) or left."
@@ -3377,16 +3391,16 @@ Let's create our /cycle/ function:
 
 Then, we just need to create a function to move to the previous workspace:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/switch-previous ()  (interactive) (+workspace/cycle -1))
 #+end_src
 
 And one for next one:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/switch-next () (interactive) (+workspace/cycle +1))
 #+end_src
@@ -3402,8 +3416,8 @@ Then, we can bind both functions to their proper keys:
 *** New workspace
 On the sequence, we have the /New workspace/. We already created a helper low-level function to spun new workspaces, now we need a command to call that function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/new (&optional name)
   "Create a new blank workspace named NAME."
@@ -3422,8 +3436,8 @@ On the sequence, we have the /New workspace/. We already created a helper low-le
 
 Notice how we use the ~auto-create-p~ functionality on the ~+workspace-switch~ function. Also, you might have noticed we use a helper function to get a sequential number when we don't provide a name to the new workspace, and we didn't implement it yet, so let's do it now:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace--generate-id ()
   "Returns the next sequential number that a new perspective
 could use on its name."
@@ -3450,8 +3464,8 @@ Going through our list of commands, we need to provide a way for us to rename a 
 
 Let's start with the command function:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/rename (new-name)
   "Rename the current workspace."
@@ -3478,8 +3492,8 @@ Let's start with the command function:
 
 Pretty straightforward, but we still need the low-level function that actually renames the workspace:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-rename (name new-name)
   "Rename the current workspace named NAME to NEW-NAME. Returns
 old name on success, nil otherwise."
@@ -3502,8 +3516,8 @@ This function do 3 validations on the given arguments:
 
 And to make these validations we still need a function we didn't implement yet:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-get (name &optional noerror)
   "return a workspace named name. Unless NOERROR is non-nil, this
 throws an error if name doesn't exist."
@@ -3525,8 +3539,8 @@ There are two main tasks still missing in our refactor of Doom Workspaces and th
 
 We will start with the ability to delete a single workspace:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/delete (name)
   "Delete workspace named NAME. If called with C-U, prompts you
@@ -3551,8 +3565,8 @@ for the name of the workspace to delete."
 
 The command function simply allows us to select which workspace to delete, or it deletes the current one. As with the other commands, we still need the low-level function that actually deletes the workspace:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-delete (workspace)
   "Delete the workspace denoted by WORKSPACE, which can be the
 name of a workspace, its index, or the workspace object itself."
@@ -3576,8 +3590,8 @@ Now we can bind the command to its proper key:
 *** Delete session
 The next command on the /delete/ series is to delete all workspaces.
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/delete-session (&optional interactive)
   "Delete the current session, all workspaces, windows and their buffers."
@@ -3606,8 +3620,8 @@ And since we only used functions we already have implemented, we can bind it to 
 *** Delete session and quit
 On the next sections in this document, we will configure session persistance, and the time when we will save our sessions, is when we kill Emacs. If we delete all sessions, and then quit, the result is that Emacs will save our /empty/ session before quitting. Although we might desire this behavior some times, we also need a way to tell emacs to /discard/ our current session. To achieve this, let's define a variable to use as a flag for saving the session or not:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defvar +workspace--auto-save-session-p t
   "Flag used to determine if Emacs should automatically save the
   current session when we quit.")
@@ -3615,8 +3629,8 @@ On the next sections in this document, we will configure session persistance, an
 
 And now, we can have our last command on the /delete/ category to flag Emacs to not save current session when quitting. This way, if we wants to quit and save the current session, we simply quit Emacs, and if we want to discard the current session, we invoke the /delete session and quit/ command:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/delete-session-and-quit ()
   "Kill emacs without saving anything."
@@ -3640,7 +3654,7 @@ Our workspace refactor is working as expected, but we still need persistance. =p
 With that out of the way, let's jump right into the first command:
 
 #+caption[File]: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/save-session (name)
   "Save the current workspace with the given NAME as its
@@ -3666,8 +3680,8 @@ The only part of this function that is worth mentioning is that we show the list
 
 We still need to code our low level  function to save a workspace:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-session-save (&optional identifier force interactive?)
   "Saves the workspace session to a file named IDENTIFIER located
 on the `+workspaces-data-dir' directory. We can load a saved
@@ -3690,8 +3704,8 @@ Returns t on success, nil otherwise."
 
 We will make sure that the most complex part of this function goes to another function to make easy to understand and reusable:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-resolve-session-file-path (&optional name)
   "Returns the full path for a session file name given a NAME
 identifier.
@@ -3712,8 +3726,8 @@ In this function we introduce two new variables that we still didn't define. The
 
 Let's add these variables to our autoload file:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defvar +workspaces-data-dir (concat doom-etc-dir "workspaces/")
   "Directory where we store perspective files.")
@@ -3735,8 +3749,8 @@ And now we can add the command to its key:
 *** Load session from file
 At this point, we can arbitrarily save our sessions to files, but still need a way to load them. Let's create the /load/ command:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/load-session (name)
   "Load a workspace session with identifier NAME."
@@ -3764,8 +3778,8 @@ The difference between the /save/ and /load/ commands (besides the obvious), is 
 
 As usual, lets get our low-level API coded as well:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-session-load (name)
   "Loads a workspace session identified by NAME. Can only
 retrieve workspace sessions that were explicitly saved with
@@ -3788,8 +3802,8 @@ Now that we save and load our workspace sessions, is time for us to make this pr
 
 The first thing we need is a hook function to execute every time Emacs quits:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace-auto-save-h ()
   (when +workspace--auto-save-session-p
@@ -3798,8 +3812,8 @@ The first thing we need is a hook function to execute every time Emacs quits:
 
 And we need a function to restore the last saved session:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/restore-last-session ()
   "Tries to load the 'auto-saved' session from last time we used
@@ -3885,8 +3899,8 @@ There are couple shortcuts that are not defined with the ~map!~ function, so we 
 
 This will delete the current workspace if closing the last open window. But we still need to implement the target function here:
 
-#+caption: autoload/workspaces.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/close-window-or-workspace ()
   "Close the selected window. If it's the last window in the
@@ -3932,7 +3946,7 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
-* Writing [0/7]
+* Writing
 Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
 
 My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
@@ -4023,8 +4037,8 @@ Notice that we crated these variables before loading anything related to Org. Th
 
 Now we can wait Org to load to  continue our configuration:
 
-#+caption: autoload/org.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-adjust-outline-fonts-h ()
   (after! outline
@@ -4167,8 +4181,8 @@ In some documents, I need to write math formulas and Org can render them pretty 
 
  I need to adjust some of the Org fonts to use fixed pitch regardless if I'm using variable pitch. This will guarantee that tables, source blocks, and some other formatting will render properly on the UI, so let's create a function for it:
 
-#+caption: autoload/org.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-adjust-org-fonts-h ()
   (after! org
@@ -4326,8 +4340,8 @@ I also need to adjust the window navigation keys that clash with default Org bin
        :n "C-k" #'evil-window-up))
 #+end_src
 
-#+caption: autoload/org.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-link-snippet-in-place ()
   (interactive)
@@ -4363,8 +4377,8 @@ At this point we can tight up everything and setup our buffer when we open an or
 
 To separate my configuration from initialization logic, let's create another autoload function, but this time on a file used for /Org things/ (=autoload/org.el=):
 
-#+caption: autoload/org.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-org-config-h ()
   "Configure all aspects of an Org buffer right before we display
@@ -4490,8 +4504,8 @@ Although we already covered most of this list of the previous section, we still 
         :n "/" (cmd! (call-interactively #'lexic-search))))
 #+end_src
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defadvice! my-dictionary-definition-lexic-a (identifier &optional _)
   "Look up the definition of the word at point (or selection) using `lexic-search'."
@@ -4545,8 +4559,8 @@ sug-mode       ultra
   (append-to-file "personal_ws-1.1 en 0 utf-8" nil my-aspell--personal-dictionary))
 #+end_src
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-get-aspell-cmd-flags (&optional camel-case &rest extra-args)
   "Return the list of arguments Emacs should use to run aspell.
@@ -4715,8 +4729,8 @@ This snippet is fine, but we still have to type the file name there. Let's creat
 #+end_src
 
 **** Org elements
-#+caption: autoload/org.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-links-in-kill-ring ()
   "Return a list of links in kill ring."
@@ -4838,8 +4852,8 @@ Talk about capture in general:
 
 Start with the open definition for =org-capture=:
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defconst my-capture--note-frame-height 15
   "Number of lines a note frame should have when capturing a long
 note.")
@@ -4896,8 +4910,8 @@ buffer")
   (setq org-capture-templates '()))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--adjust-frame (&optional extended-p frame)
   "Dinamically adjust the capture FRAME width to WIDTH and
 reposition it on the center of the screen."
@@ -4910,8 +4924,8 @@ reposition it on the center of the screen."
     (my-capture--reposition-frame frame)))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--reposition-frame (&optional frame)
   "Position FRAME around the center of the screen."
   (let ((frame-w (window-pixel-width))
@@ -4921,8 +4935,8 @@ reposition it on the center of the screen."
                         (/ (- (display-pixel-height) frame-h) 3)))) ;; Y
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture--yas-expand-h ()
   "Expand `my-capture--yas-prefix' on the template."
@@ -4943,8 +4957,8 @@ reposition it on the center of the screen."
   (setq-local org-startup-folded nil))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-yasnippet (snippet)
   "Returns a snippet mark with the given SNIPPET used to expand
@@ -4962,8 +4976,8 @@ The snippet mark will have the format:
           ":"))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture--finish-h ()
   "Clean up any outstanding variable and values set when capture
@@ -4972,8 +4986,8 @@ starts."
   (setq +org-capture--auto-align-tags-store nil))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-template-selection ()
   "Returns the text selected on the buffer that originated the
@@ -4987,8 +5001,8 @@ link to buffer."
           ""))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--mu4e-headers-selected (&optional buf-name)
   "When on a mu4e-headers buffer, store an org link to each one
 of the selected messages and return them all as a string."
@@ -5007,8 +5021,8 @@ of the selected messages and return them all as a string."
         (buffer-string)))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--mu4e-view-selected (&optional buf-name)
   "When on a mu4e-view buffer, store an org link to the message
 and return it as a string with the selected text as a
@@ -5032,8 +5046,8 @@ the org link."
         (buffer-string)))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--buffer-selected ()
   "When there is an active selection in the current buffer,
 returns an org link to the current buffer with the selection as a
@@ -5062,8 +5076,8 @@ the org link."
     (unless (s-blank-str-p sel-text) sel-text)))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-projects-p ()
   "Retuns true when current buffer belongs to current open
@@ -5078,8 +5092,8 @@ project."
            (string-prefix-p proj-root buf-path)))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-description (&rest args)
   "Returns a formatted capture description.
@@ -5110,8 +5124,8 @@ Example:
       text)))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-heading-template (&rest args)
   "Returns a formatted capture template for a heading.
@@ -5130,8 +5144,8 @@ spaces between them. Default to \"%?\"."
             "\n%(my-capture-template-selection)")))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-heading-prefix ()
   "Returns a string of `*` characters representing an org header
@@ -5143,8 +5157,8 @@ property size."
     (s-repeat (max 1 (or level olp-size)) "*")))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-position-cursor ()
   "Asks user for a timestamp and store it for template use. It
@@ -5167,8 +5181,8 @@ editing."
     (newline)))
 #+end_src
 
-#+caption: autoload/roam.el
-#+begin_src emacs-lisp :tangle autoload/roam.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-file()
   (let* ((file-name-format (org-capture-get :file-name-format))
@@ -5187,8 +5201,8 @@ editing."
       (org-roam-buffer-deactivate))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-time-read ()
   "Returns the last timestamp captured, formatted with the format
@@ -5443,8 +5457,8 @@ $0
                :kill-buffer t))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;
 ;;  IF NOTHING BREAKS DELETE!
 ;;
@@ -5456,8 +5470,8 @@ $0
 ;;   (my-journal/new-entry))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-journal-file-for-timestamp ()
   "Asks user for a specific timestamp and returns the journal
@@ -5574,8 +5588,8 @@ $0
                :kill-buffer t))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-project-notes-file-wrapper ()
   "Returns an org file to hold notes and tasks for the current
@@ -5584,8 +5598,8 @@ $0
   (+org-capture-project-notes-file))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-project-changelog-file-with-headings ()
   (let ((entry-path (+org-capture-project-changelog-file))
@@ -5597,14 +5611,14 @@ $0
     (my-capture--ensure-heading-prepend (my-capture-project-target-heading))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture-project-target-heading ()
   `("Unreleased" ,(format-time-string "%A, %B %-e, %Y")))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--ensure-heading-prepend (headings &optional initial-level)
   (if (not headings)
       (widen)
@@ -5628,8 +5642,8 @@ $0
 
 **** Finalize capture templates
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defadvice! my-org-capture-select-template-prettier-a (&optional keys)
   "Select a capture template, in a prettier way than default Lisp
@@ -5655,8 +5669,8 @@ programs can force the template by setting KEYS to a string."
                `(("q" ,(my-capture-description :text "Abort" :icon `(stop . ,(doom-color 'red 256)))))))))
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defadvice! my-org-capture-mks-prettier-a (table title &optional prompt specials)
   "Select a member of an alist with multiple keys. Prettified.
@@ -5760,8 +5774,8 @@ is selected, only the bare key is returned."
 
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--item-entry (key description &optional prefix parent-option-p key-face-extras)
   "Returns a string representing an Org Capture item with the
 given KEY and DESCRIPTION.
@@ -5784,8 +5798,8 @@ face on the entry."
 
 #+end_src
 
-#+caption: autoload/capture.el
-#+begin_src emacs-lisp :tangle autoload/capture.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--refresh-capture-frame ()
   "This function is called right after all the capture options
 were written in the capture buffer."
@@ -5837,8 +5851,8 @@ TBD
   (set-window-buffer nil (current-buffer)))
 #+end_src
 
-#+caption: autoload/journal.el
-#+begin_src emacs-lisp :tangle autoload/journal.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-journal/new-entry (&optional prefix add-header-p variable make-local)
   "Open a journal file and start a new entry. Without any
@@ -5925,8 +5939,8 @@ TBD
 
 *** TODO Utilities
 
-#+caption: autoload/notes.el
-#+begin_src emacs-lisp :tangle autoload/notes.el
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-notes-add-action-item ()
   (interactive)
@@ -5945,7 +5959,7 @@ TBD
          :desc "Insert action items"  "a" #'my-notes-add-action-item))))
 #+end_src
 
-* Development [0/10]
+* Development
 TBD
 
 ** TODO Requirements
@@ -5968,8 +5982,8 @@ TBD
   "Define a different `fill-column' to use in lisp when writing comments.")
 #+end_src
 
-#+caption: autoload/lisp.el
-#+begin_src emacs-lisp :tangle autoload/lisp.el
+#+caption: autoload/development.el
+#+begin_src emacs-lisp :tangle autoload/development.el
 ;;;###autoload
 (defadvice! my-emacs-lisp-fill-comment-paragraph-a (orig-fun &rest args)
   "Set `fill-column' before calling `'fill-comment-paragraph'"
@@ -5986,7 +6000,7 @@ TBD
 ** TODO Kotlin
 ** TODO Java
 
-* Non-editor features [0/8]
+* Non-editor features
 TBD
 
 ** TODO Requirements
@@ -6002,8 +6016,8 @@ The first thing I like to do, is to unpin Treemacs and let Doom use the latest v
 
 The next change is to use our custom =variable-pitch-ui= font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-themes-enable-treemacs-variable-pitch-labels-a (&rest _)
   "This advice changes the treemacs variable pitch font to one
@@ -6032,8 +6046,8 @@ By default, Treemacs will stay opened after you select a file to visit. Personal
 
 In order to help me achieve my desired behavior, I'll  create another /autoload/ function that I'll call when I select a file:
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-treemacs-visit-node-and-close-h (&optional arg)
   "Closes treemacs window after selecting a file to visit."
@@ -6065,8 +6079,8 @@ Then, I like Treemacs to collapse directory into one when possible:
 
 https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspace/
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-treemacs-setup-title-h ()
   (let ((bg (face-attribute 'default :background))
@@ -6104,8 +6118,8 @@ I also like to make sure it behaves as expected if I use the mouse:
 
 Treemacs offers a function that adds the current project if it is not on the workspace. That is a nice feature, but because I use workspaces heavily, the fact that this function does not /remove/ projects that do not belong to this workspace bothers me, so I  wrote this advice to do the dirty work for me:
 
-#+caption: autoload/editor.el
-#+begin_src emacs-lisp :tangle autoload/editor.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-treemacs-add-and-display-current-project-a ()
   "Open treemacs with current project. This function removes any
@@ -6134,7 +6148,7 @@ And to finalize the Treemacs configuration, let's make it respect my window navi
    "C-l" #'evil-window-right)))
 #+end_src
 
-#+caption: autoload/files.el
+#+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangleautoload/files.el
 ;;;###autoload
 (defun my-dired/toggle-git-mode ()
@@ -6353,8 +6367,8 @@ The actions I expect are:
 
 Let's create such function as an /autoload/ function:
 
-#+caption: autoload/projects.el
-#+begin_src emacs-lisp :tangle autoload/projects.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-after-switch-project-action-h ()
   "A project first action to execute when we switch our current
@@ -6454,8 +6468,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 
 ** TODO Emails
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/workspaces.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 #+end_src
 
 ** TODO Calendars
@@ -6477,8 +6491,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
   "List of directories to find files with appointment events (calendar)")
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defconst +doom-calendar-color-table (make-hash-table :test #'equal)
   "A hash table to hold an association between a calendar
@@ -6507,8 +6521,8 @@ If color is nil, this function uses the property `:color'"
        :desc "Open calendar" :nvm "c" #'=calendar))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-work/open-calendar ()
   "TODO"
@@ -6541,8 +6555,8 @@ If color is nil, this function uses the property `:color'"
         :e "q" #'+calendar/quit))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-work-calendar-open-a ()
   "Activate (or switch to) `calendar' in its workspace."
@@ -6554,8 +6568,8 @@ If color is nil, this function uses the property `:color'"
   (+workspace/display))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-work-calendar-quit-a ()
   "Activate (or switch to) `calendar' in its workspace."
@@ -6643,8 +6657,8 @@ TBD
                                  ("HOLD" . +org-todo-onhold))))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-exclude-agenda-buffers-from-perspective-h nil
   "Don't associate temporary agenda buffers with current workspace."
@@ -6659,16 +6673,17 @@ TBD
                     (kill-buffer buf))) org-agenda-new-buffers)))))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-org-agenda-setup-buffer-h ()
   (evil-window-set-width 100)
   (doom-themes-hide-modeline)
   (variable-pitch-mode -1)
   (setq-local wrap-prefix (s-repeat +org-agenda--wrap-prefix " "))
-  (setq-local olivetti-body-width 75)
-  (olivetti-mode 1)
+  (let ((+zen-text-scale 0)
+        (writeroom-width 75))
+    (+zen/toggle))
   (tab-line-mode -1)
   (hl-line-mode -1)
   (when (not (= text-scale-mode-amount 1))
@@ -6676,8 +6691,8 @@ TBD
     (text-scale-mode 1)))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-org-agenda-setup-time-grid-h ()
   "Set different line spacing based on clock time duration."
@@ -6741,8 +6756,8 @@ TBD
       (goto-char first-item))))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-org-agenda-reset-font-a (&rest _)
   "Reset text scale before running `org-agenda-redo' to prevent
@@ -6783,8 +6798,8 @@ account for the TODO word plus one space.")
         org-agenda-window-setup 'other-window))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-window-toggle-split ()
   (interactive)
@@ -6812,16 +6827,16 @@ account for the TODO word plus one space.")
       (if this-win-2nd (other-window 1))))))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-org-agenda-always-split-horizontally-a (&rest _)
   :after 'org-prepare-agenda
   (my-window-toggle-split))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/work.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-org-agenda/switch-to-item ()
   "Go to the Org mode file which contains the item at point.
@@ -6896,8 +6911,8 @@ displayed Org file fills the frame."
 (package! org-ql)
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-org-agenda-make-agenda-icon-header-a (func name)
   :around 'org-super-agenda--make-agenda-header
@@ -6915,8 +6930,8 @@ displayed Org file fills the frame."
        (s-repeat (length header) "─")))))
 #+end_src
 
-#+caption: autoload/work.el
-#+begin_src emacs-lisp :tangle autoload/org.el
+#+caption: autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-org-agenda-group-title (text &optional icon icon-color)
   (propertize text 'icon icon 'icon-color icon-color))
