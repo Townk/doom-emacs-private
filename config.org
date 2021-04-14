@@ -136,6 +136,25 @@ I also like to have a variable holding the value of my email's host name:
   "Holds the user's personal domain. By default, this variable is
   the `user-email-address' host.")
 #+end_src
+*** Dashboard
+Doom Emacs offers a lightweight dashboard, that serves as the landing page for Emacs.
+
+I really like the idea of a dashboard and I like even more what Doom offers, but, the ASCII art for its logo is not something I'm affectionate with.
+
+In order to replace the ASCII art with something more pleasant and thematic, I like to add a small picture on the dashboard:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq +doom-dashboard-banner-dir (expand-file-name "banner" doom-private-dir)
+      +doom-dashboard-banner-file "doom.png"
+      +doom-dashboard-banner-padding '(0 . 4))
+#+end_src
+
+I love the style of this image so much, that it is, besides my dashboard image, my Emacs icon as well. The author of this beauty is [[https://github.com/eccentric-j/doom-icon][Jay Zawrotny]], feel free to send him an accolade!
+
+#+begin_center
+[[./banner/doom.png]]
+#+end_center
 
 *** Key modifiers
 Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
