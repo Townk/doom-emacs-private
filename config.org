@@ -263,7 +263,7 @@ To make Emacs not jump then necessary when cursor goes outside the screen, set t
 
 #+caption: config.el
 #+begin_src  emacs-lisp
-(setq scroll-conservatively 1000)
+(setq scroll-conservatively most-positive-fixnum)
 #+end_src
 
 By default, Emacs will move the cursor with the text as you scroll, but only until the edge of the screen. When the cursor reaches the edge, it will stay there as you keep scrolling. This behavior presents an anti-pattern for usability. When I decide to scroll my buffer with the mouse wheel, I'm generally looking at the screen, around the area where the cursor is. If the cursor moves up or down from its position, my eyes lose track of it, and I will assume, it stayed with its original position as I scroll. If I decide to get back writing, my expectation is to just start typing, because the cursor should be on its previous position, but if I do this, I will start typing on the wrong part of the text.
