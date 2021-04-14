@@ -930,8 +930,44 @@ By default, Doom comes with all its configuration tailored for =ivy= or =helm=, 
 
 The first module we have to change, is /workspaces/.
 
-** TODO Inline completion
-TBD
+** Inline completion
+What I call inline completion, is also known as intellisense, code completion, or in the Vim world, omni completion. It's a useful tool to help the user type less and more correctly while editing source code.
+
+Years ago, there was two main packages that provided such feature on Emacs:
+
+- [[https://github.com/auto-complete/auto-complete][auto-complete]]
+- [[https://github.com/company-mode/company-mode][company-mode]]
+
+On the time I'm writing this part of my document, [[https://github.com/auto-complete/auto-complete][auto-complete]] is searching for a new maintainer, and I barely read any mention of it on the mainstream media.
+
+Since I've been using [[https://github.com/company-mode/company-mode][company-mode]] for the most part of my Emacs experience, I will stick with it on my new configuration.
+
+One of the best features I like on [[https://github.com/company-mode/company-mode][company-mode]], is its architecture design, where the author decided to modularize the package, allowing other packages to integrate with it where they actually mater. For instance, if my package offers a major mode to edit files from the /Foo/ language, I can create a =foo-company-backend= to integrate it on the Company ecosystem, or if my package provides a new cool way to display inline completions, I can create a /company frontend/ to make such integration
+
+For the most part, Doom does a pretty good job configuring [[https://github.com/company-mode/company-mode][company-mode]] to my liking, I just need to adjust some small behaviors and keymaps.
+
+One of the most prominent differences on my configuration is the fact that I don't like to let [[https://github.com/company-mode/company-mode][company-mode]] to show its popup automatically. It is a nice feature, but with certain backends, it can slow down the edit experience (I'm looking at you [[https://github.com/company-mode/company-mode/blob/master/company-ispell.el][company-ispell]]). For that reasons (and also because I rather the experience of [[https://github.com/ervandew/supertab][supertab]] on Vim's world), I decided to not /auto-display/ Company's popup.
+
+In order to display the completion on my configuration, one has to press =TAB= after type couple characters of the word, or type a "=.=" character after a keyword on programming modes that support it.
+
+Such behavior is so wildly used that Company offers a helper function (~company-indent-or-complete-common~) to help the user to handle /inserting a "=\t=" character/ versus displaying the completion. That is all and good, but unfortunately, as seen on section [[Text snippets]], I have a third function for the =TAB= key.
+
+In order to help me handle my three cases for =TAB= I need to create small wrapper function to add the =yasnippet= check before handling completion to Company:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defun my-company-indent-or-complete-common (arg)
+  (interactive "P")
+  (if (or (not yas-minor-mode)
+          (null (yas-expand)))
+      (company-indent-or-complete-common arg)
+    (company-abort)))
+#+end_src
+
+This function tries to expand the previous word on a snippet. If it can't, if fallback to the Company function. This gives me the ability to type part of a word and try to complete it with =TAB=, if this part of a word, is a snippet, expand the snippet into its content, otherwise, let Company handle the =TAB= scenario.
+
+But what if I'm already displaying the Company popup, but I want to expand what I just typed into a snippet? The previous function can't help us, because it does not handle navigating the completion options with =TAB=. For such behavior, I need another function that I should trigger if I have Company's popup opened:
 
 #+caption: autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -944,6 +980,17 @@ TBD
     (company-abort)))
 #+end_src
 
+Notice that the only difference between ~my-company-indent-or-complete-common~ and ~my-completion-yasnippet-or-completion~ is that I call ~company-indent-or-complete-common~ on the former, and ~company-complete-common-or-cycle~ on the later.
+
+Another deviation from the standard that I like, is how the =RET= should work with Company.
+
+For me, there are two scenarios that can happen if one presses =RET= while the Company popup is visible:
+
+1. The user meant to insert a "=\n=" character on the document;
+2. The user intended to select the selected completion option;
+
+The way to distinguish between these two scenarios, is to check if Company already have a selection stored at ~company-selection~. If it does have, the =RET= should represent a ~company-complete-selection~, otherwise, the =RET= should close the Company popup, and insert a "=\n=" character on the document. I created the next function to manage these behavior:
+
 #+caption: autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
@@ -955,26 +1002,41 @@ TBD
     (execute-kbd-macro (read-kbd-macro "<return>"))))
 #+end_src
 
+Notice also, that I didn't use ~insert~ when a =RET= means to /add a new line/. This decision is to allow Emacs to trigger any function or hook tied to the =RET= key.
+
+With all auxiliary functions created, I just need to setup Company according to my needs:
+
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! company
-  (setq company-idle-delay 0.5)
+  (setq company-idle-delay nil)
+  (setq tab-always-indent 'complete)
   (setq company-minimum-prefix-length 2)
   (setq company-show-numbers t)
   (setq company-box-doc-enable nil)
-  (add-hook 'evil-normal-state-entry-hook #'company-abort)
-
   (setq company-frontends (delq 'company-pseudo-tooltip-frontend company-frontends))
 
-  (map! :map company-active-map
-        :g [tab] #'my-completion-yasnippet-or-completion
-        :g [backtab] #'company-select-previous
-        :g [down] #'company-select-next
-        :g [up] #'company-select-previous
-        :g [return] #'my-completion-complete-selection-or-return
-        :g "C-S-j" #'company-next-page
-        :g "C-S-k" #'company-previous-page
-        :g "C-/" #'company-show-doc-buffer))
+  (add-hook 'evil-normal-state-entry-hook #'company-abort))
+#+end_src
+
+One configuration that worth mention why I choose it is to set ~company-box-doc-enable~ to =nil=. I did this, not because I don't like the documentation as another child frame, is the fact that if I do show it, I can't move my popup completion without aborting Company.
+
+Last, I ned to setup the proper keymaps for the package:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :after company
+ (:map global-map
+  :i [tab] #'my-company-indent-or-complete-common)
+ (:map company-active-map
+  :g [tab] #'my-completion-yasnippet-or-completion
+  :g [backtab] #'company-select-previous
+  :g [down] #'company-select-next
+  :g [up] #'company-select-previous
+  :g [return] #'my-completion-complete-selection-or-return
+  :g "C-S-j" #'company-next-page
+  :g "C-S-k" #'company-previous-page
+  :g "C-/" #'company-show-doc-buffer))
 #+end_src
 
 ** TODO Auto-indentation
