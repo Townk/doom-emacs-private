@@ -510,7 +510,7 @@ With the function defined, I can simply add it to a key bind to start using it. 
        :g [s-return] #'yas-exit-snippet))
 #+end_src
 
-Throughout this document, you will find helpful snippets I like to define for certain features. I decided to spread the snippets accross different features because I want to indicate to the reader to consider the snippet in question as an integral part of the configuration at hand.
+Throughout this document, you will find helpful snippets I like to define for certain features. I decided to spread the snippets across different features because I want to indicate to the reader to consider the snippet in question as an integral part of the configuration at hand.
 
 ** TODO Completion framework
 What I call the completion framework, is what we use to incrementally select an input when using the interactive mode.
