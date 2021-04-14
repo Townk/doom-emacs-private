@@ -4621,7 +4621,20 @@ to the result."
 
 *** Focus Writing
 
-**** TODO add Focus mode
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! focus)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! focus :defer t)
+
+(map! :leader
+      (:prefix ("t" . "toggle")
+       :desc "Focus mode" :mvn "o" #'focus-mode
+       :desc "Focus mode (RO)" :mvn "O" #'focus-read-only-mode))
+#+end_src
 
 *** Snippets
 Even though writing does not have boilerplate typing /per-se/, Org mode still has a formal syntax to follow. Most of the syntax are straightforward, but some could use a snippet help to make it easier and faster to type them.
