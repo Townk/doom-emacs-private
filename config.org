@@ -1911,7 +1911,7 @@ Info
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! info-plus)
+(package! info-plus :pin "5ecd4c1e3f1384bffb386e61a8e3788652e55c25")
 #+end_src
 
 #+caption: config.el
@@ -1967,7 +1967,7 @@ Info
     `(info-isolated-backquote :inherit info-quoted-name)
     `(info-glossary-word :foreground ,(doom-color 'yellow 256)
                          :background ,(doom-color 'yellow-bg 256)
-                         :box (:line-width -1 :color ,(doom-color 'yellow 256) :style released-button)
+                         :box (:line-width (4 . 1) :color ,(doom-color 'yellow-bg 256) :style nil)
                          :inherit fixed-pitch)
     `(link-visited :foreground ,(doom-color 'violet 256))
     `(info-double-quoted-name :inherit font-lock-string-face)
