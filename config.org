@@ -504,9 +504,15 @@ With the function defined, I can simply add it to a key bind to start using it. 
 Throughout this document, you will find helpful snippets I like to define for certain features. I decided to spread the snippets accross different features because I want to indicate to the reader to consider the snippet in question as an integral part of the configuration at hand.
 
 ** TODO Completion framework
-Some times, I come across a new package or a set of them that I keep my eyes on it. After a while, such packages start showing their value and start getting adopted by the community. When that time comes, in some cases, I want to adopt them as well.
+What I call the completion framework, is what we use to incrementally select an input when using the interactive mode.
 
-This happen with a set of packages I kindly named /Selectrum and Friends/. The list of packages that compose this set are:
+We call the standard interactive mode on Emacs [[https://www.gnu.org/software/emacs/manual/html_mono/ido.html][Ido]] ([[https://www.emacswiki.org/emacs/InteractivelyDoThings][Interactively Do Things]]), and users have been building packages to improve or replace it for ages. Among the most famous package are:
+
+- Icomplete :: Bundled with Emacs;
+- Helm :: One of the first heavy weight contender to replace Ido;
+- Ivy :: Created as a lightweight version of Helm, with the goal to achieve parity with Help at a minium;
+
+When I was writing this document, one of the /new kids on the block/ for completion framework was a set of packages that I kindly named /Selectrum and Friends/. The list of packages that compose this set are:
 
 - [[https://github.com/raxod502/selectrum][Selectrum]] :: A better solution for incremental narrowing in Emacs, replacing Helm, Ivy, and Ido;
 - [[https://github.com/minad/marginalia][Marginalia]] :: Marginalia are marks or annotations placed at the margin of the page of a book or in this case helpful colorful annotations placed at the margin of the minibuffer for your completion candidates;
@@ -519,18 +525,18 @@ Unfortunately, these packages are not yet bundled in Doom, so I have to install 
 
 The appeal of /Selectrum and Friends/, is the fact they use the standard Emacs features to achieve their goals, this way, there is a better chance to not need to change my configuration in the future, even if I decide to use a different package for the completion UI.
 
-I can describe the process to configure these packages as follows:
+To configure all these packages on Doom, I have to do it in the following order:
 
-- Configure Emacs completion system filtering and mach highlights;
-- Configure Emacs completion system candidates sorting;
-- Configure completioin candidates annotations (to display exta information for each completion candidate);
+- Configure result filtering and mach highlights;
+- Configure result sorting;
+- Configure result item annotations (to display exta information for each completion candidate);
 - Configure the completion UI;
 - Configure contextual menu;
 - Configure extra commands;
-- Alter the standard behavior Doom Emacs defines, to fit my preferences;
+- Alter the standard behavior of Doom Emacs, to fit my preferences;
 
 *** Filtering and highlighting
-The first package I want to install is =orderless=. This package augment the standard Emacs completion system providing multiple matches on a candidate.
+The first package I want to install is =orderless=. This package augment the standard Emacs completion system providing multiple matches for your input.
 
 First, we need to add it to =packages.el=:
 
@@ -539,7 +545,7 @@ First, we need to add it to =packages.el=:
 (package! orderless)
 #+end_src
 
-And configure it with ~use-package!~:
+And then configure it with ~use-package!~:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -550,43 +556,63 @@ And configure it with ~use-package!~:
         orderless-matching-styles '(orderless-prefixes
                                     orderless-initialism
                                     orderless-regexp))
-  :custom
-  (completion-styles '(substring orderless))
   :config
-  (custom-theme-set-faces! 'doom-tomorrow-nitght
-    `('orderless-match-face-0 :background ,(doom-color 'green-bg 256) :foreground ,(doom-color 'green 256))
-    `('orderless-match-face-1 :background ,(doom-color 'violet-bg 256) :foreground ,(doom-color 'violet 256))
-    `('orderless-match-face-2 :background ,(doom-color 'yellow-bg 256) :foreground ,(doom-color 'yellow 256))
-    `('orderless-match-face-3 :background ,(doom-color 'blue-bg 256) :foreground ,(doom-color 'blue 256))))
+  (setq completion-styles '(orderless))
+  (setq orderless-skip-highlighting (lambda () selectrum-active-p))
+  (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+  (setq orderless-matching-styles '(orderless-regexp)
+        orderless-style-dispatchers '(flex-if-twiddle
+                                      without-if-bang)))
+#+end_src
+
+You might have noticed that the last configuration we perform on =orderless=, uses two functions not implemented by default. The idea on these two functions is to create extra dispatchers to allow us more control on our searches.
+
+The first of the functions is ~flex-if-twiddle~. This dispatcher allows one to type a =~= on the input to trigger the /flex/ search style (which is a resemblance of fuzzy finder).
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defun flex-if-twiddle (pattern _index _total)
+  "Return the `orderless-flex' dispatcher if the search contains a ~ character."
+  (when (string-suffix-p "~" pattern)
+    `(orderless-flex . ,(substring pattern 0 -1))))
+#+end_src
+
+And the second one is ~without-if-bang~ which allow us to have a negation operator on our searches.
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defun without-if-bang (pattern _index _total)
+  "Define a '!not' exclusion prefix for literal strings."
+  (when (string-prefix-p "!" pattern)
+    `(orderless-without-literal . ,(substring pattern 1))))
 #+end_src
 
 On company, the matching portions of candidates are not highlighted. That’s because ~company-capf~ is hard-coded to look for the ~completions-common-part~ face, and it only use one face (~company-echo-common~) to highlight candidates.
 
 So, while you can’t get different faces for different components, you can at least get the matches highlighted in the sole available face with this configuration:
 
-#+caption: autoload/selectrum.el
-#+begin_src emacs-lisp :tangle autoload/selectrum.el
-;; ;;;###autoload
-;; (defadvice! my-orderless-match-with-one-face-a (fn &rest args)
-;;   "Function to help company to highlight all candidates with just
-;; one face."
-;;   :around 'company-capf--candidates
-;;   (let ((orderless-match-faces-original orderless-match-faces))
-;;     (setq orderless-match-faces [completions-common-part])
-;;     (apply fn args)
-;;     (setq orderless-match-faces orderless-match-faces-original)))
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defadvice! my-orderless-match-with-one-face-a (fn &rest args)
+  "Function to help company to highlight all candidates with just
+one face."
+  :around 'company-capf--candidates
+  (let ((orderless-match-faces [completions-common-part]))
+    (apply fn args)))
 #+end_src
 
 *** Sorting
-I'm really enjoying =orderless= but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
+=orderless= works pretty well, but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
 
 Then it hit me: why not use both?
 
-The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the 2 required hooks for remembering, and the one variable, later on =selectum=, to use the /pre-processing/ from =prescient=. So let's start with =packages.el=:
+The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the two required hooks for remembering, and the one variable, later on =selectum=, to use the /pre-processing/ from =prescient=. So let's start with =packages.el=:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! prescient)
 (package! selectrum-prescient)
 #+end_src
 
@@ -594,16 +620,13 @@ Then, let's configure it, and set the persistent mode:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(use-package! prescient
-  :defer t
-  :config (prescient-persist-mode 1))
-#+end_src
-
-We should also configure the =selectrum-prescient= package with ~use-package!~, but *NOT ENABLE THE MODE*:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! selectrum-prescient :after selectrum)
+(use-package! selectrum-prescient
+  :hook (selectrum-mode . selectrum-prescient-mode)
+  :hook (selectrum-mode . prescient-persist-mode)
+  :config
+  (setq selectrum-preprocess-candidates-function #'selectrum-prescient--preprocess)
+  (add-hook 'selectrum-candidate-selected-hook #'selectrum-prescient--remember)
+  (add-hook 'selectrum-candidate-inserted-hook #'selectrum-prescient--remember))
 #+end_src
 
 *** Candidates annotations
@@ -622,8 +645,10 @@ Then, configure it using ~use-packages!~:
 #+begin_src emacs-lisp
 (use-package! marginalia
   :hook (doom-first-input . marginalia-mode)
+  :init
+  (setq-default marginalia-annotators '(marginalia-annotators-heavy))
   :config
-  (setq marginalia-annotators '(marginalia-annotators-heavy)))
+  (add-to-list 'marginalia-command-categories '(persp-switch-to-buffer . buffer)))
 #+end_src
 
 At this point, our completion system can filter its candidates (=orderless=) and display extra information for each one of them (=marginalia=), all that using the Emacs default completion system and UI, which is not up to my taste, so let's get the main package of this section.
@@ -644,78 +669,16 @@ And set it up with ~use-packages!~:
 #+begin_src emacs-lisp
 (use-package! selectrum
   :hook (doom-first-input . selectrum-mode)
-#+end_src
-
-Here is something a bit unusual for me when using ~use-package!~: To use the ~:init~ area to enable a mode.
-
-We have to do this because adding the keybinding to ~use-package!~, we're telling the system to only activate this package when we press one of those keys, but we want =selectrum= to get activated right out of the bat:
-
-#+caption: config.el
-#+begin_src emacs-lisp
   :init
-#+end_src
-
-Then we can set variables to configure =selectrum= UI:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (setq selectrum-display-action nil)
-  (setq selectrum-num-candidates-displayed 15)
-  (setq selectrum-extend-current-candidate-highlight t)
-  (setq selectrum-fix-minibuffer-height t)
-#+end_src
-
-And make sure =selectrum= is using =orderless= as its candidates refinement and highlight:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (setq selectrum-refine-candidates-function #'orderless-filter)
-  (setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
-#+end_src
-
-And =prescient= for sorting:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (setq selectrum-preprocess-candidates-function #'selectrum-prescient--preprocess)
-#+end_src
-
-Once the package is loaded, we can enable selectrum:
-
-#+caption: config.el
-#+begin_src emacs-lisp
+  (setq selectrum-display-action nil
+        selectrum-num-candidates-displayed 15
+        selectrum-extend-current-candidate-highlight t)
+  (unless (featurep! +orderless)
+    (setq completion-styles '(substring partial-completion)))
   :config
-  (selectrum-mode 1)
-#+end_src
+  (setq selectrum-fix-vertical-window-height 17
+        selectrum-max-window-height 17)
 
-We also need to make sure =prescient= can /remember/ previous searches to improve the sorting over time:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (add-hook 'selectrum-candidate-selected-hook #'selectrum-prescient--remember)
-  (add-hook 'selectrum-candidate-inserted-hook #'selectrum-prescient--remember)
-#+end_src
-
-Also,  ensure we refresh =selectrum= when cycling annotations with =marginalia=.
-
-#+caption: autoload/selectrum.el
-#+begin_src emacs-lisp :tangle autoload/selectrum.el
-  (defadvice! my-selectrum-refresh-on-cycle-a (&rest _)
-    :after 'marginalia-cycle
-    (when (bound-and-true-p selectrum-mode) (selectrum-exhibit)))
-#+end_src
-
-The cursor line on Selectrum, is a bit too much for me. I like to have it with a more subdued color:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (custom-theme-set-faces! 'doom-tomorrow-night `(selectrum-current-candidate :background ,(doom-color 'base4)))
-#+end_src
-
-And last, but not least, let's set some Vim friendly keybindings:
-
-#+caption:config.el
-#+begin_src emacs-lisp
   (map!
    :g "C-s-r" #'selectrum-repeat
    (:map selectrum-minibuffer-map
@@ -725,14 +688,15 @@ And last, but not least, let's set some Vim friendly keybindings:
     :geni "C-s-j" #'selectrum-goto-end
     :geni "C-k"   #'selectrum-previous-candidate
     :geni "C-S-k" #'selectrum-previous-page
-    :geni "C-s-k" #'selectrum-goto-beginning))
+    :geni "C-s-k" #'selectrum-goto-beginning)))
 #+end_src
 
-Don't forget to close the ~use-packages!~ sexp:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  )  ;; use-package! selectrum
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defadvice! my-selectrum-refresh-on-cycle-a (&rest _)
+  :after 'marginalia-cycle
+  (when (bound-and-true-p selectrum-mode) (selectrum-exhibit)))
 #+end_src
 
 *** Contextual Menu
@@ -750,48 +714,28 @@ Now we can configure =embark= with ~use-package!~:
 #+begin_src emacs-lisp
 (use-package! embark
   :defer t
-#+end_src
-
-We  can attach the proper functions to the proper hooks:
-
-#+caption: config.el
-#+begin_src emacs-lisp
   :init
+  (setq embark-action-indicator #'my-embark-which-key-action-indicator
+        embark-become-indicator embark-action-indicator)
   (map!
     :g "C-s-e" #'embark-act
     (:map minibuffer-local-completion-map
-          "C-c C-o" #'embark-export
-          "C-c C-c" #'embark-act-noexit)
+          "C-c C-o" #'embark-export)
     (:map embark-file-map
           :desc "Open Dired on target" :g "j" #'ffap-dired
           :desc "Open target with sudo" :g "s" #'sudo-edit
           :desc "Open target with vlf" :g "l" #'vlf)
     (:map embark-file-map
-          :desc "Cycle marginalia views" :g "A" #'marginalia-cycle))
+          :desc "Cycle marginalia views" :g "A" #'marginalia-cycle)))
 #+end_src
 
-It's also nice to have a reminder of the actions configured on =embark=:
-
-#+caption: autoload/selectrum.el
-#+begin_src emacs-lisp :tangle autoload/selectrum.el
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-embark-which-key-action-indicator (map)
   "Helper function to display the `whichey' help buffer for embark."
   (which-key--show-keymap "Embark" map nil nil 'no-paging)
   #'which-key--hide-popup-ignore-command)
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (setq embark-action-indicator #'my-embark-which-key-action-indicator
-        embark-become-indicator embark-action-indicator)
-#+end_src
-
-And don't forget to close the =embark= sexp as well:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  )  ;; use-package! embark
 #+end_src
 
 #+begin_src emacs-lisp
@@ -818,17 +762,19 @@ Now we need to configure each one of this packages. Let's start with the main =c
   :init
   (fset 'multi-occur #'consult-multi-occur)
   (define-key!
-    [remap apropos] #'consult-apropos
-    [remap goto-line] #'consult-goto-line
-    [remap imenu] #'consult-imenu
-    [remap switch-to-buffer] #'consult-buffer
+    [remap apropos]                       #'consult-apropos
+    [remap bookmark-jump]                 #'consult-bookmark
+    [remap evil-show-marks]               #'consult-mark
+    [remap goto-line]                     #'consult-goto-line
+    [remap imenu]                         #'consult-imenu
+    [remap locate]                        #'consult-locate
+    [remap load-theme]                    #'consult-theme
+    [remap man]                           #'consult-man
+    [remap recentf-open-files]            #'consult-recent-file
+    [remap switch-to-buffer]              #'consult-buffer
     [remap switch-to-buffer-other-window] #'consult-buffer-other-window
-    [remap switch-to-buffer-other-frame] #'consult-buffer-other-frame
-    [remap man] #'consult-man
-    [remap yank-pop] #'consult-yank-pop
-    [remap locate] #'consult-locate
-    [remap load-theme] #'consult-theme
-    [remap recentf-open-files] #'consult-recent-file)
+    [remap switch-to-buffer-other-frame]  #'consult-buffer-other-frame
+    [remap yank-pop]                      #'consult-yank-pop)
   :config
   (setq consult-project-root-function #'doom-project-root)
   (setq completion-in-region-function #'consult-completion-in-region)
@@ -846,8 +792,8 @@ We just set couple functions that are not default to =consult= and some minor tw
 
 At this point, our configuration is matching the standard =ivy= + =counsel= duo.
 
-#+caption: autoload/selectrum.el
-#+begin_src emacs-lisp :tangle autoload/selectrum.el
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-extended-yank-pop-a (&rest _)
   "Interactively select what text to insert from the kill ring."
@@ -858,7 +804,10 @@ At this point, our configuration is matching the standard =ivy= + =counsel= duo.
          ((fboundp 'consult-yank-pop)    #'consult-yank-pop)
          ((fboundp 'helm-show-kill-ring) #'helm-show-kill-ring)
          ((error "No kill-ring search backend available. Enable ivy or helm!")))))
+#+end_src
 
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-extended-search-project-a (&optional arg)
   "Conduct a text search in the current project root.
@@ -877,9 +826,12 @@ If prefix ARG is set, include ignored/hidden files."
     (call-interactively
      (cond ((featurep! :completion ivy)  #'+ivy/project-search)
            ((featurep! :completion helm) #'+helm/project-search)
-           ((fboundp 'consult--grep)     #'my-selectrum/project-search)
+           ((fboundp 'consult--grep)     #'my-selectrum-project-search)
            (#'projectile-ripgrep)))))
+#+end_src
 
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-extended-search-cwd-a (&optional arg)
   "Conduct a text search in files under the current folder.
@@ -893,12 +845,12 @@ If prefix ARG is set, prompt for a directory to search from."
     (call-interactively
      (cond ((featurep! :completion ivy)  #'+ivy/project-search-from-cwd)
            ((featurep! :completion helm) #'+helm/project-search-from-cwd)
-           ((fboundp 'consult--grep) #'my-selectrum/project-search-from-cwd)
+           ((fboundp 'consult--grep) #'my-selectrum-project-search-from-cwd)
            (#'rgrep)))))
 #+end_src
 
-#+caption: autoload/selectrum.el
-#+begin_src emacs-lisp :tangle autoload/selectrum.el
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (cl-defun my-selectrum-file-search (&key query in all-files (recursive t) prompt args)
   "Conduct a file search using ripgrep.
@@ -916,18 +868,18 @@ If prefix ARG is set, prompt for a directory to search from."
   (let* ((this-command 'consult-ripgrep)
          (project-root (or (doom-project-root) default-directory))
          (directory (or in project-root))
-         (ripgrep-command (seq-remove 'null
-                                      (append (butlast consult-ripgrep-command)
+         (ripgrep-command (mapconcat #'identity (seq-remove 'null
+                                      (append (butlast (split-string consult-ripgrep-command " +"))
                                               (list
                                                (when all-files "-uu")
                                                (unless recursive " --maxdepth 1")
                                                "--hidden"
                                                "-g!.git")
                                               args
-                                              '("-e"))))
+                                              '("-e"))) " "))
          (prompt (or prompt
                      (format "%s [%s]: "
-                             (mapconcat #'identity ripgrep-command " ")
+                             ripgrep-command
                              (cond ((equal directory default-directory) "./")
                                    ((equal directory project-root) (projectile-project-name))
                                    ((file-relative-name directory project-root))))))
@@ -942,9 +894,12 @@ If prefix ARG is set, prompt for a directory to search from."
                     " ")))
     ;; (setq deactivate-mark t)
     (consult--grep prompt ripgrep-command directory query)))
+#+end_src
 
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
-(defun my-selectrum/project-search (&optional arg initial-query directory)
+(defun my-selectrum-project-search (&optional arg initial-query directory)
   "Performs a live project search from the project root using ripgrep.
 If ARG (universal argument), include all files, even hidden or compressed ones,
 in the search."
@@ -958,13 +913,16 @@ in the search."
     :query initial-query
     :in directory
     :all-files arg))
+#+end_src
 
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
-(defun my-selectrum/project-search-from-cwd (&optional arg initial-query)
+(defun my-selectrum-project-search-from-cwd (&optional arg initial-query)
   "Performs a project search recursively from the current directory.
 If ARG (universal argument), include all files, even hidden or compressed ones."
   (interactive "P")
-  (my-selectrum/project-search arg initial-query default-directory))
+  (my-selectrum-project-search arg initial-query default-directory))
 #+end_src
 
 *** Change Doom's behavior
