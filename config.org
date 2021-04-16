@@ -1254,15 +1254,15 @@ To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=
    '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "⇌ \\1"))))
 #+end_src
 
-** TODO Useful line numbers
-The next behavior is something I read a long time ago on some Vim mailing list. It's how the line numbers displayed on the buffer behave. Since on normal mode is pretty useful to know how the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
+** Useful line numbers
+A long time ago, I read on some Vim mailing list, an opinion on how line numbers should behave on different editing modes (if you know who is the original author of such idea, please let me know so I can give credit where credit is due). Since on normal mode is pretty useful to know the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
 
 So, I can describe this behavior as follows:
 
 - When on normal mode, show relative line numbers;
 - When on insert mode, show absolute line numbers;
 
-And to help us with this workflow, let's create couple /auto-loaded/ functions to help us out:
+To achieve this, I need a function that turns the /absolute/ line number when line numbers are visible:
 
 #+caption: autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -1274,6 +1274,8 @@ And to help us with this workflow, let's create couple /auto-loaded/ functions t
       (setq display-line-numbers t)))
 #+end_src
 
+And another function to put the line numbers on /relative mode/ (but again, only if line numbers are visible):
+
 #+caption: autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
@@ -1284,7 +1286,7 @@ And to help us with this workflow, let's create couple /auto-loaded/ functions t
       (setq display-line-numbers 'visual)))
 #+end_src
 
-And then, after loading Evil, we can hook this functions to a mode switch:
+With those functions created, after loading Evil, I can hook them to a mode switch:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1295,7 +1297,7 @@ And then, after loading Evil, we can hook this functions to a mode switch:
                evil-insert-state-exit-hook) 'my-line-number-visual-h)
 #+end_src
 
-Also, let's make sure we are displaying line numbers on any coding buffer:
+To finalize, I want to make line numbers visible on any programming mode:
 
 #+caption: config.el
 #+begin_src emacs-lisp
