@@ -4709,6 +4709,21 @@ to the result."
                                                              "--add-context-delimiters=[[ ][")))))
 #+end_src
 
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! flyspell-correct)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! flyspell
+  :hook (spell-fu-mode . flyspell-mode))
+
+(use-package! flyspell-correct
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+#+end_src
+
 *** Templates
 
 #+begin_src emacs-lisp
