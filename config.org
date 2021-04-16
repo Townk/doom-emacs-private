@@ -1819,7 +1819,7 @@ When text-scale-mode is active it’s hard to tell what line height actually is.
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(defvar +doom--line-pixel-height (line-pixel-height)
+(defvar my-line-pixel-height (line-pixel-height)
   "Line height in pixels.
 Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
@@ -2447,7 +2447,7 @@ text if needed. You can set the minimal width with
          (fg (face-attribute 'default :foreground))
          (dark-fg (face-attribute 'shadow :foreground))
          (overline (face-attribute 'highlight :background))
-         (box-width (/ +doom--line-pixel-height 2))
+         (box-width (/ my-line-pixel-height 2))
          (box-base (when (> box-width 0) (list :line-width box-width :color base)))
          (box-bg (when (> box-width 0) (list :line-width box-width :color bg))))
     (set-face-attribute 'tab-line nil
@@ -6209,7 +6209,7 @@ https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspa
         (fg (face-attribute 'default :foreground)))
     (face-remap-add-relative 'header-line
                              :background bg :foreground fg
-                             :box `(:line-width ,(/ +doom--line-pixel-height 2) :color ,bg)))
+                             :box `(:line-width ,(/ my-line-pixel-height 2) :color ,bg)))
   (setq header-line-format
         '((:eval
            (concat
