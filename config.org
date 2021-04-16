@@ -110,7 +110,7 @@ I like the text editor to show me line numbers when they mater, and when they do
 *** Auto-saving
 I want to stop saving my files. Any editor has substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
 
-*** Frame persistent geometry
+*** Persist frame position and geometry
 I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
 
 *** Remote editing
@@ -781,7 +781,7 @@ In order to be a full replacement for =ivy= + =counsel=, we need to install =con
 (package! consult)
 #+end_src
 
-Now we need to configure each one of this packages. Let's start with the main =consult= package:
+Now we needz to configure each one of this packages. Let's start with the main =consult= package:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1372,7 +1372,7 @@ To finalize, I want to make line numbers visible on any programming mode:
   (setq-hook! 'prog-mode-hook display-line-numbers-type 'visual))
 #+end_src
 
-** TODO Auto-Saving
+** Auto-Saving
 First of all, since I'm going to save my work constantly, I don't want Emacs to ask me if it should really exit, or if it should kill outstanding processes while doing it. For me, if I'm telling Emacs to quit, I want it to do it, regardless its state, but I don't want to lose any content of my current work. So, the first thing I'm going to do, is to disable questions when I'm quitting Emacs:
 
 #+caption: config.el
@@ -1416,7 +1416,7 @@ And add the advice function to the ~after-focus-change-function~ as well, just t
 (add-function :after after-focus-change-function #'my-save-all-buffers-a)
 #+end_src
 
-The aggressive auto-save will work as expected, but it will crate a side effect with my literate configuration. Since Doom tangles the Org file every time we save it, the aggressive auto-save will make this tangle happen more often than we want.
+This aggressive auto-save will work as expected, but it will crate a side effect with my literate configuration. Since Doom tangles the Org file every time we save it, the aggressive auto-save will make this tangle happen more often than we want.
 
 Doom documentation offers a partial solution to this problem asking us to remove the auto-tangle function from the save hook, so let's do it:
 
@@ -1424,22 +1424,6 @@ Doom documentation offers a partial solution to this problem asking us to remove
 #+begin_src emacs-lisp
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
-
-That works, but now we have to do a =doom sync= for every change on our configuration. Even if the change didn't modified anything on =packages.el=, =init.el=, or any of the /autoload/ files.
-
-This got me thinking: I have to restart Emacs if I want my change to take effect. Why don't I add the tangle operation when Emacs is exiting?
-
-#+caption: config.el
-#+begin_src emacs-lisp
-;; (add-hook 'kill-emacs-hook
-;;           #'(lambda()
-;;               (when (file-newer-than-file-p (file-relative-name "config.org" doom-private-dir)
-;;                                             (file-relative-name "config.el" doom-private-dir))
-;;                 (+literate-tangle-h))))
-#+end_src
-
-And that is what I consider a mid-ground between functionality and convenience.
-
 
 Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures =ws-butler=. While I understand the rational behind the choice of always remove white spaces regardless the cursor position.
 
@@ -1451,8 +1435,8 @@ To adjust that, let's make =ws-butler= behave how I expect it:
   (setq ws-butler-keep-whitespace-before-point t))
 #+end_src
 
-** TODO Frame persistent geometry
-Before I start tackling my own requirements, let's make Emacs /remember/ its window size and position between launches.
+** Persist frame position and geometry
+Before I start tackling my own requirement, let's make Emacs /remember/ its window size and position between launches.
 
 First, I like to define an auto loaded function to hook into the emacs kill process to save frame dimensions. The reason to get an auto load function, is to allow Emacs to *not* load it until it really needs it, which would be when I'm quitting Emacs.
 
