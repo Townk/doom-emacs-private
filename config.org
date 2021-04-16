@@ -792,9 +792,11 @@ Now we need to configure each one of this packages. Let's start with the main =c
   (define-key!
     [remap apropos]                       #'consult-apropos
     [remap bookmark-jump]                 #'consult-bookmark
+    [remap command-history]               #'consult-complex-command
     [remap evil-show-marks]               #'consult-mark
     [remap goto-line]                     #'consult-goto-line
     [remap imenu]                         #'consult-imenu
+    [remap isearch]                       #'consult-isearch
     [remap locate]                        #'consult-locate
     [remap load-theme]                    #'consult-theme
     [remap man]                           #'consult-man
@@ -1185,7 +1187,6 @@ And =evil-cleverparens= is on the =packages.el= file as well:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! benchmark-init)
 (package! evil-cleverparens)
 #+end_src
 
