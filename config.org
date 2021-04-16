@@ -6110,6 +6110,12 @@ TBD
 #+end_src
 
 ** TODO Version control system
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! magit-todo :defer t)
+#+end_src
+
 ** TODO Lisp
 TBD
 
