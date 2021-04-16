@@ -781,30 +781,53 @@ In order to be a full replacement for =ivy= + =counsel=, we need to install =con
 (package! consult)
 #+end_src
 
-Now we needz to configure each one of this packages. Let's start with the main =consult= package:
+Now we need to configure each one of this packages. Let's start with the main =consult= package: 
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! consult
   :defer t
   :init
-  (fset 'multi-occur #'consult-multi-occur)
   (define-key!
     [remap apropos]                       #'consult-apropos
     [remap bookmark-jump]                 #'consult-bookmark
     [remap command-history]               #'consult-complex-command
     [remap evil-show-marks]               #'consult-mark
     [remap goto-line]                     #'consult-goto-line
+    [remap grep]                          #'consult-grep
     [remap imenu]                         #'consult-imenu
     [remap isearch]                       #'consult-isearch
     [remap locate]                        #'consult-locate
     [remap load-theme]                    #'consult-theme
     [remap man]                           #'consult-man
+    [remap multi-occur]                   #'consult-multi-occur
+    [remap projectile-ripgrep]            #'consult-ripgrep
     [remap recentf-open-files]            #'consult-recent-file
     [remap switch-to-buffer]              #'consult-buffer
     [remap switch-to-buffer-other-window] #'consult-buffer-other-window
     [remap switch-to-buffer-other-frame]  #'consult-buffer-other-frame
+    [remap view-register]                 #'consult-register
     [remap yank-pop]                      #'consult-yank-pop)
+
+  (map! :leader
+
+        :desc "Show mode commands" :n "M-x" #'consult-mode-command
+
+        (:prefix ("s" . "search")
+         :desc "Jump to mark globally" :n "R" #'consult-global-mark)
+
+        (:prefix ("f" . "find")
+         :desc "Find project file" :n "o" #'consult-find
+
+         (:prefix ("i" . "inside")
+          :desc "Find inside file" :n "f" #'consult-lines
+          :desc "Find inside file (focus)" :n "F" #'consult-focus-lines))
+
+        (:map outline-map
+         :localleader
+         :prefix ("s" . "tree/subtree")
+         :desc "Search outline"  "o" #'consult-outline))
+
   :config
   (setq consult-project-root-function #'doom-project-root)
   (setq completion-in-region-function #'consult-completion-in-region)
@@ -812,10 +835,6 @@ Now we needz to configure each one of this packages. Let's start with the main =
   (setq consult-line-numbers-widen t)
   (setq consult-async-input-debounce 0.5)
   (setq consult-async-input-throttle 0.8))
-
-;; (use-package! consult-flycheck
-;;   :when (featurep! :checkers syntax)
-;;   :after (consult flycheck))
 #+end_src
 
 We just set couple functions that are not default to =consult= and some minor tweaks on its options.
@@ -4517,7 +4536,7 @@ With this function in place, we can /hook/ it to our Org major mode:
   :init
   (map! :map org-mode-map
         :localleader
-        :prefix ("s" . "tree/subtree")
+        :prefix ("g" . "goto")
         :desc "Open outline"  "o" #'org-ol-tree))
 #+end_src
 
