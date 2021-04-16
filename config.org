@@ -1240,18 +1240,86 @@ To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=
   (show-smartparens-global-mode 1))
 #+end_src
 
-** TODO Rich keybindings
+** Rich keybindings
+The good thing about this feature is that Emacs already covers almost all of my [[Rich keybindings][requirements]] for free, and doom ships with a package that covers the rest of it (=which-key=). What I need to do here, is to tweak =which-key= to /look/ and /feel/ like I want it.
 
+One aspect of which key that bothered me is not so much a =which-key= thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one on the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupt my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more then the =which-key= timeout.
+
+To remediate this situation, I found this package called =which-key-posframe= that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! which-key-posframe)
+#+end_src
+
+The main adjustments I want to do, is to make sure the child frame /width/ is big enough to fit the biggest description I can have.
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! which-key-posframe
+  :hook (which-key-mode . which-key-posframe-mode)
+  :custom
+  (which-key-posframe-poshandler 'my-posframe-poshandler-frame-right-middle)
+  (which-key-posframe-parameters '((min-width . 44))))
+#+end_src
+
+I need also to set the ~which-key-posframe-poshandler~ variable, to allow a special behavior regarding positioning the child frame on the screen.
+
+This special behavior is simply to most of the times, show the shortcut hints on the right side of the frame, but if I invoke an Embark action, I want the shortcut hints child frame to show up right besides the cursor point.
+
+To achieve this behavior, I'll define a =nil= placeholder variable that I can set to =t= when invoking Embark.
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defvar my-which-key-on-embark nil)
+#+end_src
+
+Which such variable created, I can define my function to place the frame where I want it:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defun my-posframe-poshandler-frame-right-middle (info)
+  "Posframe's position handler.
+
+Get a position which let posframe stay vertically centralized onto current
+frame's right site. Checkk the docstring of `posframe-show' for more information
+about the INFO structure."
+  (if my-which-key-on-embark
+      (posframe-poshandler-point-bottom-left-corner info)
+    (let* ((frame-width (plist-get info :parent-frame-width))
+           (frame-height (plist-get info :parent-frame-height))
+           (posframe-width (plist-get info :posframe-width))
+           (posframe-height (plist-get info :posframe-height)))
+      (cons (- frame-width posframe-width my-line-pixel-height)
+            (/ (- frame-height posframe-height) 2)))))
+#+end_src
+
+In order to connect =embark= to =which-key=, I need to advice the function I defined to invoke =which-key= when I invoke =embark=:
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defadvice! my-embark-which-key-action-wrapper (orig-fun &rest args)
+  "Wrap ORIGIN-FUN on a let bind to indicate this is an Embark call.
+
+It passes ARGS to ORIGIN-FUN without altering them. "
+  :around 'my-embark-which-key-action-indicator
+  (let ((my-which-key-on-embark t))
+    (apply orig-fun args)))
+#+end_src
+
+With the =which-key-posframe= configured, I just need to do some minor adjustments on the =which-key= package to make it display the hints on a single column with a single description occupying up to 40 characters of such column:
+
+#+caption: config.el
 #+begin_src emacs-lisp
 (after! which-key
   (setq which-key-allow-multiple-replacements t)
   (setq which-key-min-display-lines 10)
-  (setq which-key-max-description-length 40)
-
-  (pushnew!
-   which-key-replacement-alist
-   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "☠ \\1"))
-   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "⇌ \\1"))))
+  (setq which-key-max-display-columns 1)
+  (setq which-key-add-column-padding 2)
+  (setq which-key-max-description-length 40))
 #+end_src
 
 ** Useful line numbers
