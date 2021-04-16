@@ -57,6 +57,30 @@ The core difference, is the fact that each piece of code in this document may no
 ** Acknowledgements
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
 
+** Investigating issues
+If you, like me, tinker with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
+
+To get a better sense of what is going on, start Emacs from terminal with the =--debug-init= flag:
+
+#+begin_src shell :tangle no
+$ emacs --debug-init
+#+end_src
+
+This will stop Emacs on the first error and print the stack trace for it. As of now, this might not useful beyond reporting bugs, nevertheless, it's important you keep it in your mind!
+
+Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensible to package loading.
+
+What I recommend to do, is to install a package that specializes on benchmarking, and use it, when you have the need:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! benchmark-init)
+#+end_src
+
+Check my =init.el= file on the [[Appendix][Appendix]], to see how I hook up benchmarking to the =--debug-init= flag.
+
+After starting Emacs with the =--debug-init= flag, you can check the call tree with the =M-x benchmark-init/show-durations-tree= command.
+
 * Standard features
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
 
