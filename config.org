@@ -1824,6 +1824,77 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
 (use-package! tab-line
   :when window-system
   :hook ((after-init . global-tab-line-mode))
+  :init
+  (defcustom tab-line-tab-min-width 10
+    "Minimum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
+
+  (defcustom tab-line-tab-max-width 35
+    "Maximum width of a tab in characters."
+    :type 'integer
+    :group 'tab-line)
+
+  (add-hook 'doom-load-theme-hook #'my-tabs--setup-faces-h)
+  (add-hook 'window-configuration-change-hook #'my-tabs--drop-caches-h)
+
+  :config
+  (setq tab-line-close-button-show t)
+  (setq tab-line-new-button-show nil)
+  (setq tab-line-separator "")
+  (setq tab-line-tab-name-function #'my-tabs-name-buffer)
+  (setq tab-line-tabs-function #'my-tabs-mode-persp-window)
+  (setq tab-line-tabs-buffer-list-function #'persp-current-buffers)
+  (setq tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
+                                          'keymap tab-line-right-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll right"))
+  (setq tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
+                                         'keymap tab-line-left-map
+                                         'mouse-face 'tab-line-highlight
+                                         'help-echo "Click to scroll left"))
+  (setq tab-line-close-icon (all-the-icons-material "close"))
+  (setq tab-line-close-button (propertize (format "%s " tab-line-close-icon)
+                                          'keymap tab-line-tab-close-map
+                                          'mouse-face 'tab-line-close-highlight
+                                          'face 'tab-line-tab-curent
+                                          'help-echo "Click to close tab"))
+  (setq tab-line-exclude-modes '(+doom-dashboard-mode
+                                 cfw:calendar-mode
+                                 Info-mode
+                                 calendar-mode
+                                 ediff-mode
+                                 eshell-mode
+                                 help-mode
+                                 helpful-mode
+                                 imenu-list-major-mode
+                                 lexic-mode
+                                 process-menu-mode
+                                 term-mode
+                                 treemacs-mode
+                                 vterm-mode
+                                 wordnut-mode
+                                 reb-mode))
+
+  (add-hook 'doom-switch-buffer-hook #'my-tabs-hide-tab-line-maybe-h)
+
+  (map!
+   :ne "s-1" #'my-tab-line-switch-to-0
+   :ne "s-2" #'my-tab-line-switch-to-1
+   :ne "s-3" #'my-tab-line-switch-to-2
+   :ne "s-4" #'my-tab-line-switch-to-3
+   :ne "s-5" #'my-tab-line-switch-to-4
+   :ne "s-6" #'my-tab-line-switch-to-5
+   :ne "s-7" #'my-tab-line-switch-to-6
+   :ne "s-8" #'my-tab-line-switch-to-7
+   :ne "s-9" #'my-tab-line-switch-to-8
+   :ne "s-0" #'my-tab-line-switch-to-final
+
+   (:prefix "g"
+    :desc "Go to tab on the right" :n "t" #'tab-line-switch-to-next-tab
+    :desc "Go to tab on the left"  :n "T" #'tab-line-switch-to-prev-tab))
+
+  (my-tabs--setup-faces-h))
 #+end_src
 
 #+caption: autoload/preferences.el
@@ -1855,7 +1926,10 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
           (persp-remove-buffer buffer)
         (kill-buffer buffer)))))
 
+#+end_src
 
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-tabs-close-tab-a (&optional mouse-event)
   "Close the selected tab.
@@ -1872,23 +1946,6 @@ left in the window, it is deleted with `delete-window' function."
          (window (or window (get-buffer-window buffer))))
     (my-tabs-close-buffer-tab buffer window)
     (force-mode-line-update)))
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  :init
-  (defcustom tab-line-tab-min-width 10
-    "Minimum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
-
-  (defcustom tab-line-tab-max-width 35
-    "Maximum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
-
-  (add-hook 'doom-load-theme-hook #'my-tabs--setup-faces-h)
-  (add-hook 'window-configuration-change-hook #'my-tabs--drop-caches-h)
 #+end_src
 
 #+caption: autoload/preferences.el
@@ -1950,53 +2007,55 @@ text if needed. You can set the minimal width with
     (tab-line-mode -1)))
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-  :config
-  (setq tab-line-close-button-show t)
-  (setq tab-line-new-button-show nil)
-  (setq tab-line-separator "")
-  (setq tab-line-tab-name-function #'my-tabs-name-buffer)
-  (setq tab-line-tabs-function #'my-tabs-mode-persp-window)
-  (setq tab-line-tabs-buffer-list-function #'persp-current-buffers)
-  (setq tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                          'keymap tab-line-right-map
-                                          'mouse-face 'tab-line-highlight
-                                          'help-echo "Click to scroll right"))
-  (setq tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                         'keymap tab-line-left-map
-                                         'mouse-face 'tab-line-highlight
-                                         'help-echo "Click to scroll left"))
-  (setq tab-line-close-icon (all-the-icons-material "close"))
-  (setq tab-line-close-button (propertize (format "%s " tab-line-close-icon)
-                                          'keymap tab-line-tab-close-map
-                                          'mouse-face 'tab-line-close-highlight
-                                          'face 'tab-line-tab-curent
-                                          'help-echo "Click to close tab"))
-  (setq tab-line-exclude-modes '(+doom-dashboard-mode
-                                 cfw:calendar-mode
-                                 Info-mode
-                                 calendar-mode
-                                 ediff-mode
-                                 eshell-mode
-                                 help-mode
-                                 helpful-mode
-                                 imenu-list-major-mode
-                                 lexic-mode
-                                 process-menu-mode
-                                 term-mode
-                                 treemacs-mode
-                                 vterm-mode
-                                 wordnut-mode
-                                 reb-mode))
-  (add-hook 'doom-switch-buffer-hook #'my-tabs-hide-tab-line-maybe-h)
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to-tab (tab)
+  "Switch to the buffer associated with TAB."
+  (let ((buffer (if (bufferp tab) tab (cdr (assq 'buffer tab)))))
+    (when (bufferp buffer)
+        (switch-to-buffer buffer))))
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(map! :prefix "g"
-      :desc "" :n "t" #'tab-line-switch-to-next-tab
-      :desc "" :n "T" #'tab-line-switch-to-prev-tab)
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to (pos)
+  "Switch to the tab on position POS.
+
+If POS is negative, access the tab on the reverse order.
+
+If POS is bigger than the number of tabs, return nil. The same is valid for
+negative numbers, so if POS is negative and its absolute value minus 1 is bigger
+than the number of tabs, return nil."
+  (let* ((tabs (funcall tab-line-tabs-function))
+         (tabs (if (< pos 0) (reverse tabs) tabs))
+         (pos (if (< pos 0) (1- (- pos)) pos))
+         (tab (nth pos tabs)))
+    (unless (my-tab-line-switch-to-tab tab)
+      (user-error "There is no tab on position %s" (1+ pos)))))
+#+end_src
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to-final ()
+  "Switch to the last tab."
+  (interactive)
+  (let* ((tab (car (last (funcall tab-line-tabs-function)))))
+    (unless (my-tab-line-switch-to-tab tab)
+      (user-error "Tab line is not visible to go to the last tab"))))
+#+end_src
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(dotimes (i 9)
+  (defalias (intern (format "my-tab-line-switch-to-%d" i))
+    (lambda () (interactive) (my-tab-line-switch-to i))
+    (format
+     "Thin wrapper around `+workspace/switch-to' function where we pass #%d as the INDEX parameter."
+     (1+ i))))
 #+end_src
 
 #+caption: autoload/preferences.el
@@ -2068,23 +2127,12 @@ text if needed. You can set the minimal width with
                         :box box-bg)))
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-  (my-tabs--setup-faces-h)
-#+end_src
-
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-tabs-select-tab-a (&optional e)
   :after 'tab-line-select-tab
   (select-window (posn-window (event-start e))))
-#+end_src
-
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  )
 #+end_src
 
 ** TODO Windows
