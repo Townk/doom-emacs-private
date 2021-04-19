@@ -1072,32 +1072,28 @@ With the function defined, I just need to connect them to the correct hooks:
 
 ** TODO Remote editing
 * Personal preferences
-** TODO Requirements
-- In-editor file management ::
-- In-editor project management ::
-- In-editor terminal ::
+** Evil
+This section will show the reader, some of the small changes I decided to implement on Doom related to Evil.
 
-** TODO Packages
-Doom offers =evil-escape= as a default package, but was never able to adjust my muscle memory to it, so I will disable it on =packages.el=:
+For most of it, Doom integration of Evil is pretty amazing, I found just one package I don't use (or don't want to use at all), one configuration that I want to do some adjustments, and three packages missing.
+
+The package I don't use is =evil-escape=, and its purpose, is to allow one to type =j k= fast enough on insert mode to force moving from insert mode to normal mode.
+
+If you're used to this feature, good for you, but I was never able to adjust my muscle memory to it, so I rather disable it on =packages.el=:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! evil-escape :disable t)
-(package! evil-matchit)
 #+end_src
 
-The last Evil tweak I have is not really on Evil, but is tightly coupled with it. I like =evil-goggles= to be more prominent than the Doom's default:
+The Evil configuration I want to adjust to my liking is on =evil-goggles=. I understand Henrik (Doom's creator) has a good rational on why he setup =evil-goggles= the way it is, but I like the original design where *all* changes get the highlight treatment.
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! evil-matchit :defer t)
-#+end_src
+Also, I use =evil-cleverparens=, and its editing operations are not configured on =evil-goggles=, so, in order to make it work for me I have to do two things:
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(after! evil-goggles
-  (evil-goggles-use-diff-refine-faces))
-#+end_src
+1. Re-enable the change feedback disabled by default on Doom;
+2. Add all =evil-cleverparens= commands to the ~evil-goggles--commands~ to allow =evil-goggles= to handle changes from those commands as well.
+
+I can perform those changes using ~use-package~:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1167,6 +1163,131 @@ The last Evil tweak I have is not really on Evil, but is tightly coupled with it
               :switch evil-goggles-enable-paste
               :advice evil-goggles--paste-advice
               :after t)))
+#+end_src
+
+After this I can sneak a quick modification to allow =evil-goggles= to use the same faces used on =diff=:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! evil-goggles
+  (evil-goggles-use-diff-refine-faces))
+#+end_src
+
+And for the packages I'm missing, they are:
+
+- =evil-matchit=
+- =plus-minus=
+- =evil-string-inflection=
+
+*** Evil-MatchIt
+In all fairness, =matchit= (the one originally from Vim) is also disabled by default, but it provides such useful feature that I can't understand why it is not part of the standard Vim/Evil.
+
+To the reader not familiar with this plugin, let me give a brief overview of it. You probably know that pressing the key =%= on a pair character (e.g. =(=, =)=, =[=, =]=, etc.), makes the cursor jump to the other pair.
+
+The =matchit= plugin, extends this functionality to other types of pairs, like XML/Html tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
+
+Since =evil-matchit= is not distributed with Doom, I need to bring its package in:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! evil-matchit)
+#+end_src
+
+Then, need to make sure to enable the plugin itself. In order to not slow the Emacs startup, I will enable it after I load the first file into a buffer:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! evil-matchit
+  :hook (doom-first-file . global-evil-matchit-mode))
+#+end_src
+
+*** Plus-Minus
+=plus-minus= is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
+
+I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using =evil-numbers= (which Doom provides as a core package), I'll try a brand new package called =plus-minus=:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! evil-numbers :disable t)
+
+(package! plus-minus
+  :recipe (:host github
+           :repo "peterwu/plus-minus"))
+#+end_src
+
+Since this package provides the correct ~autoloads~ on it, I can simply configure it to get deferred until I actually need it:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! plus-minus :defer t)
+#+end_src
+
+Before defining the keybindings for this I would like to have an extra behavior when I try to increase or decrease a number at point. I would like to rotate the text at point with the same keybinding if the /thing at point/ is not a number.
+
+Doom ships with the =rotate-text= package by default, but I need couple helper functions to define which package should handle the key press:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-inc-or-rotate-at-point (arg)
+  (interactive "p")
+  (if (thing-at-point 'number)
+      (if current-prefix-arg (+/-:backward+) (+/-:forward+))
+    (condition-case nil
+        (rotate-text arg)
+      ('error (if current-prefix-arg (+/-:backward+) (+/-:forward+))))))
+
+;;;###autoload
+(defun my-dec-or-rotate-at-point (arg)
+  (interactive "p")
+  (if (thing-at-point 'number)
+      (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))
+    (condition-case nil
+        (rotate-text arg)
+      ('error (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))))))
+#+end_src
+
+And I also like to define some extra words for rotation:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! rotate-text
+  (add-to-list 'rotate-text-words '("yes" "no"))
+  (add-to-list 'rotate-text-words '("allow" "deny"))
+  (add-to-list 'rotate-text-words '("allowed" "denyed")))
+#+end_src
+
+With all in place, we just need to define the keybindings:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+  :n "C-a" #'my-inc-or-rotate-at-point
+  :n "C-x" #'my-dec-or-rotate-at-point
+  (:prefix "g"
+    :desc "Inc sequence" :v "C-a" #'+/-:block+
+    :desc "Dec sequence" :v "C-x" #'+/-:block-))
+#+end_src
+
+*** Evil-String-Inflection
+I've been on situations where I realized that I used /camelCase/ for all my variables, where the standard coding style of the language, request to use /snake_case/ style. There are packages available, that allow you to cycle through all case styles on a given word.
+
+I found the =evil-string-inflection= to have one of the best integrations with Evil, so I will stick with it for a while to evaluate things:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! evil-string-inflection)
+#+end_src
+
+As with the =matchit= package, I'll defer its loading until we need it, but different from =matchit=, I have to defer it using an alternative approach. I will make the package load on the first invocation of the command ~evil-operator-string-inflection~, then, on the =:init= section, I will setup the proper keymap using the Doom ~map!~ function:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! evil-string-inflection
+  :commands (evil-operator-string-inflection)
+  :init
+  (map! :prefix "g"
+        :desc "String inflection" :o "~" #'evil-operator-string-inflection))
 #+end_src
 
 ** TODO Keybindings
@@ -1274,72 +1395,8 @@ And now we can close our mapping:
 ) ;; map!
 #+end_src
 
-** TODO Change text under cursor
-I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using =evil-numbers= (which Doom provides as a core package), I'll try a brand new package called =plus-minus=:
-
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! plus-minus
-  :recipe (:host github
-           :repo "peterwu/plus-minus"))
-#+end_src
-
-Now that we installed the package, let's configure it with ~use-package!~:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! plus-minus :defer t)
-#+end_src
-
-Before defining the keybindings for this I would like to have an extra behavior when I try to increase or decrease a number at point. I would like to rotate the text at point with the same keybinding if the /think at point/ is not a number.
-
-Doom ships with the =rotate-text= package by default, but I need couple helper functions to define which package should handle the key press:
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-inc-or-rotate-at-point (arg)
-  (interactive "p")
-  (if (thing-at-point 'number)
-      (if current-prefix-arg (+/-:backward+) (+/-:forward+))
-    (condition-case nil
-        (rotate-text arg)
-      ('error (if current-prefix-arg (+/-:backward+) (+/-:forward+))))))
-
-;;;###autoload
-(defun my-dec-or-rotate-at-point (arg)
-  (interactive "p")
-  (if (thing-at-point 'number)
-      (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))
-    (condition-case nil
-        (rotate-text arg)
-      ('error (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))))))
-#+end_src
-
-And I also like to define some extra words for rotation:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(after! rotate-text
-  (add-to-list 'rotate-text-words '("yes" "no"))
-  (add-to-list 'rotate-text-words '("allow" "deny"))
-  (add-to-list 'rotate-text-words '("allowed" "denyed")))
-#+end_src
-
-With all in place, we just need to define the keybindings:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(map!
-  :n "C-a" #'my-inc-or-rotate-at-point
-  :n "C-x" #'my-dec-or-rotate-at-point
-  (:prefix "g"
-    :desc "Inc sequence" :v "C-a" #'+/-:block+
-    :desc "Dec sequence" :v "C-x" #'+/-:block-))
-#+end_src
-
 ** TODO Appearances
-I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is as important. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
+I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is important as well. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
 
 *** UI
 I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
