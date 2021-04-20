@@ -6346,6 +6346,15 @@ I also like to make sure it behaves as expected if I use the mouse:
  (:after treemacs
   (:map treemacs-mode-map
    [mouse-1] #'treemacs-single-click-expand-action))
+
+ (:after treemacs-evil
+  (:map evil-treemacs-state-map
+   "C-h" #'evil-window-left
+   "C-l" #'evil-window-right))
+
+ (:after cfrs
+  (:map cfrs-input-mode-map
+   :n [escape] #'cfrs-cancel)))
 #+end_src
 
 Treemacs offers a function that adds the current project if it is not on the workspace. That is a nice feature, but because I use workspaces heavily, the fact that this function does not /remove/ projects that do not belong to this workspace bothers me, so I  wrote this advice to do the dirty work for me:
@@ -6371,14 +6380,6 @@ project that is not the current one."
 #+end_src
 
 And to finalize the Treemacs configuration, let's make it respect my window navigation keys:
-
-#+caption: config.el
-#+begin_src emacs-lisp
- (:after treemacs-evil
-  (:map evil-treemacs-state-map
-   "C-h" #'evil-window-left
-   "C-l" #'evil-window-right)))
-#+end_src
 
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangleautoload/files.el
