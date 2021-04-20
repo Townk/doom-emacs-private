@@ -2301,10 +2301,8 @@ TBD
             Info-mode
             lexic-mode)
   (defun my-popup-format-info-side-pannel-h ()
-    (let ((+zen-text-scale 0)
-          (writeroom-width 90))
-      (variable-pitch-mode 1)
-      (+zen/toggle))
+    (setq writeroom-width 90)
+    (+zen/toggle)
     (tab-line-mode -1)
     (hl-line-mode -1)))
 #+end_src
@@ -4213,8 +4211,9 @@ The first thing I like to do, is to create some variables pointing to key locati
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(setq +zen-text-scale 1
-      writeroom-mode-line t)
+(setq writeroom-mode-line       t
+      +zen-window-divider-size  2
+      +zen-text-scale           0)
 #+end_src
 
 #+caption: config.el
@@ -4583,6 +4582,7 @@ To separate my configuration from initialization logic, let's create another aut
   it to the user."
   ;; Enable minor modes
   (variable-pitch-mode 1)
+  (setq writeroom-width 120)
   (+zen/toggle)
   (valign-mode 1)
   ;; Disable unwanted minor modes
@@ -6914,9 +6914,8 @@ TBD
   (doom-themes-hide-modeline)
   (variable-pitch-mode -1)
   (setq-local wrap-prefix (s-repeat +org-agenda--wrap-prefix " "))
-  (let ((+zen-text-scale 0)
-        (writeroom-width 75))
-    (+zen/toggle))
+  (setq writeroom-width 75)
+  (+zen/toggle)
   (tab-line-mode -1)
   (hl-line-mode -1)
   (when (not (= text-scale-mode-amount 1))
