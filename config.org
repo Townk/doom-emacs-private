@@ -131,7 +131,9 @@ I want to stop saving my files. Any editor has substantial number of undo action
 I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
 
 *** Remote editing
-This is a pretty straightforward requirement: I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
+I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
+
+I also want my text editor to allow me to start this remote editing by picking a server and a remote editor, so it can create a remote /project/ for me to explore.
 
 ** Emacs-only configurations
 This section will cover some changes I like to do on the Emacs (or Doom) default behavior, and some required settings to make sure Emacs have all the information it needs to function properly.
@@ -1290,109 +1292,137 @@ As with the =matchit= package, I'll defer its loading until we need it, but diff
         :desc "String inflection" :o "~" #'evil-operator-string-inflection))
 #+end_src
 
-** TODO Keybindings
-As a general rule, I'm pretty happy with the default Evil keybindings, but I still like to make some changes overall. So, let's change some keybindings:
+** Keybindings
+Since I decided to write this configuration, I also decided to try to use the standard Doom key bindings as much as possible, and for the most part of it, I'm not having as much problem as I expected. There are three main areas where I still like to define my own bindings.
+
+*** Window navigation
+A while ago, I configured Vim to move the cursor from one window to another using the standard movements keys (=h=, =j=, =k=, and =l=) while keeping =Ctrl= pressed. I got so used to these shortcuts, that I can't live without it anymore.
+
+The good news is that, on most cases, there is no conflict between features I use and these shortcuts, and on the cases that a conflict exists, there are reasonable options to workaround these limitations.
+
+The first step to achieve a global is to clean the target keys from any keymap that might bind them to a command:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (map!
+ (:after outline
+  (:map outline-mode-map
+   :gn "C-h" nil
+   :gn "C-j" nil
+   :gn "C-k" nil
+   :gn "C-l" nil)))
 #+end_src
 
-When I have more than one window opened on Emacs, I like to move my cursor using the default movement keys (=h=, =j=, =k=, and =l=) plus =Ctrl=:
+After that, I can bind these keys to the target window movements to the proper window commands:
 
 #+caption: config.el
 #+begin_src emacs-lisp
+(map!
   :gn "C-h" #'evil-window-left
   :gn "C-j" #'evil-window-down
   :gn "C-k" #'evil-window-up
-  :gn "C-l" #'evil-window-right
+  :gn "C-l" #'evil-window-right)
 #+end_src
+
+*** Vim defaults
+Here I need to make yet another disclaimer to the reader: I know what I'm about to write is a pet peeve, and most likely most Doom users won't even understand this, but...
+
+On Doom, there are these keymaps bound to =<leader> w ...=, that should match Vim's =<C-w> <C-...>=. Since the /leader shortcuts/ are more ergonomic for me, I got used to them quickly. The problem I have, is the difference between =<C-w> <C-o>= and =<leader> w o=!
+
+To not lose a Doom-only keymap, instead of simply rebinding =<leader> w o= to the /correct/ command, I'll /move/ ~doom/window-enlargen~ to a different keymap (=<leader> w z= to represent /zoom window/), and assign the /correct/ command to the /correct/ keymap:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  :gn "s-d" #'evil-mc-make-and-goto-next-match
-  :gn "s-u" #'evil-mc-skip-and-goto-prev-cursor
-  :gn "s-n" #'evil-mc-skip-and-goto-next-match
-  :gn "s-g" #'evil-mc-make-all-cursors
-  :gn "C-M-k" #'evil-mc-make-cursor-move-prev-line
-  :gn "C-M-j" #'evil-mc-make-cursor-move-next-line
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (:prefix "g"
-     :desc "Eval last sexp" :n ")" #'eval-last-sexp)
-#+end_src
-
-Unfortunately, =outline= also defines actions for these keys, so I have to /unbind/ them to make sure they work as expected:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (:after outline
-    (:map outline-mode-map
-      :gn "C-h" nil
-      :gn "C-j" nil
-      :gn "C-k" nil
-      :gn "C-l" nil))
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (:after cfrs
-   (:map cfrs-input-mode-map
-    :n [escape] #'cfrs-cancel))
-#+end_src
-
-And since we're on the window navigation subject, let me adjust couple bindings related to selecting which window to keep:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (:leader
-    (:prefix "w"
+(map! :leader
+      :prefix ("w" . "window")
       :desc "Enlarge window"         :n "z" #'doom/window-enlargen
-      :desc "Select window"          :n "o" #'delete-other-windows))
+      :desc "Select window"          :n "o" #'delete-other-windows)
 #+end_src
+
+*** Personal shortcuts
+Key bindings in this section are purely personal choice. Feel free to give them a try if you want, but if you're used to Doom Emacs already, my suggestion is to skip this section.
+
+#+begin_center
+◆
+#+end_center
+
+The first keymap group I like to add custom shortcuts is the multiple cursors. When I first heard about multiple cursors, was on a demo of the [[https://macromates.com/][TextMate]] editor. I got so impressed by it that this feature was one of the first things I would search on an editor. Fast forwarding to January 2008, I was watching yet another demo of a brand new editor, when the person showing off the features, demonstrated the multiple cursors. This editor was [[https://www.sublimetext.com][Sublime Text]], and I couldn't resist the chance to give it a try. For reasons of the brain (at least my brain), the shortcuts defined to manipulate multiple cursors got engraved in my memory, and recently, I decide to stop fighting against it and embrace! So these are the shortcuts (which might be different from the current shortcuts in Sublime) that I got /used to/:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map!
+ :gn "s-d" #'evil-mc-make-and-goto-next-match
+ :gn "s-u" #'evil-mc-skip-and-goto-prev-cursor
+ :gn "s-n" #'evil-mc-skip-and-goto-next-match
+ :gn "s-g" #'evil-mc-make-all-cursors
+ :gn "C-M-k" #'evil-mc-make-cursor-move-prev-line
+ :gn "C-M-j" #'evil-mc-make-cursor-move-next-line)
+#+end_src
+
+#+begin_center
+◆
+#+end_center
 
 Another /nice to have/ binding I got used to, is to move blocks of text up and down, using =j= and =k=, plus the =Meta= (a.k.a. =Alt=, =option=, or  =⌥=):
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  :nvi "M-j" #'drag-stuff-down
-  :nvi "M-k" #'drag-stuff-up
+(map! :nvi "M-j" #'drag-stuff-down
+      :nvi "M-k" #'drag-stuff-up)
 #+end_src
 
-You might have noticed that I use the =undo-tree= package to manage action history. This package offer a visual navigation of your file history jumps, allowing you too navigate between forks of /undo/ commands, and I like to map this tree visualization to the key =U= (uppercase u):
+#+begin_center
+◆
+#+end_center
+
+Something that I really like but usually forget to use is the ability to insert a new line while on /insert mode,/ above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  :n "U" #'undo-tree-visualize
+(map! :gi [s-return]   #'+default/newline-below
+      :gi [s-S-return] #'+default/newline-above)
 #+end_src
 
-I like to have a dedicated prefix key to bring back some popup buffers I might have dismissed:
+#+begin_center
+◆
+#+end_center
+
+Doom Emacs, offer a shortcut to bring back the last dismissed popup, which is what I want to do on the majority of the cases. But some times, I want to bring back a specific popup buffer to the front, and I like to have a dedicated prefix key to handle this scenario.
+
+For now, I set a shortcut for the =*Messages*=, and the =*Backtrace*= buffers, but more popup buffer might get added here in the future:
 
 #+caption:config.el
 #+begin_src emacs-lisp
-  (:leader
-    (:prefix "v"
-      :desc "View Messages" :n "m" #'(lambda () (interactive) (pop-to-buffer "*Messages*"))
-      :desc "View Backtrace" :n "e" #'(lambda () (interactive) (pop-to-buffer "*Backtrace*"))))
-  (:map messages-buffer-mode-map
-    :n "q" #'delete-window)
+(map! :leader :prefix ("v" . "view")
+      :desc "View Messages" :n "m" #'(lambda ()
+                                       (interactive)
+                                       (pop-to-buffer "*Messages*")
+                                        (goto-char (point-max)))
+      :desc "View Backtrace" :n "e" #'(lambda ()
+                                        (interactive)
+                                        (pop-to-buffer "*Backtrace*")))
 #+end_src
 
-Something that I really like but usually forget to use is the ability to insert a new line above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
+As you can see, I also like to /scroll to the bottom/ of the buffer when opening messages. The rational behind it is the fact that if I want to quick loo into the =*Messages*= buffer, is most likely to check the latest messages there.
+
+Also for the =*Messages*= buffer, I like to be able to press =q= to quit as well. Unfortunately this is not defined by default:
+
+# #+caption: config.el
+#+begin_src emacs-lisp
+(map! :map messages-buffer-mode-map
+      :n "q" #'delete-window)
+#+end_src
+
+#+begin_center
+◆
+#+end_center
+
+One binding I feel is missing on Doom, is the hability to evaluate any sexp on *any* mode, like a /global/ ~eval-last-sexp~. Gladly, it's easy enough to create my own:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-  :gi [s-return]   #'+default/newline-below
-  :gi [s-S-return] #'+default/newline-above
-#+end_src
-
-And now we can close our mapping:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-) ;; map!
+(map! :prefix "g"
+      :desc "Eval last sexp" :n ")" #'eval-last-sexp)
 #+end_src
 
 ** TODO Appearances
