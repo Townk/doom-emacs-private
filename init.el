@@ -80,12 +80,12 @@
        (dired            ; making dired pretty [functional]
         +icons
         )
-       electric          ; smarter, keyword-based electric-indent
+       ;; electric          ; smarter, keyword-based electric-indent
        (ibuffer          ; interactive buffer management
         +icons
         )
        (undo             ; persistent, smarter undo for your inevitable mistakes
-        +tree
+        ;; +tree
         )
        vc                ; version-control and Emacs, sitting in a tree
 
@@ -129,7 +129,7 @@
        (magit            ; a git porcelain for Emacs
         +forge
         )
-       ;; make              ; run make tasks from Emacs
+       make              ; run make tasks from Emacs
        ;; pass              ; password manager for nerds
        pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
@@ -185,7 +185,7 @@
        latex             ; writing papers in Emacs has never been so fun
        ;; lean
        ;; factor
-       ledger            ; an accounting system in Emacs
+       ;; ledger            ; an accounting system in Emacs
        ;; lua               ; one-based indices? one-based indices
        (markdown         ; writing docs for people to ignore
         +grip
@@ -264,9 +264,9 @@
          +bindings
          +smartparens))
 
-(when doom-debug-p
-  (require 'benchmark-init)
-  (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
+;; (when doom-debug-p
+;;   (require 'benchmark-init)
+;;   (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
 
 ;; I need this hook here to make sure my tangle runs this autoloaded function.
 (add-hook 'org-babel-post-tangle-hook
