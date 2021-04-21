@@ -5698,19 +5698,6 @@ $0
 
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
-;;
-;;  IF NOTHING BREAKS DELETE!
-;;
-;; ;;;###autoload
-;; (defun +org-capture-journal-file ()
-;;   "Thin wrapper around `+org-journal-new-entry' that adjust the
-;; capture frame width to `fill-column' before start editing it."
-;;   (my-capture--adjust-frame)
-;;   (my-journal/new-entry))
-#+end_src
-
-#+caption: autoload/writing.el
-#+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-journal-file-for-timestamp ()
   "Asks user for a specific timestamp and returns the journal
@@ -5791,7 +5778,6 @@ ${2:$(if (string= yas-text " company") "" ":PHONE-W: \n")}:EMAIL: ${5:email}
 
 $0
 #+end_src
-
 
 **** Project notes
 
@@ -6053,7 +6039,6 @@ were written in the capture buffer."
     (my-capture--reposition-frame)
     (message ""))))
 #+end_src
-
 
 *** TODO Journal
 TBD
