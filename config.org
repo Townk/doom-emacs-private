@@ -1425,6 +1425,19 @@ One binding I feel is missing on Doom, is the hability to evaluate any sexp on *
       :desc "Eval last sexp" :n ")" #'eval-last-sexp)
 #+end_src
 
+#+begin_center
+◆
+#+end_center
+
+I don't remember when this shortcut enter my life, but some time ago I got used to use =s-RET= to /confirm operations/ like sending emails and messages. In order to try to replicate this behavior I will start setting it to the ~with-editor-mode-map~ together with the analog cancel operation with =s-ESC= shortcut:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :map with-editor-mode-map
+      :in [s-return] #'with-editor-finish
+      :in [s-escape] #'with-editor-cancel)
+#+end_src
+
 ** TODO Appearances
 I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is important as well. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
 
