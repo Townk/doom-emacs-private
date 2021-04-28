@@ -1,11 +1,10 @@
-# -*- eval: (org-num-mode 1); -*-
-
 #+TITLE: Thiago's Emacs Configuration
 #+SUBTITLE: A detailed setup for Emacs using Doom Emacs framework
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
 #+DATE: Fri, Jan 1 2021
 #+LANGUAGE: en
+#+startup: num
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :comments link :shebang ";;; -*- lexical-binding: t; -*-\n"
 #+property: header-args:snippet :padline no
@@ -97,8 +96,10 @@ I need to come clean to the reader about my past experiences with text editors. 
 
 *** Text Snippets
 Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some book keeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
+
 *** Inline completion
 Also know as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
+
 *** Automatic indentation
 Here I'm not talking about indent after pressing '=RET='. I'm talking about re-indenting the file as I change it. On the Emacs world, this is also known as /electric indent/.
 
@@ -155,6 +156,7 @@ I also like to have a variable holding the value of my email's host name:
   "Holds the user's personal domain. By default, this variable is
   the `user-email-address' host.")
 #+end_src
+
 *** Dashboard
 Doom Emacs offers a lightweight dashboard, that serves as the landing page for Emacs.
 
@@ -301,7 +303,11 @@ To make Emacs not jump then necessary when cursor goes outside the screen, set t
 
 #+caption: config.el
 #+begin_src  emacs-lisp
-(setq scroll-conservatively most-positive-fixnum)
+;; (setq scroll-conservatively most-positive-fixnum)
+(setq scroll-margin 3
+      scroll-conservatively 0
+      scroll-up-aggressively 0.01
+      scroll-down-aggressively 0.01)
 #+end_src
 
 By default, Emacs will move the cursor with the text as you scroll, but only until the edge of the screen. When the cursor reaches the edge, it will stay there as you keep scrolling. This behavior presents an anti-pattern for usability. When I decide to scroll my buffer with the mouse wheel, I'm generally looking at the screen, around the area where the cursor is. If the cursor moves up or down from its position, my eyes lose track of it, and I will assume, it stayed with its original position as I scroll. If I decide to get back writing, my expectation is to just start typing, because the cursor should be on its previous position, but if I do this, I will start typing on the wrong part of the text.
@@ -408,7 +414,7 @@ Snippets (also known as Live Templates on certain platforms), are tidbits of tex
 
 Doom Emacs offers basic configuration for the package /[[https://github.com/joaotavora/yasnippet][Yasnippet]]/, which is the most used snippet system on Emacs.
 
-Most snippet frameworks available accross editors (including /Yasnippet/) offer the ability to edit some placeholders on the snippet so one can have a single snippet and use it on different scenarios. For instance:
+Most snippet frameworks available across editors (including /Yasnippet/) offer the ability to edit some placeholders on the snippet so one can have a single snippet and use it on different scenarios. For instance:
 
 Let's assume I'm a Java developer, and as such, one of the most common scenarios is for me to create a class, more or less like this:
 
@@ -518,6 +524,7 @@ The following function, is an adaptation of the Doom's own ~+snippets/delete-for
 ;;;###autoload
 (defun my-snippets-delete-backward-char-or-field (&optional field)
   "Delete backward, or skip the current field if it's empty.
+
 Prevents Yas from interfering with backspace deletion."
   (interactive)
   (let ((field (or field (and (overlayp yas--active-field-overlay)
@@ -539,7 +546,7 @@ With the function defined, I can simply add it to a key bind to start using it. 
 #+begin_src emacs-lisp
 (map! :after yasnippet
 
-      (:leader :prefix "h"
+      (:leader :prefix ("h" . "help")
        :desc "Show snippets" :n "y" #'yas-describe-tables)
 
       (:map yas-keymap
@@ -578,12 +585,29 @@ In order to help me handle my three cases for =TAB= I need to create small wrapp
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-company-indent-or-complete-common (arg)
+  "Tab key action for current point.
+
+This function tries to insert a tab character, trigger a snippet or complete a
+word with company.
+
+The order for this selection is:
+
+- Yasnippet
+- Indent region
+- Indent line
+- Indent org-mode line
+- Indent org-mode headline
+- Indent org-mode item from a list
+- Indent markdown-mode line
+- Indent rst-mode line
+- Complete with company
+
+The action selection happens in this order and stops as soon as the first action
+works."
   (interactive "P")
   (if (or (not yas-minor-mode)
           (null (yas-expand)))
-      ;; (company-indent-or-complete-common arg)
       (cond ((use-region-p) (indent-region (region-beginning) (region-end)))
-            ;; ((memq indent-line-function '(indent-relative indent-relative-maybe)) (company-complete-common))
             (t (let ((old-point (point))
                      (old-tick (buffer-chars-modified-tick))
                      (tab-always-indent t))
@@ -607,6 +631,10 @@ But what if I'm already displaying the Company popup, but I want to expand what 
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-completion-yasnippet-or-completion ()
+  "Tab key action when company popup is visible.
+
+This function tries to expand a snippet, complete a common prefix on a company
+completion, or move the company selction to the next item."
   (interactive)
   (if (or (not yas-minor-mode)
           (null (yas-expand)))
@@ -629,6 +657,10 @@ The way to distinguish between these two scenarios, is to check if Company alrea
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-completion-complete-selection-or-return ()
+  "Return key action when company popup is visible.
+
+This function will select current company item if user already selected one, or
+insert a new line character."
   (interactive)
   (if company-selection
       (company-complete-selection)
@@ -750,12 +782,12 @@ Our advice function checks if our cursor is position on the expected position to
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-super-backward-delete-a (&rest _)
-  "Special function to super-delete things. If the line content
-before cursor contains only blank characters, this function will
-delete all the blank characters, and then, join with the
-previous line. I there is any non-blank character before cursor,
-this function will delete the entire line, but keep the correct
-indentation on it."
+  "Special function to super-delete things.
+
+If the line content before cursor contains only blank characters, this function
+will delete all the blank characters, and then, join with the previous line. I
+there is any non-blank character before cursor, this function will delete the
+entire line, but keep the correct indentation on it."
   :before '+default--delete-backward-char-a
   (let* ((line-pos (- (point) (point-at-bol)))
          (prev-indent (save-excursion
@@ -926,8 +958,7 @@ To achieve this, I need a function that turns the /absolute/ line number when li
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-line-number-absolute-h ()
-  "If line numbers are visible, set the current line
-  number type to `absolute.'"
+  "If line numbers are visible, set the current line number type to `absolute.'"
   (if display-line-numbers
       (setq display-line-numbers t)))
 #+end_src
@@ -938,8 +969,7 @@ And another function to put the line numbers on /relative mode/ (but again, only
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-line-number-visual-h ()
-  "If line numbers are visible, set the current line
-  number type to `visual'"
+  "If line numbers are visible, set the current line number type to `visual'"
   (if display-line-numbers
       (setq display-line-numbers 'visual)))
 #+end_src
@@ -977,10 +1007,9 @@ Emacs allows you to define some /advices/ to any function you want. This allows 
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-save-all-buffers-a (&rest _)
-  "Advice added to functions that can potentially make user lose
-  data if one does not select to save the buffer.
+  "Advice to run `save-some-buffers' before a function.
 
-  This is a part of the full auto-save feature."
+This is a part of the full auto-save feature."
   :before (list #'save-buffers-kill-emacs #'my-tabs-close-buffer-tab)
   (save-some-buffers t t))
 #+end_src
@@ -1034,8 +1063,7 @@ First, I like to define an auto loaded function to hook into the emacs kill proc
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-save-frame-dimensions-h ()
-  "Caches the current frame dimensions and position so we can
-  restore it when we launch emacs again."
+  "Caches the current frame dimensions and position."
   (if-let ((main-frame (car-safe (visible-frame-list))))
       (doom-store-put 'last-frame-size
                       (list (frame-position main-frame)
@@ -1050,6 +1078,7 @@ Then, I like to have the analog function to call when we create a frame:
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defun my-restore-frame-dimensions-h ()
+  "Restore frame dimensions and position from `my-save-frame-dimensions-h'."
   (if-let (dims (doom-store-get 'last-frame-size "default"))
       (cl-destructuring-bind ((left . top) width height fullscreen) dims
         (setq initial-frame-alist
@@ -1073,11 +1102,12 @@ With the function defined, I just need to connect them to the correct hooks:
 
 
 ** TODO Remote editing
+
 * Personal preferences
 ** Evil
 This section will show the reader, some of the small changes I decided to implement on Doom related to Evil.
 
-For most of it, Doom integration of Evil is pretty amazing, I found just one package I don't use (or don't want to use at all), one configuration that I want to do some adjustments, and three packages missing.
+For most of it, Doom integration of Evil is pretty amazing, I found just one package I don't use (or don't want to use at all), two configurations that I want to do some adjustments, and three packages missing.
 
 The package I don't use is =evil-escape=, and its purpose, is to allow one to type =j k= fast enough on insert mode to force moving from insert mode to normal mode.
 
@@ -1088,7 +1118,7 @@ If you're used to this feature, good for you, but I was never able to adjust my 
 (package! evil-escape :disable t)
 #+end_src
 
-The Evil configuration I want to adjust to my liking is on =evil-goggles=. I understand Henrik (Doom's creator) has a good rational on why he setup =evil-goggles= the way it is, but I like the original design where *all* changes get the highlight treatment.
+The first Evil configuration I want to adjust to my liking is on =evil-goggles=. I understand Henrik (Doom's creator) has a good rational on why he setup =evil-goggles= the way it is, but I like the original design where *all* changes get the highlight treatment.
 
 Also, I use =evil-cleverparens=, and its editing operations are not configured on =evil-goggles=, so, in order to make it work for me I have to do two things:
 
@@ -1175,7 +1205,27 @@ After this I can sneak a quick modification to allow =evil-goggles= to use the s
   (evil-goggles-use-diff-refine-faces))
 #+end_src
 
-And for the packages I'm missing, they are:
+The second configuration is regarding centralizing the cursor after search jumps. I find myself pretty uncomfortable after I press =n= following a search term, and I figured it out that what makes me uncomfortable is the fact the cursor is on the bottom of the screen, and I have almost no visibility of the text after it.
+
+To fix this, I will add an advice after the Evil search function used to perform those jumps, to recenter the cursor on the window:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defadvice! my-center-after-jump (&rest _)
+  :after 'evil-ex-search
+  (evil-scroll-line-to-center nil))
+#+end_src
+
+And to make this behavior more consistent throughout the editor, I will add the same function used to advise ~'evil-ex-search~ as a hook to the ~evil-jumps-post-jump-hook~ hook:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! evil
+  (add-hook 'evil-jumps-post-jump-hook #'my-center-after-jump))
+#+end_src
+
+And finally, for the packages I'm missing, they are:
 
 - =evil-matchit=
 - =plus-minus=
@@ -1200,7 +1250,9 @@ Then, need to make sure to enable the plugin itself. In order to not slow the Em
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! evil-matchit
-  :hook (doom-first-file . global-evil-matchit-mode))
+  :hook (doom-first-file . global-evil-matchit-mode)
+  :init
+  (setq evilmi-quote-chars (string-to-list "'\"/")))
 #+end_src
 
 *** Plus-Minus
@@ -1232,15 +1284,32 @@ Doom ships with the =rotate-text= package by default, but I need couple helper f
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-inc-or-rotate-at-point (arg)
+  "Try to rotate or increase the text at point.
+
+If the thing under cursor is not rotated, tries to increase the number at
+`point' or the first number from `point' to `point-at-eol'.
+
+When called with ARG (by using the universal prefix key) the search for a number
+happens from `point' to `point-at-bol'."
   (interactive "p")
   (if (thing-at-point 'number)
       (if current-prefix-arg (+/-:backward+) (+/-:forward+))
     (condition-case nil
         (rotate-text arg)
       ('error (if current-prefix-arg (+/-:backward+) (+/-:forward+))))))
+#+end_src
 
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-dec-or-rotate-at-point (arg)
+  "Try to rotate or decrease the text at point.
+
+If the thing under cursor is not rotated, tries to decrease the number at
+`point' or the first number from `point' to `point-at-eol'.
+
+When called with ARG (by using the universal prefix key) the search for a number
+happens from `point' to `point-at-bol'."
   (interactive "p")
   (if (thing-at-point 'number)
       (if current-prefix-arg (+/-:backward- 1) (+/-:forward- 1))
@@ -1324,6 +1393,18 @@ After that, I can bind these keys to the target window movements to the proper w
   :gn "C-l" #'evil-window-right)
 #+end_src
 
+Some other modes don't play nice with this particular key bindings I choose, and I have to adjust them accordingly. This is the case of the =Info-mode=, where =C-j= and =C-k= are the keys to navigate forward and backwards on nodes. The solution for me is to bind those commands to other keys, and configure the proper window navigation:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :after info
+      :map Info-mode-map
+      :gn "s-k" #'Info-backward-node
+      :gn "s-j" #'Info-forward-node
+      :gn "C-k" #'evil-window-up
+      :gn "C-j" #'evil-window-down)
+#+end_src
+
 *** Vim defaults
 Here I need to make yet another disclaimer to the reader: I know what I'm about to write is a pet peeve, and most likely most Doom users won't even understand this, but...
 
@@ -1333,8 +1414,7 @@ To not lose a Doom-only keymap, instead of simply rebinding =<leader> w o= to th
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map! :leader
-      :prefix ("w" . "window")
+(map! :leader :prefix ("w" . "window")
       :desc "Enlarge window"         :n "z" #'doom/window-enlargen
       :desc "Select window"          :n "o" #'delete-other-windows)
 #+end_src
@@ -1379,8 +1459,13 @@ Something that I really like but usually forget to use is the ability to insert 
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map! :gi [s-return]   #'+default/newline-below
-      :gi [s-S-return] #'+default/newline-above)
+(map! :i [s-return]   #'+default/newline-below
+      :i [s-S-return] #'+default/newline-above
+      (:when IS-MAC
+         :gn "s-RET"        nil
+         :gn [s-return]     nil
+         :gn "S-s-RET"      nil
+         :gn [S-s-return]   nil))
 #+end_src
 
 #+begin_center
@@ -1438,11 +1523,70 @@ I don't remember when this shortcut enter my life, but some time ago I got used 
       :in [s-escape] #'with-editor-cancel)
 #+end_src
 
-** TODO Appearances
-I know most people using emacs value more its functionalities than its looks, but for me, the aesthetic of my editor is important as well. I will spend a substantial amount of time looking to the screen of this app, and it should be as much good looking as it is functional. Of course this is a subjective aspect of my configuration, and what is good looking for me, might not be good looking for you, but in general, what I'm trying to achieve is to open Emacs and don't feel I'm traveling back in time to the 90's.
+#+begin_center
+◆
+#+end_center
 
-*** UI
-I found that on macOS, the ~fill-column-indicator~ face, can't render unicode characters when I set my fonts with Doom. The workaround here is to make this particular face to use a font that can render unicode properly:
+Doom ships with the /Rainbow Mode/ package, which is a package that colorizes strings that represent colors. Usually there is no need to enable this mode globally because the colorization might get in the way of legibility, but on the cases where it is useful (e.g. editing CSS or Android XML files), it is *really* useful.
+
+Because of this, I want to set this mode as a toggable shortcut:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :leader :prefix ("t" . "toggle")
+      :desc "Rainbow mode" :mvn "R" #'rainbow-mode)
+#+end_src
+
+** TODO Appearances
+As far as I understand, there is a share of Emacs users that value Emacs functionalities over its looks, and I would like to write something targeted for those users.
+
+You are awesome! I can't imagine how liberating it would feel if my brain did not obsessed about my editor's appearance, so, stay strong guys! The breakthroughs on technology happens more often by the desired of people like you then people like me.
+
+With that out of the way, I need to explain to the reader my personal position on this subject. As a person with [[https://en.wikipedia.org/wiki/Attention_deficit_hyperactivity_disorder][ADHD]] and [[https://en.wikipedia.org/wiki/Obsessive%E2%80%93compulsive_disorder][OCD]].
+
+Looks mater. There is not much else to say, but if you need a bit more let me say this: When your brain is constantly searching for dopamine, and is incapable to retain it for much longer, every tinny rewarding counts towards the goal to keep my focus on one subject. If my work environment is pleasing to look, there is a lower chance my brain gets distracted by the scene outside the window. If I open my editor and get the feeling of /"oh yeah"/, than my brain will look forward to use the same tool again, or as I saw on this [[https://twitter.com/ADHDelaide/status/1326412306079682560][tweet]] a while ago, and reproduce it here for you:
+
+#+begin_quote
+❝ Having *ADHD* is basically finding new ways to trick your brain into doing the stuff you want it to do, until you die. ❞
+─ *@ADHDelaide*
+#+end_quote
+
+Nevertheless, keep in mind that taste, is a personal thing. What I consider to be beautiful, might look horrendous to the reader, and that is OK.
+
+So, if you're happy with the look and feel of your editor, feel free to skip this entire section.
+
+*** Frame ✅
+
+The Emacs frame is the container for my small world, and although I intend to do most of my things within Emacs, I still want it to look like it belongs to its environment (macOS in my case), and there are couple things I like to change to make it more macOS.
+
+The first one is to remove the text from the title bar. On macOS, the application name is present on the system menu, so there is no reason to keep any text on the title bar:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq frame-title-format nil
+      ns-use-proxy-icon nil)
+#+end_src
+
+And the second one, is to make the title bar to have the same color as the background of my selected theme:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+#+end_src
+
+*** Editor ✅
+
+The first thing to do to help with my editor appearance, is to store the current line height in a variable. This way, other adjustments can use this value without worrying about different font sizes:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defvar my-line-pixel-height (line-pixel-height)
+  "Line height in pixels.
+
+Used to avoid getting the wrong line height when `text-scale-mode' is active.")
+#+end_src
+
+One editor visual I like to have while I'm coding, is the ~fill-column-indicator~. Unfortunately I discovered that on macOS, the default ~fill-column-indicator~ face, can't render Unicode characters properly. The workaround here is to make this particular face to use a font that can render them:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1452,72 +1596,69 @@ I found that on macOS, the ~fill-column-indicator~ face, can't render unicode ch
                     :foreground (doom-color 'base3 256))
 #+end_src
 
-And since we just fix the fill column indication, let's turn it on and set the appropriate character to it:
+Using /Arial Unicode MS/ allow me to use the "=┊=" character to decorate my ~prog-mode~ buffers. After setting this up, I need to adjust the ~fill-column~ value to the column I want (while is usually 100),  and make the column indicator use the correct Unicode character (which is =0x9482=):
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq-default fill-column 100
               display-fill-column-indicator-column 100
-              display-fill-column-indicator-character 9550)
+              display-fill-column-indicator-character 9482)
 #+end_src
 
-Another indicator I like to turn on, is the indentation guide. As with the fill column indicator, I don't like the character set to it by default, so I'll also fix it:
+After this configuration I want to make sure the column indicator is off by default:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(setq-default highlight-indent-guides-character 9482
-              highlight-indent-guides-responsive 'dynamic)
+(global-hl-line-mode -1)
 #+end_src
 
-Now, to tidy the appearance, I like to set some minor tweaks to have a pretty good looking UI.
-
-I like to remove the title from the app window.
+And enabled on all ~prog-mode~ buffers:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(setq frame-title-format nil
-      ns-use-proxy-icon nil)
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(add-hook 'prog-mode-hook 'display-fill-column-indicator-mode)
 #+end_src
 
-And make scroll not jumpy:
+#+begin_center
+◆
+#+end_center
+
+As with column indicator, there is another visual that I consider crucial for programming, but a bit annoying when writing prose: The current line highlight.
+
+I can't imagine coding without it, but when I'm writing, it becomes more a distraction then an aid.
+
+On Doom, to make sure current line highlight gets disabled, you need to remove its global mode from the ~doom-first-buffer-hook~:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(setq ns-use-thin-smoothing t)
+(remove-hook 'doom-first-buffer-hook 'global-hl-line-mode)
 #+end_src
 
-When text-scale-mode is active it’s hard to tell what line height actually is. This variable helps calculating that reliably.
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(defvar my-line-pixel-height (line-pixel-height)
-  "Line height in pixels.
-Used in various places to avoid getting wrong line height when
-`text-scale-mode' is active.")
-#+end_src
+Then, I can add the mode to all ~prog-mode~ buffers with another hook:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map! :after info
-      (:map Info-mode-map
-       :gn "s-k" #'Info-backward-node
-       :gn "s-j" #'Info-forward-node
-       :gn "C-k" #'evil-window-up
-       :gn "C-j" #'evil-window-down))
+(add-hook 'prog-mode-hook 'hl-line-mode)
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(map! :leader
-      (:prefix ("t" . "toggle")
-       :desc "Rainbow mode" :mvn "R" #'rainbow-mode))
-#+end_src
+#+begin_center
+◆
+#+end_center
+
+Another extra for the editor visuals is rendering the character =^L=, which represents a page break (more precisely, the /form feed/ character).
+
+The page break character is consider a /space/ or /empty/ character, which allows one to add it on a coding file without breaking the build for such file.
+
+There are a couple packages that achieve this goal but I set on the [[https://github.com/purcell/page-break-lines][=page-break-lines=]] from [[https://github.com/purcell][Steve Purcell]] because he chose to implement this feature using glyph composition instead of /font-lock/:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! page-break-lines)
 #+end_src
+
+There is just one configuration I prefer to change over the defaults, which is the size of thee horizontal line. I like the horizontal like to stop at the ~fill-column~ column, which gives this nice /box feeling/ to the code.
+
+Besides this change, I only enable the mode on =prog-mode= buffers, and I like to define a shortcut key to jump to the next or previous page break:
 
 #+begin_src emacs-lisp
 (use-package! page-break-lines
@@ -1525,22 +1666,35 @@ Used in various places to avoid getting wrong line height when
   :init
   (setq page-break-lines-max-width fill-column)
 
-  (map! (:prefix "g"
-         :desc "Prev page break" :nv "[" #'backward-page
-         :desc "Next page break" :nv "]" #'forward-page)))
+  (map! :prefix "g"
+        :desc "Prev page break" :nv "[" #'backward-page
+        :desc "Next page break" :nv "]" #'forward-page))
 #+end_src
 
-*** Theme
-The first step into this unspecified requirement, is to have a good theme.
+#+begin_center
+◆
+#+end_center
 
-For a long time I tried to avoid this theme, but didn't mater how much I try to use a different one, I always end up installing the /Tomorrow Night/ theme; and according to Doom's files, there are two ways to load a theme. Both assume we have the theme installed and available. You can either set ~doom-theme~ or manually load a theme with the ~load-theme~ function. I prefer to use the Doom's variable:
+Since the time when widescreen monitors became the standard, when it comes to split windows in two, I prefer horizontal splits (one window aside of the other). In order to tell Emacs that I prefer horizontal splits, I have to set the width split threshold to a small number to add weight on Emacs' decision of which orientation to slipt:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq split-width-threshold 40)
+#+end_src
+
+*** Theme ✅
+I believe this section to be the most volatile section on this text. Since I got interested on cool old exoteric editors, I'm on an endless search for the Holy Graal of themes. So far I got fond of Tomorrow Night and I use it for the most part of the last 5 years. Recently I got annoyed by some color choices of the theme (the background and line highlight are a bit odd in my opinion), so I kept looking.
+
+I decided to give /Doom-One/ a try, and so far I'm enjoying. I will admit that the purple-ish feeling of the palette is not my style, but overall, I'm not finding a bed choice.
+
+So, to make /Doom-One/ the default theme, set the variable ~doom-theme~ to the symbol ~'doom-one~ to let Doom know what is the theme it should load:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq doom-theme 'doom-one)
 #+end_src
 
-And just to add a bit more differentiation to the theme's fonts, let's allow the theme to use bolds and italics:
+And because I like visual cues on my editor, I will turn on the ability to display *bold* and /italic/ faces for the theme:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1548,36 +1702,11 @@ And just to add a bit more differentiation to the theme's fonts, let's allow the
       doom-themes-enable-italic t)
 #+end_src
 
-I also start enjoying using Doom without the Solaire mode on. Because of that, I will disable that package on the =packages.el= file:
+The one complain I have on Doom theme in general, is the conflict =solaire-mode= has with =mixed-pitch=. If you turn both on, you will lose the variable pitch font. Until somehow, someone fix this, I will disable =solaire= mode to keep the editor UX consistent with my requirements:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! solaire-mode :disable t)
-#+end_src
-
-*** Colors
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(add-hook! 'doom-load-theme-hook
-  (defun my-themes-add-extra-colors-h ()
-    (pushnew! doom-themes--colors
-              '(green-bg "#435300" "#435300" "black")
-              '(violet-bg "#4C2E60" "#4C2E60" "black")
-              '(yellow-bg "#644E00" "#644E00" "black")
-              '(blue-bg "#1B2E47" "#1B2E47" "black")
-              '(orange-bg "#492812" "#492812" "black")
-              '(red-bg "#360F0F" "#360F0F" "black")
-              '(magenta-bg "#645867" "#645867" "black")
-              '(light-blue "#a0b9ce" "#a0b9ce" "brightblue")
-              '(light-blue-bg "#3B454D" "#3B454D" "black")
-              '(dark-blue-bg "#14232C" "#14232C" "black")
-              '(cyan-bg "#354B48" "#354B48" "black")
-              '(dark-cyan-bg "#1C2725" "#1C2725" "black")
-              '(bright-violet "#d6c6db" "#d6c6db" "brightmagenta")
-              '(bright-blue "#c0d0de" "#c0d0de" "bright")
-              '(bright-magenta "#e3d9e7" "#e3d9e7" "brightmagenta")
-              '(bright-light-blue "#e5ecf2" "#e5ecf2" "brightblue"))))
 #+end_src
 
 *** Typography
@@ -1585,8 +1714,8 @@ The next step is to use a better font face and size, which I recognize is a bit 
 
 For my configuration, I have selected 3 fonts:
 
-- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like thee italic face for this font.
-- [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like the italic face for this font.
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]] :: Used as my default font. I particularly like the italic face for this font.
 - [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements. Currently, I only use it on Treemacs.
 
 Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
@@ -1600,6 +1729,7 @@ Also, for the sake of documentation, this s a not complete list of fonts I used 
   + [[https://github.com/googlefonts/robotomono][RobotoMono]]
 - Variable Pitch Fonts:
   + [[https://en.wikipedia.org/wiki/Bookerly][Bookerly]]
+  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
   + [[https://github.com/impallari/Libre-Baskerville][Libre Baskerville]]
   + [[https://github.com/adobe-fonts/source-sans-pro][Source Sans Pro]]
   + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]]
@@ -1620,24 +1750,114 @@ Since I'm adding a different font for UI elements, I'll create a custom font jus
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(defface variable-pitch-ui `((t :font ,(font-spec :family "Roboto" :size 16)))
-  "Extra face used on UI elements.")
+(defface my-default-mono `((t :font ,(font-spec :family "RobotoMono Nerd Font"
+                                                :size 15)))
+  "Default monospaced font used on majority of the buffers."
+  :group 'my-typography)
+
+(defface my-big-face-mono `((t :font ,(font-spec :family "RobotoMono Nerd Font"
+                                                 :size 26)))
+  "Monospaced font used on presentation mode."
+  :group 'my-typography)
+
+(defface my-default-ui `((t :font ,(font-spec :family "Roboto"
+                                              :size 16)))
+  "Extra face used on UI elements."
+  :group 'my-typography)
+
+(defface my-ui-window-header `((t :inherit my-default-ui
+                                  :height 0.8))
+  "Face used on decorative buffer headers."
+  :group 'my-typography)
+
+(defface my-default-prose `((t :font ,(font-spec :family "iA Writer Quattro V"
+                                                 :size 18)))
+  "Default variable pitch font used on prose writing."
+  :group 'my-typography)
+
+(defface my-document-title `((t :inherit my-default-prose
+                                :height 2.4
+                                :weight light
+                                :slant normal))
+  "Face used for document titles."
+  :group 'my-typography)
+
+(defface my-headline-1 `((t :inherit my-default-prose
+                            :height 2.0
+                            :weight semi-light
+                            :slant normal))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-2 `((t :inherit my-default-prose
+                            :height 1.8
+                            :weight semi-light
+                            :slant italic))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-3 `((t :inherit my-default-prose
+                            :height 1.6
+                            :weight semi-light
+                            :slant normal))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-4 `((t :inherit my-default-prose
+                            :height 1.4
+                            :weight semi-light
+                            :slant italic))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-5 `((t :inherit my-default-prose
+                            :height 1.3
+                            :weight bold
+                            :slant normal))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-6 `((t :inherit my-default-prose
+                            :height 1.2
+                            :weight bold
+                            :slant italic))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-7 `((t :inherit my-default-prose
+                            :height 1.1
+                            :weight bold
+                            :slant normal))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
+
+(defface my-headline-8 `((t :inherit my-default-prose
+                            :height 1.0
+                            :weight bold
+                            :slant italic))
+  "Face used for headlines of level 1."
+  :group 'my-typography)
 #+end_src
 
-I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =variable-pitch-ui= when we need it down the road):
+
+
+I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =my-default-ui= when we need it down the road):
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "iMWritingMonoS Nerd Font" :size 14 :weight 'semi-light)
-      doom-big-font (font-spec :family "iMWritingMonoS Nerd Font" :size 32 :weight 'semi-light)
-      doom-variable-pitch-font (font-spec :family "iA Writer Quattro V" :size 18)
-      )
+(setq doom-font (face-attribute 'my-default-mono :font)
+      doom-big-font (face-attribute 'my-big-face-mono :font)
+      doom-variable-pitch-font (face-attribute 'my-default-prose :font))
 #+end_src
-
 
 #+begin_src emacs-lisp
 (custom-set-faces!
   '(font-lock-comment-face :inherit fixed-pitch))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq ns-use-thin-smoothing t)
 #+end_src
 
 Rainbow mode
@@ -1658,40 +1878,6 @@ either white or black."
                                "white" "black"))
              (:background ,color)
              (:inherit fixed-pitch)))))
-#+end_src
-
-Mixed pitch
-
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! mixed-pitch)
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! mixed-pitch
-  :defer t
-  :init
-  (add-hook! (Info-mode lexic-mode)
-    (defun my-mixed-pitch-setup-h ()
-      (mixed-pitch-mode 1)
-      (let ((var-pitch (face-attribute 'variable-pitch :family))
-            (var-height (face-attribute 'variable-pitch :height))
-            (fix-pitch (face-attribute 'default :family))
-            (fix-height (face-attribute 'default :height)))
-        (setq mixed-pitch-variable-cookie
-              (face-remap-add-relative 'default
-                                       :family var-pitch
-                                       :height var-height))
-        (setq mixed-pitch-fixed-cookie nil)
-        ;; keep fonts in `mixed-pitch-fixed-pitch-faces' as fixed-pitch.
-        (dolist (face mixed-pitch-fixed-pitch-faces)
-          (add-to-list 'mixed-pitch-fixed-cookie
-                       (face-remap-add-relative face
-                                                :family fix-pitch
-                                                :height fix-height))))))
-  :config
-  (setq mixed-pitch-fixed-pitch-faces (append mixed-pitch-fixed-pitch-faces '(font-lock-comment-face))))
 #+end_src
 
 Info
@@ -1717,44 +1903,37 @@ Info
             (Info-fontify-reference-items-flag nil)
             (Info-fontify-visited-nodes nil))
         (call-interactively 'Info-toggle-fontify-all)))))
-
-;; (add-hook! 'Info-selection-hook 'info-colors-fontify-node)
 #+end_src
 
 #+begin_src emacs-lisp
 (after! info
-  (custom-theme-set-faces! 'doom-one
-    `(info-title-1 :foreground ,(doom-color 'blue 256)
-                   :height 2.0
-                   :weight normal
-                   :slant normal
-                   :inherit variable-pitch)
-    `(info-title-2 :foreground ,(doom-color 'magenta 256)
-                   :height 1.8
-                   :weight normal
-                   :slant italic
-                   :inherit variable-pitch)
-    `(info-title-3 :foreground ,(doom-color 'violet 256)
-                   :height 1.6
-                   :weight normal
-                   :slant italic
-                   :inherit variable-pitch)
-    `(info-title-4 :foreground ,(doom-color 'light-blue 256)
-                   :height 1.4
-                   :weight bold
-                   :slant normal
-                   :inherit variable-pitch)
-    `(info-menu-header :foreground ,(doom-color 'magenta 256)
-                       :height 1.3
-                       :weight bold
-                       :slant normal
-                       :inherit variable-pitch)
+  (custom-set-faces!
+    `(info-title-1 :inherit my-headline-1
+                   ;; :foreground ,(face-attribute 'outline-1 :foreground)
+                   :weight unspecified
+                   :slant unspecified)
+    `(info-title-2 :inherit my-headline-2
+                   ;; :foreground ,(face-attribute 'outline-2 :foreground)
+                   :weight unspecified
+                   :slant unspecified)
+    `(info-title-3 :inherit my-headline-3
+                   ;; :foreground ,(face-attribute 'outline-3 :foreground)
+                   :weight unspecified
+                   :slant unspecified)
+    `(info-title-4 :inherit my-headline-4
+                   ;; :foreground ,(face-attribute 'outline-4 :foreground)
+                   :weight unspecified
+                   :slant unspecified)
+    `(info-menu-header :inherit my-headline-5
+                       ;; :foreground ,(face-attribute 'info-menu-header :foreground)
+                       :weight unspecified
+                       :slant unspecified)
     `(info-quoted-name :inherit font-lock-constant-face)
     `(info-isolated-quote :inherit info-quoted-name)
     `(info-isolated-backquote :inherit info-quoted-name)
-    `(info-glossary-word :foreground ,(doom-color 'yellow 256)
-                         :background ,(doom-color 'yellow-bg 256)
-                         :box (:line-width (4 . 1) :color ,(doom-color 'yellow-bg 256) :style nil)
+    `(info-glossary-word :foreground ,(doom-color 'type 256)
+                         :background ,(doom-darken 'type 0.7)
+                         :box (:line-width (4 . 1) :color ,(doom-darken 'type 0.7) :style nil)
                          :inherit fixed-pitch)
     `(link-visited :foreground ,(doom-color 'violet 256))
     `(info-double-quoted-name :inherit font-lock-string-face)
@@ -1775,7 +1954,13 @@ Info
            )))) t))
 #+end_src
 
-*** Iconography
+*** Iconography ✅
+Doom offers the =all-the-icons= package, which allow one to insert Unicode glyphs on buffers. That is a great start, but the problem I see here is how inconsistent the size of these icons are.
+
+The idea for this section is to create a list of curated icons, adjusted to occupy exactly 2 ASCII characters on the buffer. This allows for a better alignment of text when we use an Icon.
+
+I will create an /Association List/ to store symbols associated with an adjusted icon:
+
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defconst my-supported-icons
@@ -1812,6 +1997,8 @@ Info
   "Property list with all supported icons from my configuration.")
 #+end_src
 
+In order to allow other parts of this configuration to leverage the curated icons, I'll create a predicate function to  check if a given symbol has an icon associated with it:
+
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
@@ -1822,12 +2009,14 @@ Info
        (plist-member my-supported-icons icon)))
 #+end_src
 
+I want to also creat a thin-wrapper around the ~plist-get~ to retrieve the icon string for a given symbol:
+
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
-(defun my-get-raw-icon (icon)
-  "This function returns the requested ICON as if you're calling
-the `all-the-icons-'* functions directly.
+(defun my-raw-icon (icon)
+  "This function returns the requested ICON as if you're calling the
+`all-the-icons-'* functions directly.
 
 Icons supported by this function were all optimized to use exactly 2 characters
 of space when used with the font and size defined in the main configuration.
@@ -1837,24 +2026,25 @@ icons."
   (plist-get my-supported-icons icon))
 #+end_src
 
+And to finalize my icons configuration, I need to expose a function where one (me in this case) will call it to get a curated icon with a given color (this is the only function in this section that a user should call to get an icon).
+
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
-(defun my-get-icon (icon &optional color)
-  "This function returns the requested ICON as a 2-characters
-string, propertized to dieplsy the associated icon frorm the
-`all-the-icons' package. It uses the COLOR arg to 'paint' the
-icon.
+(defun my-icon (icon &optional color)
+  "This function returns the requested ICON as a 2-characters string,
+propertized to display the associated icon from the `all-the-icons' package. It
+uses the COLOR arg to 'paint' the icon.
 
-Check documentation of the function `my-get-raw-icon' for a
-list of supported icons."
-  (cond ((eq color 'raw) (my-get-raw-icon icon))
+Check documentation of the function `my-raw-icon' for a list of supported
+icons."
+  (cond ((eq color 'raw) (my-raw-icon icon))
         (color (propertize "--"
                    'face `(:foreground ,color)
-                   'display (my-get-raw-icon icon)))
+                   'display (my-raw-icon icon)))
         (t (propertize "--"
                    'face `(:foreground ,(face-attribute 'default :foreground))
-                   'display (my-get-raw-icon icon)))))
+                   'display (my-raw-icon icon)))))
 #+end_src
 
 ** TODO Editor Tabs
@@ -1869,12 +2059,12 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
   :when window-system
   :hook ((after-init . global-tab-line-mode))
   :init
-  (defcustom tab-line-tab-min-width 10
+  (defcustom tab-line-tab-min-width 20
     "Minimum width of a tab in characters."
     :type 'integer
     :group 'tab-line)
 
-  (defcustom tab-line-tab-max-width 35
+  (defcustom tab-line-tab-max-width 60
     "Maximum width of a tab in characters."
     :type 'integer
     :group 'tab-line)
@@ -1978,10 +2168,10 @@ https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-ato
 (defadvice! my-tabs-close-tab-a (&optional mouse-event)
   "Close the selected tab.
 
-If tab is presented in another window, close the tab by using
-`bury-buffer' function. If tab is unique to all existing windows,
-kill the buffer with `kill-buffer' function. Lastly, if no tabs
-left in the window, it is deleted with `delete-window' function."
+If buffer on tab is present in another window, close the tab by using
+`bury-buffer' function. If buffer on tab is unique to all existing windows, kill
+the buffer with `kill-buffer' function. Lastly, if no tabs left in the window,
+it will delete it with `delete-window' function."
   :override 'tab-line-close-tab
   (let* ((posnp (and mouse-event (event-start mouse-event)))
          (window (and posnp (posn-window posnp)))
@@ -1998,12 +2188,11 @@ left in the window, it is deleted with `delete-window' function."
 (defun my-tabs-name-buffer (buffer &rest _buffers)
   "Create name for tab with padding and truncation.
 
-If buffer name is shorter than `tab-line-tab-max-width' it gets
-centered with spaces, otherwise it gets truncated, to preserve
-equal width for all tabs. This function also tries to fit as many
-tabs in window as possible, so if there are no room for tabs with
-maximum width, it calculates new width for each tab and truncates
-text if needed. You can set the minimal width with
+If buffer name is shorter than `tab-line-tab-max-width' it gets centered with
+spaces, otherwise it gets truncated, to preserve equal width for all tabs. This
+function also tries to fit as many tabs in window as possible, so if there are
+no room for tabs with maximum width, it calculates new width for each tab and
+truncates text if needed. You can set the minimal width with
 `tab-line-tab-min-width' variable."
   (with-current-buffer buffer
     (let* ((window-width (window-width (get-buffer-window)))
@@ -2032,21 +2221,33 @@ text if needed. You can set the minimal width with
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs-mode-persp-window ()
-  (let ((win-buffs (tab-line-tabs-window-buffers)))
+  "Return a list of buffers that should have a tab for them.
+
+This functio treat 2 kinds of buffers differentely than the others. The first
+are org-capture buffers, which should never have a tab associated with them. And
+the second, dired buffers. Dired buffers should always have just the last buffer
+displayed on the tab line."
+  (let ((win-buffs (tab-line-tabs-window-buffers))
+        (last-dired-buf (seq-find 'doom-dired-buffer-p (buffer-list (selected-frame)))))
     (reverse (seq-filter (lambda (buf)
                            (let ((buf-name (buffer-name buf)))
                              (and (member buf win-buffs)
                                   (doom-real-buffer-p buf)
-                                  (not (string-prefix-p buf-name "CAPTURE-")))))
+                                  (not (string-prefix-p buf-name "CAPTURE-"))
+                                  (or (not (doom-dired-buffer-p buf))
+                                      (eq buf last-dired-buf)))))
                          (and (fboundp 'persp-current-buffers)
                               (persp-current-buffers))))))
-
 #+end_src
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs-hide-tab-line-maybe-h ()
+  "Disable `tab-line-modee' for non-real buffers.
+
+For a definition of what is a non-real buffer, check the documentation of
+`doom-real-buffer-p'."
   (when (not (doom-real-buffer-p (current-buffer)))
     (tab-line-mode -1)))
 #+end_src
@@ -2115,6 +2316,7 @@ than the number of tabs, return nil."
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun my-tabs--setup-faces-h ()
+  "Configure the `tab-line-mode' user interface."
   (let* ((base (if (and (facep 'solaire-default-face)
                         (not (eq (face-attribute 'solaire-default-face :background) 'unspecified)))
                    (face-attribute 'default :background)
@@ -2130,41 +2332,33 @@ than the number of tabs, return nil."
          (box-base (when (> box-width 0) (list :line-width box-width :color base)))
          (box-bg (when (> box-width 0) (list :line-width box-width :color bg))))
     (set-face-attribute 'tab-line nil
-                        :font "RobotoMono Nerd Font"
                         :background base
                         :foreground dark-fg
-                        :height 0.9
-                        :inherit nil
                         :overline base
+                        :inherit 'my-default-ui
                         :box box-base)
     (set-face-attribute 'tab-line-tab nil
-                        :font "RobotoMono Nerd Font"
                         :foreground dark-fg
                         :background bg
-                        :inherit nil
+                        :inherit 'my-default-ui
                         :box box-bg)
     (set-face-attribute 'tab-line-tab-inactive nil
-                        :font "RobotoMono Nerd Font"
                         :foreground dark-fg
                         :background base
-                        :inherit nil
+                        :inherit 'my-default-ui
                         :box box-base)
     (set-face-attribute 'tab-line-tab-current nil
-                        :font "RobotoMono Nerd Font"
-                        :font "RobotoMono Nerd Font"
                         :foreground fg
                         :background bg
-                        :inherit nil
+                        :inherit 'my-default-ui
                         :overline overline
                         :box box-bg)
     (set-face-attribute 'tab-line-highlight nil
-                        :font "RobotoMono Nerd Font"
                         :foreground fg
                         :background nil
                         :inherit 'tab-line-tab
                         :box box-bg)
     (set-face-attribute 'tab-line-close-highlight nil
-                        :font "RobotoMono Nerd Font"
                         :foreground overline
                         :background nil
                         :inherit 'tab-line-tab
@@ -2175,6 +2369,7 @@ than the number of tabs, return nil."
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-tabs-select-tab-a (&optional e)
+  "Advice to select the buffer window of a tab when clicking on the tab."
   :after 'tab-line-select-tab
   (select-window (posn-window (event-start e))))
 #+end_src
@@ -2314,10 +2509,11 @@ TBD
             Info-mode
             lexic-mode)
   (defun my-popup-format-info-side-pannel-h ()
-    (setq writeroom-width 90)
+    (setq writeroom-width 70)
     (+zen/toggle)
     (tab-line-mode -1)
-    (hl-line-mode -1)))
+    ;; (hl-line-mode -1)
+    ))
 #+end_src
 
 * Temporary workarounds
@@ -2417,8 +2613,7 @@ So, while you can’t get different faces for different components, you can at l
 #+begin_src emacs-lisp :tangle autoload/editor.el
 ;;;###autoload
 (defadvice! my-orderless-match-with-one-face-a (fn &rest args)
-  "Function to help company to highlight all candidates with just
-one face."
+  "Function to help company to highlight all candidates with just one face."
   :around 'company-capf--candidates
   (let ((orderless-match-faces [completions-common-part]))
     (apply fn args)))
@@ -2601,23 +2796,20 @@ Now we need to configure each one of this packages. Let's start with the main =c
     [remap view-register]                 #'consult-register
     [remap yank-pop]                      #'consult-yank-pop)
 
-  (map! :leader
+  (map! (:leader
+         :desc "Show mode commands" :n "M-x" #'consult-mode-command
 
-        :desc "Show mode commands" :n "M-x" #'consult-mode-command
+         (:prefix ("s" . "search")
+          :desc "Jump to mark globally" :n "R" #'consult-global-mark)
 
-        (:prefix ("s" . "search")
-         :desc "Jump to mark globally" :n "R" #'consult-global-mark)
+         (:prefix ("f" . "find")
+          :desc "Find project file" :n "o" #'consult-find
 
-        (:prefix ("f" . "find")
-         :desc "Find project file" :n "o" #'consult-find
+          (:prefix ("i" . "inside")
+           :desc "Find inside file" :n "f" #'consult-lines
+           :desc "Find inside file (focus)" :n "F" #'consult-focus-lines)))
 
-         (:prefix ("i" . "inside")
-          :desc "Find inside file" :n "f" #'consult-lines
-          :desc "Find inside file (focus)" :n "F" #'consult-focus-lines))
-
-        (:map outline-map
-         :localleader
-         :prefix ("s" . "tree/subtree")
+        (:map outline-mode-map :localleader :prefix ("s" . "tree/subtree")
          :desc "Search outline"  "o" #'consult-outline))
 
   :config
@@ -2652,6 +2844,7 @@ At this point, our configuration is matching the standard =ivy= + =counsel= duo.
 ;;;###autoload
 (defadvice! my-extended-search-project-a (&optional arg)
   "Conduct a text search in the current project root.
+
 If prefix ARG is set, include ignored/hidden files."
   :override '+default/search-project
   (interactive "P")
@@ -2676,6 +2869,7 @@ If prefix ARG is set, include ignored/hidden files."
 ;;;###autoload
 (defadvice! my-extended-search-cwd-a (&optional arg)
   "Conduct a text search in files under the current folder.
+
 If prefix ARG is set, prompt for a directory to search from."
   :override '+default/search-cwd
   (interactive "P")
@@ -2695,6 +2889,7 @@ If prefix ARG is set, prompt for a directory to search from."
 ;;;###autoload
 (cl-defun my-selectrum-file-search (&key query in all-files (recursive t) prompt args)
   "Conduct a file search using ripgrep.
+
 :query STRING
   Determines the initial input to search for.
 :in PATH
@@ -2879,10 +3074,11 @@ Don't forget to close the =use-package!= sexp:
 ;;;###autoload
 (defun project-bookmark-completing-read (prompt &optional default)
   "Prompting with PROMPT, read a bookmark name in completion.
-PROMPT will get a \": \" stuck on the end no matter what, so you
-probably don't want to include one yourself.
-Optional arg DEFAULT is a string to return if the user input is empty.
-If DEFAULT is nil then return empty string for empty input."
+
+PROMPT will get a \": \" stuck on the end no matter what, so you probably don't
+want to include one yourself. Optional arg DEFAULT is a string to return if the
+user input is empty. If DEFAULT is nil then return empty string for empty
+input."
   (bookmark-maybe-load-default-file)    ; paranoia
   (if (listp last-nonmenu-event)
       (bookmark-menu-popup-paned-menu t prompt
@@ -2910,15 +3106,15 @@ If DEFAULT is nil then return empty string for empty input."
 ;;;###autoload
 (defun project-bookmark-jump (bookmark &optional display-func)
   "Jump to bookmark BOOKMARK (a point in some file).
-You may have a problem using this function if the value of variable
-`bookmark-alist' is nil.  If that happens, you need to load in some
-bookmarks.  See help on function `bookmark-load' for more about
-this.
 
-If the file pointed to by BOOKMARK no longer exists, you will be asked
-if you wish to give the bookmark a new location, and `bookmark-jump'
-will then jump to the new location, as well as recording it in place
-of the old one in the permanent bookmark record.
+You may have a problem using this function if the value of variable
+`bookmark-alist' is nil. If that happens, you need to load in some bookmarks.
+See help on function `bookmark-load' for more about this.
+
+If the file pointed to by BOOKMARK no longer exists, you will be asked if you
+wish to give the bookmark a new location, and `bookmark-jump' will then jump to
+the new location, as well as recording it in place of the old one in the
+permanent bookmark record.
 
 BOOKMARK is usually a bookmark name (a string).  It can also be a
 bookmark record, but this is usually only done by programmatic callers.
@@ -2969,9 +3165,8 @@ DISPLAY-FUNC would be `switch-to-buffer-other-window'."
 ;;;###autoload
 (defun persp-switch-to-real-buffer* (buffer-or-name)
   "Like `switch-to-buffer', restricted to the current perspective.
-This respects ido-ignore-buffers, since we automatically add
-buffer filtering to ido-mode already (see use of
-PERSP-SET-IDO-BUFFERS)."
+This respects ido-ignore-buffers, since we automatically add buffer filtering to
+ido-mode already (see use of PERSP-SET-IDO-BUFFERS)."
   (interactive
    (list
     (if (or current-prefix-arg (not persp-mode))
@@ -3000,12 +3195,11 @@ PERSP-SET-IDO-BUFFERS)."
 (defun persp-consult-buffer ()
   "Enhanced `switch-to-buffer' command with support for perspectives.
 
-The command supports recent files, bookmarks, views and project
-files as virtual buffers. Buffers are previewed. Furthermore
-narrowing to buffers (b), files (f), bookmarks (m), views (v) and
-project files (p) is supported via the corresponding keys. In
-order to determine the project-specific files and buffers, the
-`consult-project-root-function' is used. The list of available
+The command supports recent files, bookmarks, views and project files as virtual
+buffers. Buffers are previewed. Furthermore narrowing to buffers (b), files (f),
+bookmarks (m), views (v) and project files (p) is supported via the
+corresponding keys. In order to determine the project-specific files and
+buffers, the `consult-project-root-function' is used. The list of available
 views is obtained by calling `consult-view-list-function'."
   (interactive)
   (require 'consult)
@@ -3016,8 +3210,8 @@ views is obtained by calling `consult-view-list-function'."
 (defun persp-consult--buffer (open-buffer open-file open-bookmark)
   "Backend implementation of `consult-buffer'.
 
-Depending on the selected item OPEN-BUFFER, OPEN-FILE or
-OPEN-BOOKMARK will be used to display the item."
+Depending on the selected item OPEN-BUFFER, OPEN-FILE or OPEN-BOOKMARK will be
+used to display the item."
   (let* ((curr-buf (current-buffer))
          (all-bufs (append (delq curr-buf (persp-current-real-buffers)) (list curr-buf)))
          (buf-file-hash (let ((ht (make-hash-table :test #'equal :size (length all-bufs))))
@@ -3223,12 +3417,11 @@ With the faces defined, we can create a helper function to build the tab bar str
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
 (defun +workspace--tabline (&optional names)
-  "Returns the given NAMES list as a propertied string
-representing each name as a tab for the current workspace
-session. If an item on the NAMES list matches the current
-workspace name, it will represent this item as a selected
-item."
+  "Returns the given NAMES list as a propertied string representing each name as a
+tab for the current workspace session. If an item on the NAMES list matches the
+current workspace name, it will represent this item as a selected item."
   (let ((names (or names (reverse (persp-names))))
         (current-name (persp-current-name)))
     (mapconcat
@@ -3335,22 +3528,24 @@ Then we can add the function to resolve a workspace name from any type of refere
 (defun +workspace-name-from-reference (ref)
   "Returns the name of a workspace referenced by REF.
 
-REF can be a perspective object, a string name, a string number,
-a positive number, or a negative number. How it retrieves the
-workspace name depends on the value of REF:
+REF can be a perspective object, a string name, a string number, a positive
+number, or a negative number. How it retrieves the workspace name depends on the
+value of REF:
 
 Perspective object - it access the `CL-X->name' from the object;
-String name - return the same value if a workspace with that name
-  exists;
-String number - parse the number and get the workspace name from
-  the index representing the parsed number;
-Positive number - get the workspace name from the index
-  representing the giving number;
-Negative number - Access the workspace index from the end to the
-  start too retrieve the correct workspace;
 
-If REF does not match a current workspace in any way, it
-returns nil."
+String name - return the same value if a workspace with that name exists;
+
+String number - parse the number and get the workspace name from the index
+  representing the parsed number;
+
+Positive number - get the workspace name from the index representing the giving
+  number;
+
+Negative number - Access the workspace index from the end to the start too
+  retrieve the correct workspace;
+
+If REF does not match a current workspace in any way, it returns nil."
   (cond ((perspective-p ref) (persp-name ref))
         ((numberp ref) (+workspace-name-from-index ref t))
         ((stringp ref) (cond ((+workspace-exists-p ref) ref)
@@ -3362,16 +3557,15 @@ This last function needs another helper one, to make sure it returns the correct
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
 (defun +workspace-name-from-index (index &optional noerror)
   "Return the workspace name on INDEX.
 
-This function throw an error if there is no workspace on INDEX.
-If you pass a non-nil value to NOERROR, it will return nil when
-it can't find a workspace.
+This function throw an error if there is no workspace on INDEX. If you pass a
+non-nil value to NOERROR, it will return nil when it can't find a workspace.
 
-When INDEX is negative, it access the workspace on the reverse
-order (e.g. on a 4 workspaces session, -1 access the workspace on
-index 3)."
+When INDEX is negative, it access the workspace on the reverse order (e.g. on a
+4 workspaces session, -1 access the workspace on index 3)."
   (or (when-let ((is-number (numberp index))
                  (names (reverse (persp-names)))
                  (len (length names))
@@ -3468,23 +3662,21 @@ Since we already have a function to display the tabs for us, lets use that funct
   "Returns a propertied string representing a workspace
 message.
 
-A workspace message consist of a 'tab line' representation of the
-workspace session, with the given TEXT concatenated after it.
+A workspace message consist of a 'tab line' representation of the workspace
+session, with the given TEXT concatenated after it.
 
-The text color changes depending of TYPE passed. If we omit the
-TYPE, the function assumes this message is an 'info message.
+The text color changes depending of TYPE passed. If we omit the TYPE, the
+function assumes this message is an 'info message.
 
-We associate the message color to the respective font faces,
-which are:
+We associate the message color to the respective font faces, which are:
 
 - 'info
 - 'success
 - 'warn
 - 'error
 
-The only TYPE that does not have a direct font face
-representation is 'info, which uses the `font-lock-comment-face'
-font face."
+The only TYPE that does not have a direct font face representation is 'info,
+which uses the `font-lock-comment-face' font face."
   (concat (+workspace--tabline)
           (propertize " | " 'face 'font-lock-comment-face)
           (propertize (format "%s" text)
@@ -3502,13 +3694,11 @@ With this last function we can implement a generic message function that we can 
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace-message (text &optional type)
-  "Displays the given TEXT message on the echo area, formatted as
-a workspace message (see `+workspace--message-body' for details
-on the formatting) of the given TYPE. When type is 'error, if
-thee INTERNAL argument is a non-nil value, the message will use
-the `persp-error' function print it, and when it is nil, it uses
-the `error' function. Otherwise, it uses the normal `message'
-function."
+  "Displays the given TEXT message on the echo area, formatted as a workspace
+message (see `+workspace--message-body' for details on the formatting) of the
+given TYPE. When type is 'error, if thee INTERNAL argument is a non-nil value,
+the message will use the `persp-error' function print it, and when it is nil, it
+uses the `error' function. Otherwise, it uses the normal `message' function."
   (cond ((eq type 'error) (error text))
         ((eq type 'user-error) (user-error text))
         ((eq type 'internal-error) (persp-error text))
@@ -3728,8 +3918,8 @@ Pretty straightforward, but we still need the low-level function that actually r
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-rename (name new-name)
-  "Rename the current workspace named NAME to NEW-NAME. Returns
-old name on success, nil otherwise."
+  "Rename the current workspace named NAME to NEW-NAME. Returns old name on
+success, nil otherwise."
   (cond ((+workspace--protected-p name) (+workspace-error "Can't rename `%s' workspace" name))
         ((not (+workspace-get name)) (+workspace-error "Perspective `%s' does not exists" name))
         ((+workspace-get new-name) (+workspace-error "Perspective `%s' already exists" new-name))
@@ -3752,8 +3942,8 @@ And to make these validations we still need a function we didn't implement yet:
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-get (name &optional noerror)
-  "return a workspace named name. Unless NOERROR is non-nil, this
-throws an error if name doesn't exist."
+  "return a workspace named name. Unless NOERROR is non-nil, this throws an error
+if name doesn't exist."
   (cl-check-type name string)
   (when-let (persp (gethash name (perspectives-hash)))
     (cond ((perspective-p persp) persp)
@@ -3776,8 +3966,8 @@ We will start with the ability to delete a single workspace:
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/delete (name)
-  "Delete workspace named NAME. If called with C-U, prompts you
-for the name of the workspace to delete."
+  "Delete workspace named NAME. If called with C-U, prompts you for the name of
+the workspace to delete."
   (interactive
    (let ((current-name (persp-current-name)))
      (list (if current-prefix-arg
@@ -3801,8 +3991,8 @@ The command function simply allows us to select which workspace to delete, or it
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-delete (workspace)
-  "Delete the workspace denoted by WORKSPACE, which can be the
-name of a workspace, its index, or the workspace object itself."
+  "Delete the workspace denoted by WORKSPACE, which can be the name of a
+workspace, its index, or the workspace object itself."
   (let ((ws-name (+workspace-name-from-reference workspace)))
     (unless ws-name
       (+workspace-error "Can't find a workspace for the reference '%s'" workspace))
@@ -3856,8 +4046,8 @@ On the next sections in this document, we will configure session persistance, an
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defvar +workspace--auto-save-session-p t
-  "Flag used to determine if Emacs should automatically save the
-  current session when we quit.")
+  "Flag used to determine if Emacs should automatically save the current session
+when we quit.")
 #+end_src
 
 And now, we can have our last command on the /delete/ category to flag Emacs to not save current session when quitting. This way, if we wants to quit and save the current session, we simply quit Emacs, and if we want to discard the current session, we invoke the /delete session and quit/ command:
@@ -3890,8 +4080,7 @@ With that out of the way, let's jump right into the first command:
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/save-session (name)
-  "Save the current workspace with the given NAME as its
-identifier."
+  "Save the current workspace with the given NAME as its identifier."
   (interactive
    (list (completing-read "Save workspace session to file: "
                           (mapcar
@@ -3916,15 +4105,15 @@ We still need to code our low level  function to save a workspace:
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-session-save (&optional identifier force interactive?)
-  "Saves the workspace session to a file named IDENTIFIER located
-on the `+workspaces-data-dir' directory. We can load a saved
-session with `+workspace-load'.
+  "Saves the workspace session to a file named IDENTIFIER located on the
+`+workspaces-data-dir' directory. We can load a saved session with
+`+workspace-load'.
 
-If we call this function without a IDENTIFIER, we will generate a
-name using the current time, and the format \"%Y-%0m-%0d-%0H-%0M\".
+If we call this function without a IDENTIFIER, we will generate a name using the
+current time, and the format \"%Y-%0m-%0d-%0H-%0M\".
 
-If FORCE is non nil, this function will overwrite the session
-file if it is already present in the system.
+If FORCE is non nil, this function will overwrite the session file if it is
+already present in the system.
 
 Returns t on success, nil otherwise."
   (when-let ((fname (+workspace-resolve-session-file-path identifier))
@@ -3940,13 +4129,11 @@ We will make sure that the most complex part of this function goes to another fu
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-resolve-session-file-path (&optional name)
-  "Returns the full path for a session file name given a NAME
-identifier.
+  "Returns the full path for a session file name given a NAME identifier.
 
-If we omit the NAME, we will use the current time with the
-format \"%Y-%0m-%0d-%0H-%0M\" (see `format-time-string' for
-information about the format), if NAME is not a string nor nil,
-we throw an error."
+If we omit the NAME, we will use the current time with the format
+\"%Y-%0m-%0d-%0H-%0M\" (see `format-time-string' for information about the
+format), if NAME is not a string nor nil, we throw an error."
   (unless (string-or-null-p name)
     (+workspace-error "Invalid name! Argument '%s' is not string or nil" name))
   (expand-file-name (format "%s%s.dws"
@@ -3968,8 +4155,8 @@ Let's add these variables to our autoload file:
 
 ;;;###autoload
 (defvar +workspaces-data-file-prefix "_workspaces_"
-  "The file name prefix of files used to store a workspace
-session. We will store these file at `+workspaces-data-dir'.")
+  "The file name prefix of files used to store a workspace session. We will store
+these file at `+workspaces-data-dir'.")
 #+end_src
 
 And now we can add the command to its key:
@@ -4014,9 +4201,8 @@ As usual, lets get our low-level API coded as well:
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-session-load (name)
-  "Loads a workspace session identified by NAME. Can only
-retrieve workspace sessions that were explicitly saved with
-`+workspace-session-save'.
+  "Loads a workspace session identified by NAME. Can only retrieve workspace
+sessions that were explicitly saved with `+workspace-session-save'.
 
 Returns t if successful, nil otherwise."
   (persp-state-load (+workspace-resolve-session-file-path name))
@@ -4049,8 +4235,7 @@ And we need a function to restore the last saved session:
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/restore-last-session ()
-  "Tries to load the 'auto-saved' session from last time we used
-  Emacs."
+  "Tries to load the 'auto-saved' session from last time we used Emacs."
   (interactive)
   (condition-case err
       (let ((as-file (+workspace-resolve-session-file-path +workspaces-auto-save-identifier)))
@@ -4119,9 +4304,9 @@ This will delete the current workspace if closing the last open window. But we s
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defun +workspace/close-window-or-workspace ()
-  "Close the selected window. If it's the last window in the
-workspace, either close the workspace (as well as its associated
-frame, if one exists) and move to the next."
+  "Close the selected window. If it's the last window in the workspace, either
+close the workspace (as well as its associated frame, if one exists) and move to
+the next."
   (interactive)
   (condition-case err
       (if (cdr (my-tabs-mode-persp-window))
@@ -4226,7 +4411,7 @@ The first thing I like to do, is to create some variables pointing to key locati
 #+begin_src emacs-lisp
 (setq writeroom-mode-line       t
       +zen-window-divider-size  2
-      +zen-text-scale           0)
+      +zen-text-scale           1)
 #+end_src
 
 #+caption: config.el
@@ -4264,48 +4449,39 @@ Now we can wait Org to load to  continue our configuration:
 ;;;###autoload
 (defun my-adjust-outline-fonts-h ()
   (after! outline
-    (custom-theme-set-faces! 'doom-one
-     `(outline-1 :foreground ,(doom-color 'blue 256)
-                 :height 1.8
-                 :weight normal
-                 :slant normal
-                 :inherit variable-pitch)
-     `(outline-2 :foreground ,(doom-color 'magenta 256)
-                 :height 1.6
-                 :weight normal
-                 :slant italic
-                 :inherit variable-pitch)
-     `(outline-3 :foreground ,(doom-color 'violet 256)
-                 :height 1.4
-                 :weight normal
-                 :slant italic
-                 :inherit variable-pitch)
-     `(outline-4 :foreground ,(doom-color 'light-blue 256)
-                 :height 1.4
-                 :weight bold
-                 :slant normal
-                 :inherit variable-pitch)
-     `(outline-5 :foreground ,(doom-color 'bright-violet 256)
-                 :height 1.2
-                 :weight bold
-                 :slant normal
-                 :inherit variable-pitch)
-     `(outline-6 :foreground ,(doom-color 'bright-blue 256)
-                 :height 1.2
-                 :weight bold
-                 :slant normal
-                 :inherit variable-pitch)
-     `(outline-7 :foreground ,(doom-color 'bright-magentann/ 256)
-                 :height 1.1
-                 :weight bold
-                 :slant normal
-                 :inherit variable-pitch)
-     `(outline-8 :foreground ,(doom-color 'bright-light-blue 256)
-                 :height 1.1
-                 :weight bold
-                 :slant normal
-                 :inherit variable-pitch))
-))
+    (custom-set-faces!
+     `(outline-1 :inherit my-headline-1
+                 ;; :foreground ,(face-attribute 'outline-1 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-2 :inherit my-headline-2
+                 ;; :foreground ,(face-attribute 'outline-2 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-3 :inherit my-headline-3
+                 ;; :foreground ,(face-attribute 'outline-3 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-4 :inherit my-headline-4
+                 ;; :foreground ,(face-attribute 'outline-4 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-5 :inherit my-headline-5
+                 ;; :foreground ,(face-attribute 'outline-5 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-6 :inherit my-headline-6
+                 ;; :foreground ,(face-attribute 'outline-6 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-7 :inherit my-headline-7
+                 ;; :foreground ,(face-attribute 'outline-7 :foreground)
+                 :weight unspecified
+                 :slant unspecified)
+     `(outline-8 :inherit my-headline-8
+                 ;; :foreground ,(face-attribute 'outline-8 :foreground)
+                 :weight unspecified
+                 :slant unspecified))))
 #+end_src
 
 #+caption: config.el
@@ -4409,7 +4585,7 @@ In some documents, I need to write math formulas and Org can render them pretty 
 (defun my-adjust-org-fonts-h ()
   (after! org
     (custom-set-faces!
-      '(org-document-title :height 2.0 :weight light :inherit variable-pitch)
+      '(org-document-title :height unspecified :weight unspecified :slant unspecified :inherit my-document-title)
       '(org-document-info :inherit fixed-pitch)
       '(org-document-info-keyword :inherit fixed-pitch)
       '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
@@ -4484,7 +4660,11 @@ Then, we use =use-package!= to defer its loading (we will load it manually later
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(use-package! org-fragtog :defer t)
+(use-package! org-fragtog
+  :defer t
+  :init
+  (add-hook! evil-insert-state-entry (org-fragtog-mode 1))
+  (add-hook! evil-insert-state-exit (org-fragtog-mode -1)))
 #+end_src
 
 Another nice plugin to have is the =valign= plugin. It will align your Org tables nicely, even when you have formulas and images on them.
@@ -4526,7 +4706,8 @@ To fix this behavior, we just need to re-bind some of the movement keys to the /
        :nv "0" #'evil-beginning-of-visual-line
        :nvm "^" #'evil-first-non-blank-of-visual-line
        :nvm "$" #'evil-end-of-visual-line
-       (:prefix "g"
+
+       (:prefix ("g" . "goto")
         :desc "Next real line" :nvm "j" #'evil-next-line
         :desc "Previous real line" :nvm "k" #'evil-previous-line
         :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
@@ -4541,13 +4722,30 @@ I also need to adjust the window navigation keys that clash with default Org bin
 #+caption: config.el
 #+begin_src emacs-lisp
 (map! :after org
-      (:map org-mode-map
-       :n "s-j" #'org-next-visible-heading
-       :n "s-k" #'org-previous-visible-heading
-       :n "C-s-j" #'org-forward-heading-same-level
-       :n "C-s-k" #'org-backward-heading-same-level
-       :n "C-j" #'evil-window-down
-       :n "C-k" #'evil-window-up))
+      :map org-mode-map
+      :n "s-j" #'org-next-visible-heading
+      :n "s-k" #'org-previous-visible-heading
+      :n "C-s-j" #'org-forward-heading-same-level
+      :n "C-s-k" #'org-backward-heading-same-level
+      :n "C-j" #'evil-window-down
+      :n "C-k" #'evil-window-up)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :after org
+      :map org-mode-map
+      :g "s-RET"     #'org-edit-special
+      :g [s-return]  #'org-edit-special)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :after org
+      :map org-src-mode-map
+      :in [s-escape] #'org-edit-src-abort
+      :gin "s-RET"     #'org-edit-src-exit
+      :gin [s-return]  #'org-edit-src-exit)
 #+end_src
 
 #+caption: autoload/writing.el
@@ -4582,7 +4780,9 @@ At this point we can tight up everything and setup our buffer when we open an or
   :defer t
   :init
   (setq org-appear-autolinks t
-        org-appear-autosubmarkers t))
+        org-appear-autosubmarkers t)
+  (add-hook! evil-insert-state-entry (org-appear-mode 1))
+  (add-hook! evil-insert-state-exit (org-appear-mode -1)))
 #+end_src
 
 To separate my configuration from initialization logic, let's create another autoload function, but this time on a file used for /Org things/ (=autoload/org.el=):
@@ -4591,28 +4791,16 @@ To separate my configuration from initialization logic, let's create another aut
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-org-config-h ()
-  "Configure all aspects of an Org buffer right before we display
-  it to the user."
+  "Configure all aspects of an Org buffer right before we display it to the user."
   ;; Enable minor modes
-  (variable-pitch-mode 1)
-  (setq writeroom-width 120)
   (+zen/toggle)
   (valign-mode 1)
   ;; Disable unwanted minor modes
-  (hl-line-mode -1)
-  ;; Disable fill column indicator
-  (display-fill-column-indicator-mode -1)
+  ;; (hl-line-mode -1)
   ;; Call org configuration functions
   (org-display-inline-images)
   ;; Force a buffer refresh to guarantee all setup is in use
-  (set-window-buffer nil (current-buffer))
-  ;; Insert state tweaks
-  (add-hook! evil-insert-state-entry-hook
-    (org-fragtog-mode 1)
-    (org-appear-mode 1))
-  (add-hook! evil-insert-state-exit-hook
-    (org-fragtog-mode -1)
-    (org-appear-mode -1)))
+  (set-window-buffer nil (current-buffer)))
 #+end_src
 
 With this function in place, we can /hook/ it to our Org major mode:
@@ -4634,9 +4822,11 @@ With this function in place, we can /hook/ it to our Org major mode:
   :commands org-ol-tree
   :init
   (map! :map org-mode-map
-        :localleader
-        :prefix ("g" . "goto")
-        :desc "Open outline"  "o" #'org-ol-tree))
+        :localleader :prefix ("g" . "goto")
+        :desc "Open outline"  "o" #'org-ol-tree)
+
+  (setq org-ol-tree-ui-window-header-format
+        '((:eval (concat " ☰ " (propertize "Outline" 'face '(:inherit 'my-default-ui :height 0.8)))))))
 #+end_src
 
 #+caption: config.el
@@ -4773,15 +4963,14 @@ sug-mode       ultra
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
-(defun my-get-aspell-cmd-flags (&optional camel-case &rest extra-args)
+(defun my-aspell-cmd-flags (&optional camel-case &rest extra-args)
   "Return the list of arguments Emacs should use to run aspell.
 
-You can use this list of arguments directly as the value of
-`ispell-extra-args'. If CAMEL-CASE is a non-nil value, the list
-of arguments will include the \"--camel-case\" option.
+You can use this list of arguments directly as the value of `ispell-extra-args'.
+If CAMEL-CASE is a non-nil value, the list of arguments will include the
+\"--camel-case\" option.
 
-If EXTRA-ARGS is not nil, this function will append its value
-to the result."
+If EXTRA-ARGS is not nil, this function will append its value to the result."
   (append '("--sug-mode=ultra") extra-args (when camel-case '("--camel-case"))))
 #+end_src
 
@@ -4790,7 +4979,7 @@ to the result."
 (after! ispell
   (setq ispell-personal-dictionary my-aspell--personal-dictionary)
   (setq ispell-really-aspell t)
-  (setq ispell-extra-args (my-get-aspell-cmd-flags t))
+  (setq ispell-extra-args (my-aspell-cmd-flags t))
 
   (add-hook! org-mode
     (defun my-spell-add-extra-ignores-to-org-h ()
@@ -4803,7 +4992,7 @@ to the result."
       (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
       (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
 
-      (setq-local ispell-extra-args (my-get-aspell-cmd-flags nil
+      (setq-local ispell-extra-args (my-aspell-cmd-flags nil
                                                              "--lset-filter=url:email:context"
                                                              "--context-visible-first=true"
                                                              "--add-context-delimiters=~ ~"
@@ -4862,10 +5051,9 @@ to the result."
 #+begin_src emacs-lisp
 (use-package! focus :defer t)
 
-(map! :leader
-      (:prefix ("t" . "toggle")
-       :desc "Focus mode" :mvn "o" #'focus-mode
-       :desc "Focus mode (RO)" :mvn "O" #'focus-read-only-mode))
+(map! :leader :prefix ("t" . "toggle")
+      :desc "Focus mode" :mvn "o" #'focus-mode
+      :desc "Focus mode (RO)" :mvn "O" #'focus-read-only-mode)
 #+end_src
 
 *** Snippets
@@ -5094,20 +5282,16 @@ Start with the open definition for =org-capture=:
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defconst my-capture--note-frame-height 15
-  "Number of lines a note frame should have when capturing a long
-note.")
+  "Number of lines a note frame should have when capturing a long note.")
 
 (defconst my-capture--long-note-frame-height 35
-  "Number of lines a note frame should have when capturing a long
-note.")
+  "Number of lines a note frame should have when capturing a long note.")
 
 (defconst my-capture--menu-width 50
-  "Number of lines a note frame should have when capturing a long
-note.")
+  "Number of lines a note frame should have when capturing a long note.")
 
 (defconst my-capture--yas-prefix "--DOOM-ORG-CAPTURE-YAS-PREFIX--:"
-  "String used to identify a yasnippet template on a capture
-buffer")
+  "String used to identify a yasnippet template on a capture buffer")
 #+end_src
 
 #+caption: config.el
@@ -5123,8 +5307,9 @@ buffer")
   :after all-the-icons
   :commands (org-capture +org-capture/open-frame)
   :init
-  (add-hook 'org-capture-mode-hook 'my-capture--yas-expand-h)
-  (add-hook 'org-capture-after-finalize-hook 'my-capture--finish-h)
+  (add-hook 'org-capture-mode-hook #'my-capture--yas-expand-h)
+  (add-hook 'org-capture-after-finalize-hook #'my-capture--finish-h)
+  (add-hook 'window-state-change-hook #'my-bring-org-capture-to-front-h)
   :config
   (setq +org-capture-changelog-file "CHANGELOG.org")
   (setq org-capture-templates-contexts '(("p" (my-capture-projects-p))))
@@ -5151,9 +5336,20 @@ buffer")
 
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-bring-org-capture-to-front-h ()
+  (when-let ((captur-buffer (seq-find (lambda (buf) (string-prefix-p "CAPTURE" (buffer-name buf)))
+                                      (buffer-list))))
+    (my-bring-buffer-to-front captur-buffer)
+    (when (eq (org-roam-buffer--visibility) 'visible)
+      (org-roam-buffer-deactivate))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--adjust-frame (&optional extended-p frame)
-  "Dinamically adjust the capture FRAME width to WIDTH and
-reposition it on the center of the screen."
+  "Dinamically adjust the capture FRAME width to WIDTH and reposition it on the
+center of the screen."
   (when (+org-capture-frame-p)
     (set-frame-size (or frame (selected-frame))
                     (+ fill-column 20)
@@ -5200,8 +5396,8 @@ reposition it on the center of the screen."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-yasnippet (snippet)
-  "Returns a snippet mark with the given SNIPPET used to expand
-it with yasnippet when the capture finishes.
+  "Returns a snippet mark with the given SNIPPET used to expand it with yasnippet
+when the capture finishes.
 
 SNIPPET can be a string or a symbol.
 
@@ -5229,9 +5425,8 @@ starts."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-template-selection ()
-  "Returns the text selected on the buffer that originated the
-capture. If the selection is the entire buffer, return an org
-link to buffer."
+  "Returns the text selected on the buffer that originated the capture. If the
+selection is the entire buffer, return an org link to buffer."
   (with-current-buffer (org-capture-get :original-buffer)
     (when (region-active-p)
       (or (my-capture--mu4e-headers-selected)
@@ -5243,8 +5438,8 @@ link to buffer."
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--mu4e-headers-selected (&optional buf-name)
-  "When on a mu4e-headers buffer, store an org link to each one
-of the selected messages and return them all as a string."
+  "When on a mu4e-headers buffer, store an org link to each one of the selected
+messages and return them all as a string."
   (when (and (boundp 'mu4e~headers-buffer-name)
              (string= (or buf-name (buffer-name)) mu4e~headers-buffer-name))
     (let* ((beg (region-beginning))
@@ -5263,10 +5458,9 @@ of the selected messages and return them all as a string."
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--mu4e-view-selected (&optional buf-name)
-  "When on a mu4e-view buffer, store an org link to the message
-and return it as a string with the selected text as a
-block-quote. If the selection is the entire buffer, just return
-the org link."
+  "When on a mu4e-view buffer, store an org link to the message and return it as a
+string with the selected text as a block-quote. If the selection is the entire
+buffer, just return the org link."
   (when (and (boundp 'mu4e~view-buffer-name)
              (string= (or buf-name (buffer-name)) mu4e~view-buffer-name))
     (let* ((beg (region-beginning))
@@ -5289,9 +5483,8 @@ the org link."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--buffer-selected ()
   "When there is an active selection in the current buffer,
-returns an org link to the current buffer with the selection as a
-blockquote. If the selection is the entire buffer, just return
-the org link."
+returns an org link to the current buffer with the selection as a blockquote. If
+the selection is the entire buffer, just return the org link."
   (let ((sel-text (let* ((beg (region-beginning))
                          (end (region-end))
                          (full-buf-sel-p (and (= beg (point-min))
@@ -5319,8 +5512,7 @@ the org link."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-projects-p ()
-  "Retuns true when current buffer belongs to current open
-project."
+  "Retuns true when current buffer belongs to current open project."
   (with-current-buffer (or (org-capture-get :original-buffer) (current-buffer))
     (let* ((proj-root (doom-project-root))
            (proj-root (when proj-root (expand-file-name proj-root)))
@@ -5359,7 +5551,7 @@ Example:
                        (stringp (cdr-safe icon)))
             (error (concat "A capture description icon must be a cons cell with"
                            " one of my-supported-icons symbol and a string color.")))
-          (format "%s %s" (my-get-icon (car icon) (cdr icon)) text))
+          (format "%s %s" (my-icon (car icon) (cdr icon)) text))
       text)))
 #+end_src
 
@@ -5369,8 +5561,8 @@ Example:
 (defun my-capture-heading-template (&rest args)
   "Returns a formatted capture template for a heading.
 
-ARGS should all be string that will get concatenated with no
-spaces between them. Default to \"%?\"."
+ARGS should all be string that will get concatenated with no spaces between
+them. Default to \"%?\"."
   (let* ((content (when args (s-join "" args)))
          (content (if (s-matches-p content "%|\\([^|]*\\)|")
                       (s-trim (s-replace-all '((" %? " . " ") ("%?" . "")) content))
@@ -5387,10 +5579,9 @@ spaces between them. Default to \"%?\"."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-heading-prefix ()
-  "Returns a string of `*` characters representing an org header
-level. The number of characters is the one on the org-capture
-`:heading-level' property or calculated by the org-capture `:olp'
-property size."
+  "Returns a string of `*` characters representing an org header level. The number
+of characters is the one on the org-capture `:heading-level' property or
+calculated by the org-capture `:olp' property size."
   (let ((level (org-capture-get :heading-level))
         (olp-size (1+ (length (org-capture-get :olp)))))
     (s-repeat (max 1 (or level olp-size)) "*")))
@@ -5400,10 +5591,9 @@ property size."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-position-cursor ()
-  "Asks user for a timestamp and store it for template use. It
-also position the cursor on the correct place for a new entry,
-and adjust the capture frame width to `fill-column' before start
-editing."
+  "Asks user for a timestamp and store it for template use. It also position the
+cursor on the correct place for a new entry, and adjust the capture frame width
+to `fill-column' before start editing."
   (my-capture--adjust-frame (org-capture-get :clock-in))
   (let* ((read-time (org-capture-get :read-time))
          (read-time-labal (or (org-capture-get :read-time-label) "Timestamp"))
@@ -5444,9 +5634,9 @@ editing."
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-time-read ()
-  "Returns the last timestamp captured, formatted with the format
-specified on `org-time-stamp-formats'. If user didn't capture any
-date, returns current time."
+  "Returns the last timestamp captured, formatted with the format specified on
+`org-time-stamp-formats'. If user didn't capture any date, returns current
+time."
   (format-time-string (cdr-safe org-time-stamp-formats) (org-capture-get :time-read)))
 #+end_src
 
@@ -5700,10 +5890,9 @@ $0
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-capture-journal-file-for-timestamp ()
-  "Asks user for a specific timestamp and returns the journal
-  file for it. It also position the cursor on the correct place
-  for a new entry, and adjust the capture frame width to
-  `fill-column' before start editing."
+  "Asks user for a specific timestamp and returns the journal file for it. It also
+position the cursor on the correct place for a new entry, and adjust the capture
+frame width to `fill-column' before start editing."
   (my-capture--adjust-frame)
   (my-journal/new-entry t nil 'my-capture-timestamp))
 #+end_src
@@ -5871,8 +6060,8 @@ $0
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defadvice! my-org-capture-select-template-prettier-a (&optional keys)
-  "Select a capture template, in a prettier way than default Lisp
-programs can force the template by setting KEYS to a string."
+  "Select a capture template, in a prettier way than default Lisp programs can
+force the template by setting KEYS to a string."
   :override 'org-capture-select-template
   (let ((org-capture-templates
          (or (org-contextualize-keys (org-capture-upgrade-templates org-capture-templates)
@@ -5900,29 +6089,27 @@ programs can force the template by setting KEYS to a string."
 (defadvice! my-org-capture-mks-prettier-a (table title &optional prompt specials)
   "Select a member of an alist with multiple keys. Prettified.
 
-TABLE is the alist which should contain entries where the car is
-a string. There should be two types of entries.
+TABLE is the alist which should contain entries where the car is a string. There
+should be two types of entries.
 
-1. prefix descriptions like (\"a\" \"Description\") This
-   indicates that `a' is a prefix key for multi-letter selection,
-   and that there are entries following with keys like \"ab\",
-   \"ax\"…
+1. prefix descriptions like (\"a\" \"Description\") This indicates that `a' is a
+   prefix key for multi-letter selection, and that there are entries following
+   with keys like \"ab\", \"ax\"…
 
-2. Select-able members must have more than two elements, with the
-   first being the string of keys that lead to selecting it, and
-   the second a short description string of the item.
+2. Select-able members must have more than two elements, with the first being
+   the string of keys that lead to selecting it, and the second a short
+   description string of the item.
 
-The command will then make a temporary buffer listing all entries
-that can be selected with a single key, and all the single key
-prefixes. When you press the key for a single-letter entry, it is
-selected. When you press a prefix key, the commands (and maybe
-further prefixes) under this key will be shown and offered for
-selection.
+The command will then make a temporary buffer listing all entries that can be
+selected with a single key, and all the single key prefixes. When you press the
+key for a single-letter entry, it is selected. When you press a prefix key, the
+commands (and maybe further prefixes) under this key will be shown and offered
+for selection.
 
-TITLE will be placed over the selection in the temporary buffer,
-PROMPT will be used when prompting for a key. SPECIALS is an
-alist with (\"key\" \"description\") entries. When one of these
-is selected, only the bare key is returned."
+TITLE will be placed over the selection in the temporary buffer, PROMPT will be
+used when prompting for a key. SPECIALS is an alist with (\"key\"
+\"description\") entries. When one of these is selected, only the bare key is
+returned."
   :override 'org-mks
   (save-window-excursion
     (let ((inhibit-quit t)
@@ -6002,17 +6189,16 @@ is selected, only the bare key is returned."
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--item-entry (key description &optional prefix parent-option-p key-face-extras)
-  "Returns a string representing an Org Capture item with the
-given KEY and DESCRIPTION.
+  "Returns a string representing an Org Capture item with the given KEY and
+DESCRIPTION.
 
-PREFIX is the character sequences already pressed during the
-capture process.
+PREFIX is the character sequences already pressed during the capture process.
 
-If PARENT-OPTION-P is non-nil, it means the this entry has
-sub-entries and some sort of indication should be displayed
+If PARENT-OPTION-P is non-nil, it means the this entry has sub-entries and some
+sort of indication should be displayed
 
-The KEY-FACE-EXTRAS is one or more simbols to be added to the KEY
-face on the entry."
+The KEY-FACE-EXTRAS is one or more simbols to be added to the KEY face on the
+entry."
   (let ((parent-option-p (when parent-option-p "›"))
         (prefix (when prefix (concat prefix " "))))
     (concat
@@ -6026,8 +6212,8 @@ face on the entry."
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 (defun my-capture--refresh-capture-frame ()
-  "This function is called right after all the capture options
-were written in the capture buffer."
+  "This function is called right after all the capture options were written in the
+capture buffer."
   (when (+org-capture-frame-p)
     (let ((frame (selected-frame)))
     (set-frame-parameter frame 'left-fringe 30)
@@ -6079,22 +6265,19 @@ TBD
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
 (defun my-journal/new-entry (&optional prefix add-header-p variable make-local)
-  "Open a journal file and start a new entry. Without any
-arguments, this function is equivalent to
-calling `(org-journal-new-entry t)'
+  "Open a journal file and start a new entry. Without any arguments, this function
+is equivalent to calling `(org-journal-new-entry t)'
 
 With PREFIX argumant, request the journal timestamp to the user.
 
-If ADD-HEADER-P is non-nil, fully create the new entry (this is
-equivalent to `(not PREFIX)' on the `org-journal-new-entry').
+If ADD-HEADER-P is non-nil, fully create the new entry (this is equivalent
+to `(not PREFIX)' on the `org-journal-new-entry').
 
-VARIABLE is a string that, when set, will store the timestamp
-value selected by the user. This function ignores this argument
-if PREFIX is nil.
+VARIABLE is a string that, when set, will store the timestamp value selected by
+the user. This function ignores this argument if PREFIX is nil.
 
-When MAKE-LOCAL is a non-nil value, this function uses VARIABLE
-to create a local variable. If PREFIX or VARIABLE is nil, this
-argument has no effect."
+When MAKE-LOCAL is a non-nil value, this function uses VARIABLE to create a
+local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
   (interactive "P")
   (when make-local
     (make-local-variable variable))
@@ -6183,6 +6366,57 @@ TBD
          :desc "Insert action items"  "a" #'my-notes-add-action-item))))
 #+end_src
 
+** TODO Other modes
+Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
+
+*** Markdown
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(setq markdown-split-window-direction 'right
+      markdown-header-scaling t
+      markdown-header-scaling-values (list (face-attribute 'my-headline-1 :height)
+                                           (face-attribute 'my-headline-2 :height)
+                                           (face-attribute 'my-headline-3 :height)
+                                           (face-attribute 'my-headline-4 :height)
+                                           (face-attribute 'my-headline-5 :height)
+                                           (face-attribute 'my-headline-6 :height)))
+
+(defun my-setup-markdown-faces-h ()
+  (custom-set-faces!
+    `(markdown-header-face :inherit unspecified)
+    `(markdown-header-face-1 :inherit my-headline-1
+                             :foreground ,(face-attribute 'outline-1 :foreground)
+                             :weight unspecified
+                             :slant unspecified)
+    `(markdown-header-face-2 :inherit my-headline-2
+                             :foreground ,(face-attribute 'outline-2 :foreground)
+                             :weight unspecified
+                             :slant unspecified)
+    `(markdown-header-face-3 :inherit my-headline-3
+                             :foreground ,(face-attribute 'outline-3 :foreground)
+                             :weight unspecified
+                             :slant unspecified)
+    `(markdown-header-face-4 :inherit my-headline-4
+                             :foreground ,(face-attribute 'outline-4 :foreground)
+                             :weight unspecified
+                             :slant unspecified)
+    `(markdown-header-face-5 :inherit my-headline-5
+                             :foreground ,(face-attribute 'outline-5 :foreground)
+                             :weight unspecified
+                             :slant unspecified)
+    `(markdown-header-face-6 :inherit my-headline-6
+                             :foreground ,(face-attribute 'outline-6 :foreground)
+                             :weight unspecified
+                             :slant unspecified)))
+
+(add-hook! (markdown-mode gfm-mode)
+  (defun my-markdown-setup ()
+    (+zen/toggle 1)
+    (markdown-toggle-markup-hiding 1)
+    (my-setup-markdown-faces-h)))
+#+end_src
+
 * Development
 TBD
 
@@ -6196,11 +6430,88 @@ TBD
   (lsp-ui-doc-enable t))
 #+end_src
 
-** TODO Version control system
+** TODO Common configuration
+TBD
+
+*** Version control system
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! magit-todo :defer t)
+#+end_src
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! gitmoji
+  :recipe (:local-repo "~/workplace/personal/emacs/gitmoji"))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! gitmoji
+  :commands (gitmoji-insert gitmoji-select)
+  :init
+  (setq gitmoji-insert-utf8-emoji t
+        gitmoji-display-utf8-emoji t))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! magit
+  ;; (remove-hook 'server-switch-hook 'magit-commit-diff)
+  (add-hook 'git-commit-setup-hook 'my-git-commit-mode-setup-h))
+#+end_src
+
+#+caption: autoload/development.el
+#+begin_src emacs-lisp :tangle autoload/development.el
+;;;###autoload
+(defun my-git-commit-mode-setup-h ()
+  "Configure the Git Commit Message buffer."
+  (setq-local display-fill-column-indicator-column 72)
+  (display-fill-column-indicator-mode 1)
+  (goto-char (point-min))
+  (evil-append-line 1)
+  (yas-expand-snippet (yas-lookup-snippet "commit-message" 'git-commit-mode)))
+#+end_src
+
+#+caption: snippets/git-commit-mode/commit-message
+#+begin_src snippet :tangle snippets/git-commit-mode/commit-message
+# name: commit-message
+# key: msg
+# --
+${1:$$(unless (or yas-moving-away-p yas-modified-p)
+              (yas-auto-next
+                (condition-case nil
+                    (or (gitmoji-select) "")
+                  ('quit ""))))}${2:Subject}
+
+;-------------------------------------------------|
+;       Do not pass this column on the subject -> |
+;-------------------------------------------------|
+${3:`"## Changes Description\n"`}$0
+; 1. Separate subject from body with a blank line
+; 2. Limit the subject line to 50 characters
+; 3. Capitalize the subject line
+; 4. Do not end the subject line with a period
+; 5. Use the imperative mood in the subject line
+; 6. Wrap the body at 72 characters
+; 7. Use the body to explain what and why vs. how
+#+end_src
+
+*** Comments
+TBD
+
+#+caption: autoload/development.el
+#+begin_src emacs-lisp :tangle autoload/development.el
+;;;###autoload
+(defadvice! my-comment-and-next-line-a (func &rest args)
+  :around 'evilnc-comment-or-uncomment-lines
+  (let ((no-selection-p (not (region-active-p))))
+    (apply func args)
+    (when no-selection-p
+      (next-line)
+      (goto-char (point-at-bol))
+      (skip-chars-forward " \t\r"))))
 #+end_src
 
 ** TODO Lisp
@@ -6208,18 +6519,7 @@ TBD
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(defvar my-emacs-lisp-comment-fill-column 80
-  "Define a different `fill-column' to use in lisp when writing comments.")
-#+end_src
-
-#+caption: autoload/development.el
-#+begin_src emacs-lisp :tangle autoload/development.el
-;;;###autoload
-(defadvice! my-emacs-lisp-fill-comment-paragraph-a (orig-fun &rest args)
-  "Set `fill-column' before calling `'fill-comment-paragraph'"
-  :around 'fill-comment-paragraph
-  (let ((fill-column my-emacs-lisp-comment-fill-column))
-      (apply orig-fun args)))
+(setq emacs-lisp-docstring-fill-column 80)
 #+end_src
 
 ** TODO Shell script
@@ -6244,14 +6544,14 @@ The first thing I like to do, is to unpin Treemacs and let Doom use the latest v
 (unpin! treemacs)
 #+end_src
 
-The next change is to use our custom =variable-pitch-ui= font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
+The next change is to use our custom =my-default-ui= font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
 
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-themes-enable-treemacs-variable-pitch-labels-a (&rest _)
-  "This advice changes the treemacs variable pitch font to one
-  without serif so the UI looks more polished."
+  "This advice changes the treemacs variable pitch font to one without serif so
+the UI looks more polished."
   :override #'doom-themes-enable-treemacs-variable-pitch-labels
   (when doom-themes-treemacs-enable-variable-pitch
     (dolist (face '(treemacs-root-face
@@ -6269,7 +6569,7 @@ The next change is to use our custom =variable-pitch-ui= font face. I have to re
       (let ((faces (face-attribute face :inherit nil)))
         (set-face-attribute
          face nil :inherit
-         `(variable-pitch-ui ,@(delq 'unspecified (if (listp faces) faces (list faces)))))))))
+         `(my-default-ui ,@(delq 'unspecified (if (listp faces) faces (list faces)))))))))
 #+end_src
 
 By default, Treemacs will stay opened after you select a file to visit. Personally I don't like this, I rather have Treemacs closing when I select a file.
@@ -6322,7 +6622,7 @@ https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspa
         '((:eval
            (concat
             " ☰ "
-            (s-titleize (persp-current-name)))))))
+            (propertize (s-titleize (persp-current-name)) 'face 'my-ui-window-header))))))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -6361,8 +6661,8 @@ Treemacs offers a function that adds the current project if it is not on the wor
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-treemacs-add-and-display-current-project-a ()
-  "Open treemacs with current project. This function removes any
-project that is not the current one."
+  "Open treemacs with current project. This function removes any project that is
+not the current one."
   :override #'treemacs-add-and-display-current-project
   (interactive)
 
@@ -6391,8 +6691,8 @@ And to finalize the Treemacs configuration, let's make it respect my window navi
 
 ;;;###autoload
 (defun my-dired/open-directory ()
-  "Enters in the directory at point. If the cursor is not on a
-directory, do nothing."
+  "Enters in the directory at point. If the cursor is not on a directory, do
+nothing."
   (interactive)
   (when (file-directory-p (dired-get-file-for-visit))
     (dired-find-file)))
@@ -6407,8 +6707,8 @@ directory, do nothing."
 
 ;;;###autoload
 (defun my-dired/widen-or-quit-all ()
-  "If `dired-narow' is on, revert to the normal view. If there
-is no active narrow, quit Dired."
+  "If `dired-narow' is on, revert to the normal view. If there is no active
+narrow, quit Dired."
   (interactive)
   (if (buffer-modified-p)
       (revert-buffer)
@@ -6532,28 +6832,28 @@ is no active narrow, quit Dired."
        :ne "R"        #'dired-do-rename
        :ne "d"        #'dired-do-delete
        :ne "x"        #'my-dired/toggle-mark
-       (:prefix "t"
+       (:prefix ("t" . "toggle")
         :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
         :desc "Toggle git info"       :ne "g" #'my-dired/toggle-git-mode
         :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
         :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks)
-       (:prefix "y"
+       (:prefix ("y" . "yank")
         :desc "Copy absolut path"     :ne "a" #'my-dired/yank-absolute-path
         :desc "Copy file"             :ne "f" #'dired-do-copy
         :desc "Copy with regexp"      :ne "r" #'dired-do-copy-regexp
         :desc "Copy relative path"    :ne "y" #'my-dired/yank-relative-path)
-       (:prefix "c"
+       (:prefix ("c" . "create")
         :desc "Create empty file"     :ne "f" #'dired-do-touch
         :desc "Create directory"      :ne "d" #'dired-create-directory
         :desc "Create project"        :ne "p" #'xxx)
-       (:prefix "o"
+       (:prefix ("o" . "open")
         :desc "Open no split"         :ne "o" #'dired-find-alternate-file
         :desc "Quick view"            :ne "p" #'my-dired/mac-quick-view
         :desc "Reveal on Finder"      :ne "f" #'my-dired/reveal-on-finder
         :desc "Open vertically"       :ne "s" #'my-dired/open-split-bellow
         :desc "Open horizontally"     :ne "v" #'my-dired/open-split-right
         :desc "Open externally"       :ne "x" #'my-dired/open-externally)
-       (:prefix "m"
+       (:prefix ("m" . "mark")
         :ne "h" nil
         :desc "Mark directories"  :ne "d" #'dired-mark-directories
         :desc "Mark extension"    :ne "e" #'dired-mark-extension
@@ -6602,8 +6902,7 @@ Let's create such function as an /autoload/ function:
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-after-switch-project-action-h ()
-  "A project first action to execute when we switch our current
-project."
+  "A project first action to execute when we switch our current project."
   (let ((file (file-exists-p! (or "README.rst"
                                   "README.md"
                                   "README"
@@ -6726,9 +7025,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defconst +doom-calendar-color-table (make-hash-table :test #'equal)
-  "A hash table to hold an association between a calendar
-name (in our org world, this is the event's category), and its
-defined color.")
+  "A hash table to hold an association between a calendar name (in our org world,
+this is the event's category), and its defined color.")
 
 (puthash "work"     '(:color "#a67a63" :bg "#4f3426" :fg "#ffc8a9") +doom-calendar-color-table)
 (puthash "personal" '(:color "#19adf8" :bg "#17445d" :fg "#a9e3ff") +doom-calendar-color-table)
@@ -6736,8 +7034,8 @@ defined color.")
 
 ;;;###autoload
 (defun my-work-calendar-color (name &optional prop)
-  "Returns a string representing the color for PROP for the
-calendar with the given NAME.
+  "Returns a string representing the color for PROP for the calendar with the
+given NAME.
 
 If color is nil, this function uses the property `:color'"
   (plist-get (gethash name +doom-calendar-color-table) (or prop :color)))
@@ -6747,9 +7045,8 @@ If color is nil, this function uses the property `:color'"
 #+begin_src emacs-lisp
 (setq +calendar-open-function #'my-work/open-calendar)
 
-(map! :leader
-      (:prefix ("o" . "open")
-       :desc "Open calendar" :nvm "c" #'=calendar))
+(map! :leader :prefix ("o" . "open")
+      :desc "Open calendar" :nvm "c" #'=calendar)
 #+end_src
 
 #+caption: autoload/extras.el
@@ -6776,8 +7073,8 @@ If color is nil, this function uses the property `:color'"
     `(cfw:face-today :foreground ,(doom-color 'fg)
                      :background "#1c2b39")
     `(cfw:face-grid :foreground ,(doom-color 'base4 256))
-    `(cfw:face-select :foreground ,(doom-color 'orange-bg 256)
-                      :background "#f0c774")
+    `(cfw:face-select :foreground ,(doom-darken 'number 256)
+                      :background ,(doom-lighten 'number 256))
     `(cfw:face-holiday :foreground ,(doom-color 'green 256))
     `(cfw:face-saturday :foreground ,(doom-color 'red 256))
     `(cfw:face-sunday :foreground ,(doom-color 'red 256)))
@@ -6891,31 +7188,16 @@ TBD
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-exclude-agenda-buffers-from-perspective-h nil
-  "Don't associate temporary agenda buffers with current workspace."
-  (if (and org-agenda-new-buffers
-           (and (boundp 'persp-mode) persp-mode)
-           (not org-agenda-sticky))
-      (progn
-        (let (persp-autokill-buffer-on-remove)
-          (mapc (lambda (buf)
-                  (if (persp-buffer-in-other-p buf)
-                      (bury-buffer buf)
-                    (kill-buffer buf))) org-agenda-new-buffers)))))
-#+end_src
-
-#+caption: autoload/extras.el
-#+begin_src emacs-lisp :tangle autoload/extras.el
-;;;###autoload
 (defun my-org-agenda-setup-buffer-h ()
   (evil-window-set-width 100)
   (doom-themes-hide-modeline)
-  (variable-pitch-mode -1)
+  ;; (variable-pitch-mode -1)
   (setq-local wrap-prefix (s-repeat +org-agenda--wrap-prefix " "))
-  (setq writeroom-width 75)
-  (+zen/toggle)
+  (setq writeroom-width 65)
+  (+zen/toggle 1)
+  (visual-line-mode 1)
   (tab-line-mode -1)
-  (hl-line-mode -1)
+  ;; (hl-line-mode -1)
   (when (not (= text-scale-mode-amount 1))
     (setq-local text-scale-mode-amount 1)
     (text-scale-mode 1)))
@@ -6990,8 +7272,8 @@ TBD
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defadvice! my-org-agenda-reset-font-a (&rest _)
-  "Reset text scale before running `org-agenda-redo' to prevent
-messing with layout."
+  "Reset text scale before running `org-agenda-redo' to prevent messing with
+layout."
   :before 'org-agenda-redo
   (setq-local text-scale-mode-amount 0)
   (text-scale-mode -1))
@@ -7031,68 +7313,48 @@ account for the TODO word plus one space.")
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-window-toggle-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-         (next-win-buffer (window-buffer (next-window)))
-         (this-win-edges (window-edges (selected-window)))
-         (next-win-edges (window-edges (next-window)))
-         (this-win-2nd (not (and (<= (car this-win-edges)
-                     (car next-win-edges))
-                     (<= (cadr this-win-edges)
-                     (cadr next-win-edges)))))
-         (splitter
-          (if (= (car this-win-edges)
-             (car (window-edges (next-window))))
-          'split-window-horizontally
-        'split-window-vertically)))
-    (delete-other-windows)
-    (let ((first-win (selected-window)))
-      (funcall splitter)
-      (if this-win-2nd (other-window 1))
-      (set-window-buffer (selected-window) this-win-buffer)
-      (set-window-buffer (next-window) next-win-buffer)
-      (select-window first-win)
-      (if this-win-2nd (other-window 1))))))
+(defun my-contain-buffer-p (lst buf)
+  "Return t if th given BUF is in the given LST.
+
+This function searches the buffer in all nested lists containd in LST."
+  (unless (not lst)
+    (if (seqp lst)
+        (seq-some (lambda (elm) (my-contain-buffer-p elm buf)) lst)
+      (eq lst buf))))
 #+end_src
 
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defadvice! my-org-agenda-always-split-horizontally-a (&rest _)
-  :after 'org-prepare-agenda
-  (my-window-toggle-split))
+(defun my-bring-buffer-to-front (buffer-or-name)
+  "Make sure buffer is visible on its window.
+
+BUFFER-OR-NAME is the buffer to look for.
+
+Return t if the buffer moved to front."
+  (when-let ((buf (when buffer-or-name (get-buffer buffer-or-name)))
+             (win (seq-find (lambda (window)
+                              (seq-some (lambda (buf-list) (my-contain-buffer-p buf-list buf))
+                                        (append (mapcar #'car (window-prev-buffers window))
+                                                (list (window-buffer window))
+                                                (window-next-buffers window))))
+                            (window-list))))
+    (set-window-buffer win buf t)
+    t))
 #+end_src
 
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-org-agenda/switch-to-item ()
-  "Go to the Org mode file which contains the item at point.
-When optional argument DELETE-OTHER-WINDOWS is non-nil, the
-displayed Org file fills the frame."
-  (interactive)
-  (let (buffer)
-    (when-let ((target (or (org-get-at-bol 'org-target-file)
-                           (org-agenda-error)))
-               (file-name (car target))
-               (pos (cdr target)))
-      (if (setq buffer (get-file-buffer file-name))
-          (org-switch-to-buffer-other-window buffer)
-        (find-file-other-window file-name))
-      (widen)
-      (goto-char pos)
-      (org-narrow-to-subtree)
-      (when (derived-mode-p 'org-mode)
-        (org-show-context 'agenda)
-        (run-hooks 'org-agenda-after-show-hook)))))
+(defun my-bring-org-agenda-to-front-h ()
+  (when (my-bring-buffer-to-front org-agenda-buffer)
+    (my-org-agenda-setup-buffer-h)))
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! org-agenda
-  (custom-theme-set-faces! 'doom-one
+  (custom-set-faces!
     `(org-agenda-current-time :foreground ,(doom-color 'red 256))
     `(org-agenda-date-today :foreground ,(doom-color 'violet 256)
                             :height 1.5
@@ -7101,10 +7363,14 @@ displayed Org file fills the frame."
 
   (add-hook 'org-agenda-mode-hook #'my-org-agenda-setup-buffer-h)
   (add-hook 'org-agenda-finalize-hook #'my-org-agenda-setup-time-grid-h)
-  (add-hook 'org-agenda-finalize-hook #'my-exclude-agenda-buffers-from-perspective-h)
+  (add-hook 'window-state-change-hook #'my-bring-org-agenda-to-front-h)
   (remove-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-workspace-h)
-  (remove-hook 'org-agenda-finalize-hook '+org-defer-mode-in-agenda-buffers-h)
+  (remove-hook 'org-agenda-finalize-hook '+org-defer-mode-in-agenda-buffers-h))
+#+end_src
 
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! evil-org-agenda
   ;; (add-hook 'org-agenda-finalize-hook 'my-exclude-agenda-buffers-from-perspective-h)
   (map! :map evil-org-agenda-mode-map
         :nvm [return] #'org-agenda-goto
@@ -7128,7 +7394,7 @@ displayed Org file fills the frame."
         :nvm "G" #'(lambda ()
                      (interactive)
                      (goto-char (point-max)) (org-agenda-previous-item 1))
-        (:prefix "g"
+        (:prefix ("g" . "goto")
          :desc "Go to first item" :nvm "g" #'(lambda ()
                                                (interactive)
                                                (goto-char (point-min))
@@ -7152,7 +7418,7 @@ displayed Org file fills the frame."
     (concat
      "\n"
      (when icon
-       (format "%s " (my-get-icon icon icon-color)))
+       (format "%s " (my-icon icon icon-color)))
      header
      "\n"
      (if icon
@@ -7170,7 +7436,7 @@ displayed Org file fills the frame."
 #+caption: config.el
 #+begin_src emacs-lisp
 (use-package! org-super-agenda
-  :after org-agenda
+  :commands (org-agenda)
   :init
   (setq org-agenda-custom-commands
         '(("c" "Super view"
@@ -7181,7 +7447,7 @@ displayed Org file fills the frame."
                         (org-agenda-use-time-grid t)
                         (org-agenda-overriding-header "")
                         (org-super-agenda-groups
-                         `((:name ,(my-org-agenda-group-title "Agenda" 'calendar (doom-color 'light-blue))
+                         `((:name ,(my-org-agenda-group-title "Agenda" 'calendar (doom-lighten 'blue 0.5))
                             :time-grid t
                             :and (:date today
                                   :todo nil))))))
