@@ -104,7 +104,7 @@
         ;; +enchant
         +everywhere
         )
-       grammar           ; tasing grammar mistake every you make
+       ;; grammar           ; tasing grammar mistake every you make
 
        :tools
        ansible
@@ -147,7 +147,8 @@
 
        :lang
        ;; agda              ; types of types of types of types...
-       cc                ; C/C++/Obj-C madness
+       (cc               ; C/C++/Obj-C madness
+        +lsp)
        ;; clojure           ; java with a lisp
        ;; common-lisp       ; if you've seen one lisp, you've seen them all
        ;; coq               ; proofs-as-programs
@@ -264,9 +265,8 @@
          +bindings
          +smartparens))
 
-;; (when doom-debug-p
-;;   (require 'benchmark-init)
-;;   (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
+;; (require 'benchmark-init)
+;; (add-hook 'doom-first-input-hook #'benchmark-init/deactivate
 
 ;; I need this hook here to make sure my tangle runs this autoloaded function.
 (add-hook 'org-babel-post-tangle-hook

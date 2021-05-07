@@ -53,7 +53,7 @@ Since this document is about a text editor configuration, I have to highlight co
 
 The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
-** Acknowledgements
+** Acknowledgments
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
 
 ** Investigating issues
@@ -1100,7 +1100,6 @@ With the function defined, I just need to connect them to the correct hooks:
 (my-restore-frame-dimensions-h)
 #+end_src
 
-
 ** TODO Remote editing
 
 * Personal preferences
@@ -1720,7 +1719,7 @@ For my configuration, I have selected 3 fonts:
 
 Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
 
-- Monospace Fonts:
+- Monospaced Fonts:
   + [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]]
   + [[https://pcaro.es/p/hermit/][Hermit]]
   + [[https://github.com/tonsky/FiraCode][FiraCode]]
@@ -1750,12 +1749,12 @@ Since I'm adding a different font for UI elements, I'll create a custom font jus
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(defface my-default-mono `((t :font ,(font-spec :family "RobotoMono Nerd Font"
-                                                :size 15)))
+(defface my-default-mono `((t :font ,(font-spec :family "iMWritingMonoS Nerd Font"
+                                                :size 16)))
   "Default monospaced font used on majority of the buffers."
   :group 'my-typography)
 
-(defface my-big-face-mono `((t :font ,(font-spec :family "RobotoMono Nerd Font"
+(defface my-big-face-mono `((t :font ,(font-spec :family "iMWritingMonoS Nerd Font"
                                                  :size 26)))
   "Monospaced font used on presentation mode."
   :group 'my-typography)
@@ -1839,8 +1838,6 @@ Since I'm adding a different font for UI elements, I'll create a custom font jus
   :group 'my-typography)
 #+end_src
 
-
-
 I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =my-default-ui= when we need it down the road):
 
 #+caption: config.el
@@ -1851,7 +1848,12 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
 #+end_src
 
 #+begin_src emacs-lisp
+(setq doom-emoji-fallback-font-families nil)
 (custom-set-faces!
+  '(fixed-pitch :inherit my-default-mono
+                :family unspecified)
+  '(variable-pitch :inherit my-default-prose
+                   :family unspecified)
   '(font-lock-comment-face :inherit fixed-pitch))
 #+end_src
 
@@ -1909,23 +1911,18 @@ Info
 (after! info
   (custom-set-faces!
     `(info-title-1 :inherit my-headline-1
-                   ;; :foreground ,(face-attribute 'outline-1 :foreground)
                    :weight unspecified
                    :slant unspecified)
     `(info-title-2 :inherit my-headline-2
-                   ;; :foreground ,(face-attribute 'outline-2 :foreground)
                    :weight unspecified
                    :slant unspecified)
     `(info-title-3 :inherit my-headline-3
-                   ;; :foreground ,(face-attribute 'outline-3 :foreground)
                    :weight unspecified
                    :slant unspecified)
     `(info-title-4 :inherit my-headline-4
-                   ;; :foreground ,(face-attribute 'outline-4 :foreground)
                    :weight unspecified
                    :slant unspecified)
     `(info-menu-header :inherit my-headline-5
-                       ;; :foreground ,(face-attribute 'info-menu-header :foreground)
                        :weight unspecified
                        :slant unspecified)
     `(info-quoted-name :inherit font-lock-constant-face)
@@ -4116,6 +4113,8 @@ If FORCE is non nil, this function will overwrite the session file if it is
 already present in the system.
 
 Returns t on success, nil otherwise."
+  (unless (file-exists-p +workspaces-data-dir)
+    (make-directory +workspaces-data-dir))
   (when-let ((fname (+workspace-resolve-session-file-path identifier))
              (should-save (or (or (not (file-exists-p fname)) force)
                               (yes-or-no-p (format "Overwrite the '%s' session state?" identifier)))))
@@ -4451,35 +4450,27 @@ Now we can wait Org to load to  continue our configuration:
   (after! outline
     (custom-set-faces!
      `(outline-1 :inherit my-headline-1
-                 ;; :foreground ,(face-attribute 'outline-1 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-2 :inherit my-headline-2
-                 ;; :foreground ,(face-attribute 'outline-2 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-3 :inherit my-headline-3
-                 ;; :foreground ,(face-attribute 'outline-3 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-4 :inherit my-headline-4
-                 ;; :foreground ,(face-attribute 'outline-4 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-5 :inherit my-headline-5
-                 ;; :foreground ,(face-attribute 'outline-5 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-6 :inherit my-headline-6
-                 ;; :foreground ,(face-attribute 'outline-6 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-7 :inherit my-headline-7
-                 ;; :foreground ,(face-attribute 'outline-7 :foreground)
                  :weight unspecified
                  :slant unspecified)
      `(outline-8 :inherit my-headline-8
-                 ;; :foreground ,(face-attribute 'outline-8 :foreground)
                  :weight unspecified
                  :slant unspecified))))
 #+end_src
@@ -4795,8 +4786,8 @@ To separate my configuration from initialization logic, let's create another aut
   ;; Enable minor modes
   (+zen/toggle)
   (valign-mode 1)
-  ;; Disable unwanted minor modes
-  ;; (hl-line-mode -1)
+  ;; (setq line-spacing 0.25)
+  (variable-pitch-mode 1)
   ;; Call org configuration functions
   (org-display-inline-images)
   ;; Force a buffer refresh to guarantee all setup is in use
@@ -4919,28 +4910,20 @@ Although we already covered most of this list of the previous section, we still 
 #+end_src
 
 #+begin_src shell :tangle no
-λ> cd $TMPDIR
-λ> curl 'http://app.aspell.net/create?'\
-        'max_size=95&'\
-        'spelling=GBs&'\
-        'spelling=AU&'\
-        'max_variant=0&'\
-        'diacritic=keep&'\
-        'special=hacker&'\
-        'special=roman-numerals&'\
-        'encoding=utf-8&'\
-        'format=inline&'\
-        'download=aspell' | tar -xj
-λ> cd aspell6-en-custom
-λ> ./configure --vars DESTDIR=$XDG_DATA_HOME/aspell && make && make install
-λ> cd ..
-λ> rm -rf aspell6-en-custom
+cd $TMPDIR
+curl -o "aspell6-en-custom.tar.bz2" 'http://app.aspell.net/create?max_size=95&spelling=GBs&spelling=AU&max_variant=0&diacritic=keep&special=hacker&special=roman-numerals&encoding=utf-8&format=inline&download=aspell'
+tar -xjf "aspell6-en-custom.tar.bz2"
+cd aspell6-en-custom
+./configure && make && sudo make install
+cd ..
+rm -rf aspell6-en-custom*
 #+end_src
 
 #+caption: ~/.aspell.conf
-#+begin_src conf :tangle ~/.aspell.conf
-personal       ~/.local/share/aspell/personal.en.pws
-local-data-dir ~/.local/share/aspell
+#+begin_src conf :tangle no
+personal       personal.en.pws
+local-data-dir .
+prefix         ~/.local/share/aspell
 master         en-custom
 sug-mode       ultra
 #+end_src
@@ -6366,6 +6349,21 @@ TBD
          :desc "Insert action items"  "a" #'my-notes-add-action-item))))
 #+end_src
 
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! plantuml-mode
+  :defer t
+  :init
+  (setq plantuml-jar-path "/usr/local/var/homebrew/linked/plantuml/libexec/plantuml.jar"
+        org-plantuml-jar-path plantuml-jar-path)
+
+  :config
+  (set-popup-rule! "^\\*PLANTUML" :size 0.4 :side 'right :select nil :ttl 0))
+#+end_src
+
+#+RESULTS:
+: t
+
 ** TODO Other modes
 Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
 
@@ -6524,6 +6522,21 @@ TBD
 
 ** TODO Shell script
 ** TODO Python
+** TODO Ansible
+TBD
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(def-project-mode! +ansible-yaml-mode
+  :modes '(yaml-mode)
+  :add-hooks '(ansible ansible-auto-decrypt-encrypt ansible-doc-mode)
+  :files (and "ansible.cfg"
+              (or "main.yaml"
+                  "main.yml"
+                  "tasks/main.yaml"
+                  "tasks/main.yml")))
+#+end_src
+
 ** TODO Javascript/Typescript
 ** TODO C/C++
 ** TODO Swift
