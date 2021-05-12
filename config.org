@@ -592,6 +592,7 @@ word with company.
 
 The order for this selection is:
 
+- Org table
 - Yasnippet
 - Indent region
 - Indent line
@@ -605,22 +606,23 @@ The order for this selection is:
 The action selection happens in this order and stops as soon as the first action
 works."
   (interactive "P")
-  (if (or (not yas-minor-mode)
-          (null (yas-expand)))
-      (cond ((use-region-p) (indent-region (region-beginning) (region-end)))
-            (t (let ((old-point (point))
+  (cond ((org-table-p) (orgtbl-tab arg))
+        ((or (not yas-minor-mode) (null (yas-expand))) t)
+        ((use-region-p) (indent-region (region-beginning) (region-end)))
+        (t (let ((old-point (point))
                      (old-tick (buffer-chars-modified-tick))
                      (tab-always-indent t))
                  (indent-for-tab-command arg)
                  (when (and (eq old-point (point))
                             (eq old-tick (buffer-chars-modified-tick)))
                    (unless (pcase major-mode
-                             ('org-mode (or (org-indent-line) (org-cycle-level) (org-cycle-item-indentation)))
+                             ('org-mode (or (org-indent-line)
+                                            (org-cycle-level)
+                                            (org-cycle-item-indentation)))
                              ('markdown-mode (markdown-indent-line))
                              ('rst-mode (rst-indent-line nil))
                              (_ nil))
-                     (company-complete-common))))))
-    (company-abort)))
+                     (company-complete-common)))))))
 #+end_src
 
 This function incorporates the source code of ~company-indent-or-complete-common~ to allow me to handle special cases like in Org mode when I want to indent a list item or headline. It first tries to expand the previous word on a snippet. If it can't, it falls back to the altered Company function, where it also tries to do an Org indent, or a Markdown indent, or a reStructuredText before settling on ~company-complete-common~.
