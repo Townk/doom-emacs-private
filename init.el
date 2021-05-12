@@ -281,3 +281,10 @@
                 (when (equal (char-before) ?\n)
                   (delete-char -1)
                   (save-buffer)))))
+
+;; When I'm using soft-wraps to write prose, I like to have Emacs (Evil in
+;; particular) to respect my visual lines. In order to do that, I must set
+;; the `evil-respect-visual-line-mode' variable before Evil is loaded.
+;; Unfortunately, by the time the 'config.el' file is loaded, it is too late,
+;; and that is why I have to set this variable here.
+(setq evil-respect-visual-line-mode t)

@@ -12,7 +12,7 @@
 * Prologue
 Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to this community that is always available to help me when I have any question about Emacs.
 
-This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (from now on, referred as just Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this configuration (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ on the Doom's community.
+This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this configuration (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ on the Doom's community.
 
 Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://liberapay.com/hlissner][creator]].
 
@@ -57,7 +57,7 @@ The core difference, is the fact that each piece of code in this document may no
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
 
 ** Investigating issues
-If you, like me, tinker with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
+If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
 
 To get a better sense of what is going on, start Emacs from terminal with the =--debug-init= flag:
 
@@ -247,7 +247,7 @@ Then, set the variable ~source-directory~ to the cloned repository's path:
 #+end_src
 
 *** Line numbers
-I like to have line numbers displayed on the side of any source code I edit, but I don't like them everywhere (e.g. during prose writing), so I always make them disabled by default, and let the appropriate modes to set them on when they needed it:
+I like to have line numbers displayed on the side of any source code I edit, but I don't like them everywhere (e.g. during prose writing), so I always make them turned off by default, and let the appropriate modes to set them on when they needed it:
 
 To disable line numbers by default, set the variable ~display-line-numbers-type~ to ~nil~:
 
@@ -305,9 +305,9 @@ To make Emacs not jump then necessary when cursor goes outside the screen, set t
 #+begin_src  emacs-lisp
 ;; (setq scroll-conservatively most-positive-fixnum)
 (setq scroll-margin 3
-      scroll-conservatively 0
-      scroll-up-aggressively 0.01
-      scroll-down-aggressively 0.01)
+      scroll-conservatively 1000
+      scroll-up-aggressively 0.001
+      scroll-down-aggressively 0.001)
 #+end_src
 
 By default, Emacs will move the cursor with the text as you scroll, but only until the edge of the screen. When the cursor reaches the edge, it will stay there as you keep scrolling. This behavior presents an anti-pattern for usability. When I decide to scroll my buffer with the mouse wheel, I'm generally looking at the screen, around the area where the cursor is. If the cursor moves up or down from its position, my eyes lose track of it, and I will assume, it stayed with its original position as I scroll. If I decide to get back writing, my expectation is to just start typing, because the cursor should be on its previous position, but if I do this, I will start typing on the wrong part of the text.
@@ -503,7 +503,7 @@ public class AwesomeClass {
 }
 #+end_src
 
-What we want to do here, is to delete the placeholder and move to the next posittion, and end up with the same result as before:
+What we want to do here, is to delete the placeholder and move to the next position, and end up with the same result as before:
 
 #+begin_src java :tangle no
 public class AwesomeClass {
@@ -719,7 +719,7 @@ It is a bit too aggressive, but so far is working just fine for me, so let's add
 (package! aggressive-indent)
 #+end_src
 
-A point to note is where to use this package. Mostly I need it on ~prog-mode~, but due to some particularities of certain languages (did someone said Python here?), I need to specify the set of languages I want to support aggressive indent. The reader can check the list of supported language on the following code snippet:
+A point to note is where to use this package. I need it on ~prog-mode~, but due to some particularities of certain languages (did someone said Python here?), I need to specify the set of languages I want to support aggressive indent. The reader can check the list of supported language on the following code snippet:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1044,7 +1044,7 @@ Doom documentation offers a partial solution to this problem asking us to remove
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
 
-Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures =ws-butler=. While I understand the rational behind the choice of always remove white spaces regardless the cursor position.
+Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures =ws-butler=. While I understand the rational behind the choice of always remove blank spaces regardless the cursor position.
 
 To adjust that, let's make =ws-butler= behave how I expect it:
 
@@ -1211,7 +1211,7 @@ To fix this, I will add an advice after the Evil search function used to perform
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
-(defadvice! my-center-after-jump (&rest _)
+(defadvice! my-center-after-jump-a (&rest _)
   :after 'evil-ex-search
   (evil-scroll-line-to-center nil))
 #+end_src
@@ -1221,7 +1221,7 @@ And to make this behavior more consistent throughout the editor, I will add the 
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! evil
-  (add-hook 'evil-jumps-post-jump-hook #'my-center-after-jump))
+  (add-hook 'evil-jumps-post-jump-hook #'my-center-after-jump-a))
 #+end_src
 
 And finally, for the packages I'm missing, they are:
@@ -1235,7 +1235,7 @@ In all fairness, =matchit= (the one originally from Vim) is also disabled by def
 
 To the reader not familiar with this plugin, let me give a brief overview of it. You probably know that pressing the key =%= on a pair character (e.g. =(=, =)=, =[=, =]=, etc.), makes the cursor jump to the other pair.
 
-The =matchit= plugin, extends this functionality to other types of pairs, like XML/Html tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
+The =matchit= plugin, extends this functionality to other types of pairs, like XML/HTML tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
 
 Since =evil-matchit= is not distributed with Doom, I need to bring its package in:
 
@@ -1342,7 +1342,7 @@ With all in place, we just need to define the keybindings:
 *** Evil-String-Inflection
 I've been on situations where I realized that I used /camelCase/ for all my variables, where the standard coding style of the language, request to use /snake_case/ style. There are packages available, that allow you to cycle through all case styles on a given word.
 
-I found the =evil-string-inflection= to have one of the best integrations with Evil, so I will stick with it for a while to evaluate things:
+I found the =evil-string-inflection= to have one of the best integration with Evil, so I will stick with it for a while to evaluate things:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1491,7 +1491,7 @@ As you can see, I also like to /scroll to the bottom/ of the buffer when opening
 
 Also for the =*Messages*= buffer, I like to be able to press =q= to quit as well. Unfortunately this is not defined by default:
 
-# #+caption: config.el
+#+caption: config.el
 #+begin_src emacs-lisp
 (map! :map messages-buffer-mode-map
       :n "q" #'delete-window)
@@ -1501,7 +1501,7 @@ Also for the =*Messages*= buffer, I like to be able to press =q= to quit as well
 ◆
 #+end_center
 
-One binding I feel is missing on Doom, is the hability to evaluate any sexp on *any* mode, like a /global/ ~eval-last-sexp~. Gladly, it's easy enough to create my own:
+One binding I feel is missing on Doom, is the ability to evaluate any sexp on *any* mode, like a /global/ ~eval-last-sexp~. Gladly, it's easy enough to create my own:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1513,7 +1513,7 @@ One binding I feel is missing on Doom, is the hability to evaluate any sexp on *
 ◆
 #+end_center
 
-I don't remember when this shortcut enter my life, but some time ago I got used to use =s-RET= to /confirm operations/ like sending emails and messages. In order to try to replicate this behavior I will start setting it to the ~with-editor-mode-map~ together with the analog cancel operation with =s-ESC= shortcut:
+I don't remember when this shortcut entered my life, but some time ago I got used to use =s-RET= to /confirm operations/ like sending emails and messages. In order to try to replicate this behavior I will start setting it to the ~with-editor-mode-map~ together with the analog cancel operation with =s-ESC= shortcut:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1536,10 +1536,10 @@ Because of this, I want to set this mode as a toggable shortcut:
       :desc "Rainbow mode" :mvn "R" #'rainbow-mode)
 #+end_src
 
-** TODO Appearances
+** Appearances
 As far as I understand, there is a share of Emacs users that value Emacs functionalities over its looks, and I would like to write something targeted for those users.
 
-You are awesome! I can't imagine how liberating it would feel if my brain did not obsessed about my editor's appearance, so, stay strong guys! The breakthroughs on technology happens more often by the desired of people like you then people like me.
+You are awesome! I can't imagine how liberating it would feel if my brain did not obsessed about my editor's appearance, so, stay strong folks! The breakthroughs on technology happens more often by the desired of people like you then people like me.
 
 With that out of the way, I need to explain to the reader my personal position on this subject. As a person with [[https://en.wikipedia.org/wiki/Attention_deficit_hyperactivity_disorder][ADHD]] and [[https://en.wikipedia.org/wiki/Obsessive%E2%80%93compulsive_disorder][OCD]].
 
@@ -1554,7 +1554,7 @@ Nevertheless, keep in mind that taste, is a personal thing. What I consider to b
 
 So, if you're happy with the look and feel of your editor, feel free to skip this entire section.
 
-*** Frame ✅
+*** Frame
 
 The Emacs frame is the container for my small world, and although I intend to do most of my things within Emacs, I still want it to look like it belongs to its environment (macOS in my case), and there are couple things I like to change to make it more macOS.
 
@@ -1573,7 +1573,7 @@ And the second one, is to make the title bar to have the same color as the backg
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 #+end_src
 
-*** Editor ✅
+*** Editor
 
 The first thing to do to help with my editor appearance, is to store the current line height in a variable. This way, other adjustments can use this value without worrying about different font sizes:
 
@@ -1674,15 +1674,15 @@ Besides this change, I only enable the mode on =prog-mode= buffers, and I like t
 ◆
 #+end_center
 
-Since the time when widescreen monitors became the standard, when it comes to split windows in two, I prefer horizontal splits (one window aside of the other). In order to tell Emacs that I prefer horizontal splits, I have to set the width split threshold to a small number to add weight on Emacs' decision of which orientation to slipt:
+Since the time when widescreen monitors became the standard, when it comes to split windows in two, I prefer horizontal splits (one window aside of the other). In order to tell Emacs that I prefer horizontal splits, I have to set the width split threshold to a small number to add weight on Emacs' decision of which orientation to split:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq split-width-threshold 40)
 #+end_src
 
-*** Theme ✅
-I believe this section to be the most volatile section on this text. Since I got interested on cool old exoteric editors, I'm on an endless search for the Holy Graal of themes. So far I got fond of Tomorrow Night and I use it for the most part of the last 5 years. Recently I got annoyed by some color choices of the theme (the background and line highlight are a bit odd in my opinion), so I kept looking.
+*** Theme
+I believe this section to be the most volatile section on this text. Since I got interested on cool old esoteric editors, I'm on an endless search for the Holy Grail of themes. So far I got fond of Tomorrow Night and I use it for the most part of the last 5 years. Recently I got annoyed by some color choices of the theme (the background and line highlight are a bit odd in my opinion), so I kept looking.
 
 I decided to give /Doom-One/ a try, and so far I'm enjoying. I will admit that the purple-ish feeling of the palette is not my style, but overall, I'm not finding a bed choice.
 
@@ -1709,31 +1709,7 @@ The one complain I have on Doom theme in general, is the conflict =solaire-mode=
 #+end_src
 
 *** Typography
-The next step is to use a better font face and size, which I recognize is a bit subjective. Nevertheless, I'll put here my /current/ font selection.
-
-For my configuration, I have selected 3 fonts:
-
-- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default font. I particularly like the italic face for this font.
-- [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]] :: Used as my default font. I particularly like the italic face for this font.
-- [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements. Currently, I only use it on Treemacs.
-
-Also, for the sake of documentation, this s a not complete list of fonts I used in the past:
-
-- Monospaced Fonts:
-  + [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]]
-  + [[https://pcaro.es/p/hermit/][Hermit]]
-  + [[https://github.com/tonsky/FiraCode][FiraCode]]
-  + [[https://www.jetbrains.com/lp/mono/][JetBrains Mono]]
-  + [[https://github.com/adobe-fonts/source-code-pro][SourceCode Pro]]
-  + [[https://github.com/googlefonts/robotomono][RobotoMono]]
-- Variable Pitch Fonts:
-  + [[https://en.wikipedia.org/wiki/Bookerly][Bookerly]]
-  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]] :: Used for prose writing. This is a serif font with some flare on character assents.
-  + [[https://github.com/impallari/Libre-Baskerville][Libre Baskerville]]
-  + [[https://github.com/adobe-fonts/source-sans-pro][Source Sans Pro]]
-  + [[https://github.com/DavidBarts/ET_Bembo][ETBembo]]
-  + [[https://github.com/googlefonts/roboto][Roboto]]
-  + [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]]
+This section requires an important disclaimer to the reader. In majority of the cases, one should not /need/ to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
 
 Doom exposes five (optional) variables for controlling fonts:
 
@@ -1743,9 +1719,103 @@ Doom exposes five (optional) variables for controlling fonts:
 - ~doom-serif-font~ :: The default font to use for the fixed-pitch-serif face;
 - ~doom-unicode-font~ :: Fallback font for Unicode glyphs;
 
-They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =xlfd= font string. You generally only need ~doom-font~ and ~doom-variable-pitch-font~, but I like to set ~doom-big-font~ as well, to make sure any time I switch to a presentation mode, it still feels like my configuration.
+They all accept either a font-spec, a font string (e.g. "Input Mono-12"), or a =xlfd= font string. You generally only need ~doom-font~ and ~doom-variable-pitch-font~, but I like to set ~doom-big-font~ as well, to make sure any time I switch to a presentation mode, it still feels like I have the same editor, but with a bigger font.
 
-Since I'm adding a different font for UI elements, I'll create a custom font just for this purpose:
+With that out of the way, I need to explain what is, and why my /typography/ configuration exists.
+
+#+begin_center
+◆
+#+end_center
+
+In the past years, I've got involved in some projects where I worked directly with the UX team on visual identity tasks. One of the first thing I got used to do, is to define the typography of the project. But what is typography? According to the wikipedia:
+
+#+begin_quote
+*Typography* is the art and technique of arranging type to make written language legible, readable and appealing when displayed.
+#+end_quote
+
+In the case of my configuration, I can define typography as a set of rules regarding displayed text that I want to use regardless the mode Emacs is in. Or simply put:
+
+Text in my editor must be consistent, and look good.
+
+To achieve this, I have to define said rules, and create a mechanism that will help me get the editor to behave the way I want. The one exception are the colors used on text elements. I want to let this particular trait to the theme I'm using.
+
+The first rule to define is the simplest one: which fonts to use throughout the editor.
+
+Currently, I narrowed my selection to these 3 fonts:
+
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default monospaced font. The actual font I'm using is the [[https://www.nerdfonts.com/][Nerd Fonts]] version, known as /"iMWritingMonoS Nerd Font"/ due to its support for the =all-the-icons= package;
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]] :: Used as my default font for prose writing. For this font in particular, I can't use the Nerd Fonts version, nor the version distributed through [[https://brew.sh/][Homebrew]]. These versions, use the static version of the font that does not support different weights. For my configuration I use the [[https://github.com/iaolo/iA-Fonts/tree/master/iA%20Writer%20Quattro/Variable][Veriable]] version of the font;
+- [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements like the project drawer, tab names, and tooltips;
+
+To install the [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] and the [[https://github.com/googlefonts/roboto][Roboto]], one can use [[https://brew.sh/][Homebrew]] on macOS:
+
+#+begin_src sh :tangle no
+brew tap homebrew/cask-fonts
+brew install --cask font-roboto font-im-writing-nerd-font
+#+end_src
+
+But for the [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]] you have to use to install it manually because the version offered by Homebrew is the static version of the font, which does not come with all the weights available. The correct font to install here is the /variable/ type.
+
+To install the correct font, first download it using =curl=:
+
+#+begin_src sh :tangle no
+cd ~/Downloads && {
+ curl -O 'https://github.com/iaolo/iA-Fonts/raw/master/iA%20Writer%20Quattro/Variable/iAWriterQuattroV.ttf'
+ curl -O 'https://github.com/iaolo/iA-Fonts/raw/master/iA%20Writer%20Quattro/Variable/iAWriterQuattroV-Italic.ttf'
+ cd -
+}
+#+end_src
+
+Then, run the following AppleScript to perform the installation:
+
+#+begin_src sh :tangle no
+osascript <<'END'
+  set theDownloadsFolder to get path to Downloads folder
+  tell application "Finder"
+    set allFonts to every file of theDownloadsFolder whose name starts with "iAWriterQuattroV"
+  end tell
+
+  repeat with theFont in allFonts
+    tell application "Finder"
+        open theFont
+    end tell
+
+    tell application "Font Book"
+        activate
+        set theFontWindow to the first window
+    end tell
+
+    tell application "System Events"
+        tell process "Font Book"
+            tell window 1
+                tell group 1
+                    click button "Install Font"
+                end tell
+            end tell
+        end tell
+    end tell
+  end repeat
+END
+#+end_src
+
+The rest of the rules are more subjective, and in all honesty, the methodology I used to decide which slant, and weight to use to each one of the text elements is non existent. I simply tried, checked how it looked, and asked myself, /"Is this a nice looking element?"/. If the answer was yes, I kept the configuration.
+
+For the size, I started with the headline level 1 and configure it to be as big as it could be without looking disproportional to the text. Then, I reduced the size for the next level gradually until I get to the 8^{th} one, guaranteeing that it would not be smaller than the normal font size.
+
+In practice, this means:
+
+| Headline Level | Proportional size | Multiplier rate |
+|----------------+-------------------+-----------------|
+| Level 1        |              100% |             2.0 |
+| Level 2        |               80% |             1.8 |
+| Level 3        |               60% |             1.6 |
+| Level 4        |               40% |             1.4 |
+| Level 5        |               30% |             1.3 |
+| Level 6        |               20% |             1.2 |
+| Level 7        |               10% |             1.1 |
+| Level 8        |                0% |             1.0 |
+
+To make my typography rules easy to refer to, I create one face for each rule as follows:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1836,9 +1906,54 @@ Since I'm adding a different font for UI elements, I'll create a custom font jus
                             :slant italic))
   "Face used for headlines of level 1."
   :group 'my-typography)
+
+(defface my-uri-face `((t :inherit link))
+  "Face used to display URIs."
+  :group 'my-typography)
 #+end_src
 
-I just need to set the main 3 fonts of Doom, to the ones I selected (we will use the =my-default-ui= when we need it down the road):
+The goal is to customize the fonts I want to have follow one of these rules by resetting all its values to ~'unspecified~ and inheriting one of my typography faces.
+
+To help the tedious task of resetting a face, I want to have a helper function that will do the work for me:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defsubst my-typography-reset (&rest faces)
+  "Mark all face attributes from each face on FACES as `unspecified'."
+  (custom-set-faces!
+            `(,faces
+              :family unspecified
+              :foundry unspecified
+              :width unspecified
+              :height unspecified
+              :weight unspecified
+              :slant unspecified
+              :underline unspecified
+              :overline unspecified
+              :strike-through unspecified
+              :box unspecified
+              :stipple unspecified
+              :font unspecified
+              :fontset unspecified
+              :extend unspecified)))
+#+end_src
+
+The astute reader might ask: /"Why not have this function do the whole work of resetting the font and assign an inheritance?"/
+
+Unfortunately at this point, the answer is not clear. When I tried to implement the /one-shot/ function, the target face would not get the inheritance value, and fonts were all messed up.
+
+By splitting the process into cleaning and then setting, Emacs seams to behave as expected.
+
+#+begin_note
+If you know what is going on here, please let me know. I'll be more than happy to learn and credit you for that!
+#+end_note
+
+#+begin_center
+◆
+#+end_center
+
+To start the configuration, per-se, I will get the Doom's font system configured accordingly to my typography:
 
 #+caption: config.el
 #+begin_src emacs-lisp
@@ -1847,111 +1962,36 @@ I just need to set the main 3 fonts of Doom, to the ones I selected (we will use
       doom-variable-pitch-font (face-attribute 'my-default-prose :font))
 #+end_src
 
+It would be great if Doom could accept a /face/ as the value for these variables, but unfortunately, it does not. Until this change, I have to live with this anonymous face that copy the =font= attribute from my typography face.
+
+The next step is to make sure the base faces used on the editor match my base typography. The process to do so is the same I will use throughout this document whenever I find a mode that I need to adjust to match the defined typography.
+
+I first clean up all styles except color on the faces I want to configure, in this case the faces are =fixed-pitch= and =variable-pitch=:
+
+#+caption: config.el
 #+begin_src emacs-lisp
-(setq doom-emoji-fallback-font-families nil)
-(custom-set-faces!
-  '(fixed-pitch :inherit my-default-mono
-                :family unspecified)
-  '(variable-pitch :inherit my-default-prose
-                   :family unspecified)
-  '(font-lock-comment-face :inherit fixed-pitch))
+(my-typography-reset 'fixed-pitch 'variable-pitch)
 #+end_src
+
+Then I set each face inheritance to the correct typography face:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '(fixed-pitch :inherit my-default-mono)
+  '(variable-pitch :inherit my-default-prose))
+#+end_src
+
+At his point, Emacs have ~'default~, ~'fixed-pitch~, and ~'variable-pitch~ faces matching my selection of fonts. This is, probably, a major part on the typography configuration. The rest of my setup, are individual packages, which I will configure once they show up in this document.
+
+To close out the typography section, I like to enable font smoothing on macOS. To do so, simply set ~ns-use-thin-smoothing~ to =t=:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq ns-use-thin-smoothing t)
 #+end_src
 
-Rainbow mode
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defadvice! my-fontify-rainbow-colorize-match-a (color &optional match)
-  "Return a matched string propertized with a face whose background is COLOR.
-
-This function computes the foreground using `rainbow-color-luminance', and is
-either white or black."
-  :override 'rainbow-colorize-match
-  (let ((match (or match 0)))
-    (put-text-property
-     (match-beginning match) (match-end match)
-     'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
-                               "white" "black"))
-             (:background ,color)
-             (:inherit fixed-pitch)))))
-#+end_src
-
-Info
-
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! info-plus :pin "5ecd4c1e3f1384bffb386e61a8e3788652e55c25")
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! info-plus
-  :commands Info-toggle-fontify-all
-  :init
-  (add-hook! 'Info-selection-hook
-    (defun my-info--fontify-info-h ()
-      (let ((Info-fontify-angle-bracketed-flag nil)
-            (Info-fontify-bookmarked-xrefs-flag nil)
-            (Info-fontify-emphasis-flag nil)
-            (Info-fontify-glossary-words nil)
-            (Info-fontify-isolated-quote-flag nil)
-            (Info-fontify-quotations nil)
-            (Info-fontify-reference-items-flag nil)
-            (Info-fontify-visited-nodes nil))
-        (call-interactively 'Info-toggle-fontify-all)))))
-#+end_src
-
-#+begin_src emacs-lisp
-(after! info
-  (custom-set-faces!
-    `(info-title-1 :inherit my-headline-1
-                   :weight unspecified
-                   :slant unspecified)
-    `(info-title-2 :inherit my-headline-2
-                   :weight unspecified
-                   :slant unspecified)
-    `(info-title-3 :inherit my-headline-3
-                   :weight unspecified
-                   :slant unspecified)
-    `(info-title-4 :inherit my-headline-4
-                   :weight unspecified
-                   :slant unspecified)
-    `(info-menu-header :inherit my-headline-5
-                       :weight unspecified
-                       :slant unspecified)
-    `(info-quoted-name :inherit font-lock-constant-face)
-    `(info-isolated-quote :inherit info-quoted-name)
-    `(info-isolated-backquote :inherit info-quoted-name)
-    `(info-glossary-word :foreground ,(doom-color 'type 256)
-                         :background ,(doom-darken 'type 0.7)
-                         :box (:line-width (4 . 1) :color ,(doom-darken 'type 0.7) :style nil)
-                         :inherit fixed-pitch)
-    `(link-visited :foreground ,(doom-color 'violet 256))
-    `(info-double-quoted-name :inherit font-lock-string-face)
-    `(info-string :inherit font-lock-string-face)
-    `(info-header-node :height 160
-                       :inherit info-node)
-    `(info-header-xref :height 160
-                       :inherit info-xref))
-
-  (font-lock-add-keywords
-   'Info-mode
-   `(("^[\t ]*\\(\\*\\)\\(?:[^(]+([^)]+)\\.\\|[^:]+::\\)"
-      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
-     ("^[\t ]*\\(\\*\\) Menu\\(:\\)"
-      (0 (prog1 ()
-           (compose-region (match-beginning 1) (match-end 1) "☰")
-           (put-text-property (match-beginning 2) (match-end 2) 'invisible t)
-           )))) t))
-#+end_src
-
-*** Iconography ✅
+*** Iconography
 Doom offers the =all-the-icons= package, which allow one to insert Unicode glyphs on buffers. That is a great start, but the problem I see here is how inconsistent the size of these icons are.
 
 The idea for this section is to create a list of curated icons, adjusted to occupy exactly 2 ASCII characters on the buffer. This allows for a better alignment of text when we use an Icon.
@@ -2006,7 +2046,7 @@ In order to allow other parts of this configuration to leverage the curated icon
        (plist-member my-supported-icons icon)))
 #+end_src
 
-I want to also creat a thin-wrapper around the ~plist-get~ to retrieve the icon string for a given symbol:
+I want to also create a thin-wrapper around the ~plist-get~ to retrieve the icon string for a given symbol:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2382,16 +2422,21 @@ TBD
     (or (window-dedicated-p win)
         (not (or (window-next-buffers win)
                  (window-prev-buffers win))))))
+#+end_src
 
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
-(defun my-close-window-when-kill-buffer (&optional buffer-or-name)
+(defun my-close-window-when-kill-buffer-h (&optional buffer-or-name)
   (let* ((buf (get-buffer (or buffer-or-name (current-buffer))))
          (win (get-buffer-window buf)))
     (when (and win
                (my-window-single-buffer-p win))
       (delete-window win))))
+#+end_src
 
-
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defadvice! my-close-window-when-no-buffer-a (&rest _)
   :before-until #'kill-current-buffer
@@ -2424,7 +2469,7 @@ TBD
 #+caption: config.el
 #+begin_src emacs-lisp
 
-(add-hook 'kill-buffer-hook 'my-close-window-when-kill-buffer)
+(add-hook 'kill-buffer-hook 'my-close-window-when-kill-buffer-h)
 
 (advice-remove 'kill-current-buffer #'doom--switch-to-fallback-buffer-maybe-a)
 
@@ -2465,19 +2510,11 @@ TBD
     ("^ \\*undo-tree\\*"
      :slot 2   :vslot -1     :side left    :width 20 :height 0.5
      :select t :modeline nil :autosave nil :ttl 0    :quit t)
-    ("^\\*[Hh]elp"
-     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
+
     ("^\\*YASnippet Tables\\*"
      :slot 2   :vslot -1     :side right   :width 104 :height 0.4
      :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*lexic\\*$"
-     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*WordNut\\*$"
-     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*info\\*$"
      :slot 2   :vslot -1     :side right   :width 100 :height 0.4
      :select t :modeline nil :autosave nil :ttl 0     :quit t)
     ("^\\*Warnings"
@@ -2499,18 +2536,148 @@ TBD
     ))
 #+end_src
 
+** TODO Special modes
+TBD
+
+*** Info mode
+TBD
+
 #+caption: config.el
 #+begin_src emacs-lisp
-(add-hook! (help-mode
-            helpful-mode
-            Info-mode
-            lexic-mode)
-  (defun my-popup-format-info-side-pannel-h ()
-    (setq writeroom-width 70)
-    (+zen/toggle)
-    (tab-line-mode -1)
-    ;; (hl-line-mode -1)
-    ))
+(set-popup-rule! "^\\*info\\*$"
+  :slot 2   :vslot -1     :side 'right  :width 90 :height 0.4
+  :select t :modeline nil :autosave nil :ttl 0    :quit t)
+#+end_src
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! info-plus :pin "5ecd4c1e3f1384bffb386e61a8e3788652e55c25")
+#+end_src
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-info--fontify-info-h ()
+  (let ((Info-fontify-angle-bracketed-flag nil)
+        (Info-fontify-bookmarked-xrefs-flag nil)
+        (Info-fontify-emphasis-flag nil)
+        (Info-fontify-glossary-words nil)
+        (Info-fontify-isolated-quote-flag nil)
+        (Info-fontify-quotations nil)
+        (Info-fontify-reference-items-flag nil)
+        (Info-fontify-visited-nodes nil))
+    (call-interactively 'Info-toggle-fontify-all)
+    (font-lock-update)))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! info-plus
+  :commands Info-toggle-fontify-all
+  :init
+  (add-hook! Info-selection #'my-info--fontify-info-h))
+#+end_src
+
+#+begin_src emacs-lisp
+(after! info
+  (font-lock-add-keywords
+   'Info-mode
+   `(("^\\(\\*\\) "
+      (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))
+     ("^[\t ]*\\(\\*\\) Menu\\(:\\)"
+      (0 (prog1 ()
+           (compose-region (match-beginning 1) (match-end 1) "☰")
+           (put-text-property (match-beginning 2) (match-end 2) 'invisible t)
+           )))) t))
+#+end_src
+
+#+begin_src emacs-lisp
+(my-typography-reset (cl-loop for i from 1 to 4 collect (intern (format "info-title-%d" i))))
+(my-typography-reset 'info-menu-header)
+#+end_src
+
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '(info-title-1 :inherit outline-1 :weight unspecified :extend unspecified)
+  '(info-title-2 :inherit outline-2 :weight unspecified :extend unspecified)
+  '(info-title-3 :inherit outline-3 :weight unspecified :extend unspecified)
+  '(info-title-4 :inherit outline-4 :weight unspecified :extend unspecified)
+  '(info-menu-header :inherit outline-5 :weight unspecified :extend unspecified)
+  `(info-quoted-name :inherit font-lock-constant-face)
+  `(info-isolated-quote :inherit info-quoted-name)
+  `(info-isolated-backquote :inherit info-quoted-name)
+  `(info-glossary-word :foreground ,(doom-color 'type 256)
+                       :background ,(doom-darken 'type 0.7)
+                       :box (:line-width (4 . 1) :color ,(doom-darken 'type 0.7) :style nil)
+                       :inherit fixed-pitch)
+  `(link-visited :foreground ,(doom-color 'violet 256))
+  `(info-double-quoted-name :inherit font-lock-string-face)
+  `(info-string :inherit font-lock-string-face)
+  `(info-header-node :height 160
+                     :inherit info-node)
+  `(info-header-xref :height 160
+                     :inherit info-xref))
+#+end_src
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-info-buffer-config-h ()
+  (setq writeroom-width 75)
+  (let ((+zen-text-scale 0))
+    (+zen/toggle))
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook! Info-mode #'my-info-buffer-config-h)
+#+end_src
+
+*** Help mode
+TBD
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*[Hh]elp"
+  :slot 2   :vslot -1     :side 'right  :width 90 :height 0.4
+  :select t :modeline nil :autosave nil :ttl 0    :quit t)
+#+end_src
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-help-buffer-config-h ()
+  (setq writeroom-width 75)
+  (let ((+zen-text-scale 0))
+    (+zen/toggle))
+  (visual-line-mode 1))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook! (help-mode helpful-mode) #'my-help-buffer-config-h)
+#+end_src
+
+*** Rainbow mode
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defadvice! my-fontify-rainbow-colorize-match-a (color &optional match)
+  "Return a matched string propertized with a face whose background is COLOR.
+
+This function computes the foreground using `rainbow-color-luminance', and is
+either white or black."
+  :override 'rainbow-colorize-match
+  (let ((match (or match 0)))
+    (put-text-property
+     (match-beginning match) (match-end match)
+     'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
+                               "white" "black"))
+             (:background ,color)
+             (:inherit fixed-pitch)))))
 #+end_src
 
 * Temporary workarounds
@@ -2523,7 +2690,7 @@ We call the standard interactive mode on Emacs [[https://www.gnu.org/software/em
 
 - Icomplete :: Bundled with Emacs;
 - Helm :: One of the first heavy weight contender to replace Ido;
-- Ivy :: Created as a lightweight version of Helm, with the goal to achieve parity with Help at a minium;
+- Ivy :: Created as a lightweight version of Helm, with the goal to achieve parity with Help at a minimum;
 
 When I was writing this document, one of the /new kids on the block/ for completion framework was a set of packages that I kindly named /Selectrum and Friends/. The list of packages that compose this set are:
 
@@ -2542,7 +2709,7 @@ To configure all these packages on Doom, I have to do it in the following order:
 
 - Configure result filtering and mach highlights;
 - Configure result sorting;
-- Configure result item annotations (to display exta information for each completion candidate);
+- Configure result item annotations (to display extra information for each completion candidate);
 - Configure the completion UI;
 - Configure contextual menu;
 - Configure extra commands;
@@ -2621,7 +2788,7 @@ So, while you can’t get different faces for different components, you can at l
 
 Then it hit me: why not use both?
 
-The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the two required hooks for remembering, and the one variable, later on =selectum=, to use the /pre-processing/ from =prescient=. So let's start with =packages.el=:
+The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the two required hooks for remembering, and the one variable, later on =selectum=, to use the /preprocessing/ from =prescient=. So let's start with =packages.el=:
 
 #+caption: packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -2959,7 +3126,72 @@ If ARG (universal argument), include all files, even hidden or compressed ones."
 #+end_src
 
 *** Change Doom's behavior
-By default, Doom comes with all its configuration tailored for =ivy= or =helm=, this means that some packages will need some help from us to work nicely with =selectrum= and friends.
+By default, Doom comes with all its configuration tailored for =ivy= or =helm=, this means that some packages will need some help from us to work nicely with =selectrum= and friends.c
+
+#+caption: autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defadvice! my-spell-correct-a ()
+  "Correct spelling of word at point."
+  :override '+spell/correct
+  (interactive)
+  ;; spell-fu fails to initialize correctly if it can't find aspell or a similar
+  ;; program. We want to signal the error, not tell the user that every word is
+  ;; spelled correctly.
+  (unless (;; This is what spell-fu uses to check for the aspell executable
+           or (and ispell-really-aspell ispell-program-name)
+           (executable-find "aspell"))
+    (user-error "Aspell is required for spell checking"))
+
+  (ispell-set-spellchecker-params)
+  (save-current-buffer
+    (ispell-accept-buffer-local-defs))
+  (cl-destructuring-bind (start . end)
+      (or (bounds-of-thing-at-point 'word)
+          (user-error "No word at point"))
+    (let ((word (thing-at-point 'word t))
+          (orig-pt (point))
+          poss ispell-filter)
+      (ispell-send-string "%\n")
+      (ispell-send-string (concat "^" word "\n"))
+      (while (progn (accept-process-output ispell-process)
+                    (not (string= "" (car ispell-filter)))))
+      ;; Remove leading empty element
+      (setq ispell-filter (cdr ispell-filter))
+      ;; ispell process should return something after word is sent. Tag word as
+      ;; valid (i.e., skip) otherwise
+      (unless ispell-filter
+        (setq ispell-filter '(*)))
+      (when (consp ispell-filter)
+        (setq poss (ispell-parse-output (car ispell-filter))))
+      (cond
+       ((or (eq poss t) (stringp poss))
+        ;; don't correct word
+        (message "%s is correct" (funcall ispell-format-word-function word))
+        t)
+       ((null poss)
+        ;; ispell error
+        (error "Ispell: error in Ispell process"))
+       (t
+        ;; The word is incorrect, we have to propose a replacement.
+        (setq res (funcall +spell-correct-interface (nth 2 poss) word))
+        ;; Some interfaces actually eat 'C-g' so it's impossible to stop rapid
+        ;; mode. So when interface returns nil we treat it as a stop.
+        (unless res (setq res (cons 'break word)))
+        (cond
+         ((stringp res)
+          (+spell--correct res poss word orig-pt start end))
+         ((let ((cmd (car res))
+                (wrd (cdr res)))
+            (unless (or (eq cmd 'skip)
+                        (eq cmd 'break)
+                        (eq cmd 'stop))
+              (+spell--correct cmd poss wrd orig-pt start end)
+              (unless (string-equal wrd word)
+                (+spell--correct wrd poss word orig-pt start end))))))
+        (ispell-pdict-save t))))))
+
+#+end_src
 
 The first module we have to change, is /workspaces/.
 
@@ -4038,7 +4270,7 @@ And since we only used functions we already have implemented, we can bind it to 
 #+end_src
 
 *** Delete session and quit
-On the next sections in this document, we will configure session persistance, and the time when we will save our sessions, is when we kill Emacs. If we delete all sessions, and then quit, the result is that Emacs will save our /empty/ session before quitting. Although we might desire this behavior some times, we also need a way to tell emacs to /discard/ our current session. To achieve this, let's define a variable to use as a flag for saving the session or not:
+On the next sections in this document, we will configure session persistence, and the time when we will save our sessions, is when we kill Emacs. If we delete all sessions, and then quit, the result is that Emacs will save our /empty/ session before quitting. Although we might desire this behavior some times, we also need a way to tell emacs to /discard/ our current session. To achieve this, let's define a variable to use as a flag for saving the session or not:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -4069,7 +4301,7 @@ And since we only used functions we already have implemented, we can bind it to 
 #+end_src
 
 *** Save session to file
-Our workspace refactor is working as expected, but we still need persistance. =perspective.el= and =persp-mode= behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
+Our workspace refactor is working as expected, but we still need persistence. =perspective.el= and =persp-mode= behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
 
 With that out of the way, let's jump right into the first command:
 
@@ -4095,7 +4327,7 @@ With that out of the way, let's jump right into the first command:
       (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error))))))
 #+end_src
 
-The only part of this function that is worth mentioning is that we show the list of current saved workspaces so we can see what is there when we're choosing a file name.
+The only part of this function that is worth mentioning is that we show the list of current saved workspaces so we can see what is there when we're choosing a filename.
 
 We still need to code our low level  function to save a workspace:
 
@@ -4128,7 +4360,7 @@ We will make sure that the most complex part of this function goes to another fu
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 (defun +workspace-resolve-session-file-path (&optional name)
-  "Returns the full path for a session file name given a NAME identifier.
+  "Returns the full path for a session filename given a NAME identifier.
 
 If we omit the NAME, we will use the current time with the format
 \"%Y-%0m-%0d-%0H-%0M\" (see `format-time-string' for information about the
@@ -4154,7 +4386,7 @@ Let's add these variables to our autoload file:
 
 ;;;###autoload
 (defvar +workspaces-data-file-prefix "_workspaces_"
-  "The file name prefix of files used to store a workspace session. We will store
+  "The filename prefix of files used to store a workspace session. We will store
 these file at `+workspaces-data-dir'.")
 #+end_src
 
@@ -4347,7 +4579,7 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 #+end_src
 
 * Writing
-Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is Ok handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
+Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
 
 My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
 
@@ -4443,44 +4675,18 @@ Notice that we crated these variables before loading anything related to Org. Th
 
 Now we can wait Org to load to  continue our configuration:
 
-#+caption: autoload/writing.el
-#+begin_src emacs-lisp :tangle autoload/writing.el
-;;;###autoload
-(defun my-adjust-outline-fonts-h ()
-  (after! outline
-    (custom-set-faces!
-     `(outline-1 :inherit my-headline-1
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-2 :inherit my-headline-2
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-3 :inherit my-headline-3
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-4 :inherit my-headline-4
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-5 :inherit my-headline-5
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-6 :inherit my-headline-6
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-7 :inherit my-headline-7
-                 :weight unspecified
-                 :slant unspecified)
-     `(outline-8 :inherit my-headline-8
-                 :weight unspecified
-                 :slant unspecified))))
-#+end_src
-
 #+caption: config.el
 #+begin_src emacs-lisp
-(after! outline
-  (if (daemonp)
-      (add-hook! 'server-after-make-frame-hook #'my-adjust-outline-fonts-h)
-    (my-adjust-outline-fonts-h)))
+(my-typography-reset (cl-loop for i from 1 to 8 collect (intern (format "outline-%d" i))))
+(custom-set-faces!
+  `(outline-1 :inherit my-headline-1 :weight unspecified :extend unspecified)
+  `(outline-2 :inherit my-headline-2 :weight unspecified :extend unspecified)
+  `(outline-3 :inherit my-headline-3 :weight unspecified :extend unspecified)
+  `(outline-4 :inherit my-headline-4 :weight unspecified :extend unspecified)
+  `(outline-5 :inherit my-headline-5 :weight unspecified :extend unspecified)
+  `(outline-6 :inherit my-headline-6 :weight unspecified :extend unspecified)
+  `(outline-7 :inherit my-headline-7 :weight unspecified :extend unspecified)
+  `(outline-8 :inherit my-headline-8 :weight unspecified :extend unspecified))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -4570,42 +4776,7 @@ In some documents, I need to write math formulas and Org can render them pretty 
 
  I need to adjust some of the Org fonts to use fixed pitch regardless if I'm using variable pitch. This will guarantee that tables, source blocks, and some other formatting will render properly on the UI, so let's create a function for it:
 
-#+caption: autoload/writing.el
-#+begin_src emacs-lisp :tangle autoload/writing.el
-;;;###autoload
-(defun my-adjust-org-fonts-h ()
-  (after! org
-    (custom-set-faces!
-      '(org-document-title :height unspecified :weight unspecified :slant unspecified :inherit my-document-title)
-      '(org-document-info :inherit fixed-pitch)
-      '(org-document-info-keyword :inherit fixed-pitch)
-      '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
-      '(org-property-value :inherit fixed-pitch)
-      '(org-special-keyword :inherit font-lock-comment-face)
-      `(org-drawer :foreground ,(doom-color 'doc-comments) :inherit fixed-pitch)
-      '(org-table :inherit fixed-pitch)
-      '(org-formula :inherit org-table)
-      '(org-block :inherit fixed-pitch)
-      '(org-verbatim :inherit fixed-pitch)
-      '(org-code :inherit fixed-pitch)
-      '(org-date :inherit fixed-pitch)
-      '(org-block-begin-line :height 0.8 :inherit fixed-pitch)
-      '(org-block-end-line :inherit org-block-begin-line)
-      '(org-tag :height 150)))
-
-  (after! org-indent
-    (custom-set-faces!
-      '(org-indent :inherit (org-hide fixed-pitch)))))
-#+end_src
-
 Once we create the function, we can attach it to a hook or execute it right away depending on Emacs running as a daemon or not:
-
-#+caption: config.el
-#+begin_src emacs-lisp
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook #'my-adjust-org-fonts-h)
-    (my-adjust-org-fonts-h))
-#+end_src
 
 And to close out my /beautification/, I want to render some unicode characters instead of some Org elements:
 
@@ -4636,6 +4807,38 @@ After all these tweaks, we can close our parenthesis:
 #+caption: config.el
 #+begin_src emacs-lisp
 ) ;; after! org
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '((org-document-info
+     org-document-info-keyword
+     org-property-value
+     org-drawer
+     org-table
+     org-block
+     org-verbatim
+     org-code
+     org-date
+     org-block-begin-line)
+    :inherit fixed-pitch))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(my-typography-reset 'org-document-title)
+
+(custom-set-faces!
+  '(org-document-title :inherit my-document-title :weight unspecified :extend unspecified)
+  '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
+  '(org-special-keyword :inherit font-lock-comment-face)
+  `(org-drawer :foreground ,(doom-color 'doc-comments))
+  '(org-formula :inherit org-table)
+  '(org-block-begin-line :height 0.8)
+  '(org-block-end-line :inherit org-block-begin-line)
+  '(org-tag :height 150)
+  '(org-indent :inherit (org-hide fixed-pitch)))
 #+end_src
 
 Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called =org-fragtog=. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
@@ -4690,20 +4893,20 @@ To fix this behavior, we just need to re-bind some of the movement keys to the /
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(map! :after org
-      (:map org-mode-map
-       :nvm "j" #'evil-next-visual-line
-       :nvm "k" #'evil-previous-visual-line
-       :nv "0" #'evil-beginning-of-visual-line
-       :nvm "^" #'evil-first-non-blank-of-visual-line
-       :nvm "$" #'evil-end-of-visual-line
+;; (map! :after org
+;;       (:map org-mode-map
+;;        :nvm "j" #'evil-next-visual-line
+;;        :nvm "k" #'evil-previous-visual-line
+;;        :nv "0" #'evil-beginning-of-visual-line
+;;        :nvm "^" #'evil-first-non-blank-of-visual-line
+;;        :nvm "$" #'evil-end-of-visual-line
 
-       (:prefix ("g" . "goto")
-        :desc "Next real line" :nvm "j" #'evil-next-line
-        :desc "Previous real line" :nvm "k" #'evil-previous-line
-        :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
-        :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
-        :desc "End of real line" :nvm "$" #'evil-end-of-line)))
+;;        (:prefix ("g" . "goto")
+;;         :desc "Next real line" :nvm "j" #'evil-next-line
+;;         :desc "Previous real line" :nvm "k" #'evil-previous-line
+;;         :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
+;;         :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
+;;         :desc "End of real line" :nvm "$" #'evil-end-of-line)))
 #+end_src
 
 While I'm sure I'm missing a command or two, these will get me started.
@@ -4781,15 +4984,17 @@ To separate my configuration from initialization logic, let's create another aut
 #+caption: autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
 ;;;###autoload
-(defun my-org-config-h ()
+(defun my-org-buffer-config-h ()
   "Configure all aspects of an Org buffer right before we display it to the user."
   ;; Enable minor modes
   (+zen/toggle)
   (valign-mode 1)
-  ;; (setq line-spacing 0.25)
   (variable-pitch-mode 1)
+  (visual-line-mode 1)
   ;; Call org configuration functions
   (org-display-inline-images)
+  ;; Ignore flycheck errors on source blocks
+  (my-noflycheck-h)
   ;; Force a buffer refresh to guarantee all setup is in use
   (set-window-buffer nil (current-buffer)))
 #+end_src
@@ -4798,7 +5003,7 @@ With this function in place, we can /hook/ it to our Org major mode:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook #'my-org-config-h)
+(add-hook 'org-mode-hook #'my-org-buffer-config-h)
 #+end_src
 
 #+caption: packages.el
@@ -4820,11 +5025,6 @@ With this function in place, we can /hook/ it to our Org major mode:
         '((:eval (concat " ☰ " (propertize "Outline" 'face '(:inherit 'my-default-ui :height 0.8)))))))
 #+end_src
 
-#+caption: config.el
-#+begin_src emacs-lisp
-
-#+end_src
-
 ** TODO Prose writing
 I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
 
@@ -4832,7 +5032,7 @@ With that out of the way, I need to acknowledge that, currently in my career, th
 
 For me, this means I should have a tool that offers me the power required to do any kind of writing, but in the same time, makes my life easier when doing the /writing thing/.
 
-Emacs and Org Mode fullfil the /power/ part of my goal, and this configuration will try to tackle the second.
+Emacs and Org Mode fulfill the /power/ part of my goal, and this configuration will try to tackle the second.
 
 Let's look into my list of requirements for writing:
 
@@ -4859,6 +5059,11 @@ Although we already covered most of this list of the previous section, we still 
 #+begin_src emacs-lisp
 (use-package! lexic
   :commands lexic-search lexic-list-dictionary
+  :init
+  (set-popup-rule! "^\\*lexic\\*$"
+    :slot 2   :vslot -1     :side 'right  :width 100 :height 0.4
+    :select t :modeline nil :autosave nil :ttl 0     :quit t)
+
   :config
   (cl-delete-if (lambda (spec)
                   (equal (car-safe spec) "Online Etymology Dictionary"))
@@ -4877,7 +5082,7 @@ Although we already covered most of this list of the previous section, we still 
               :short "Origin"
               :formatter lexic-format-online-etym
               :priority 4))
- 
+
   (map! :map lexic-mode-map
         :n "q" #'lexic-return-from-lexic
         :nv "RET" #'lexic-search-word-at-point
@@ -4894,6 +5099,20 @@ Although we already covered most of this list of the previous section, we still 
         :n "C-p" #'lexic-search-history-backwards
         :n "C-n" #'lexic-search-history-forwards
         :n "/" (cmd! (call-interactively #'lexic-search))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-lexic-buffer-config-h ()
+  (setq writeroom-width 75)
+  (let ((+zen-text-scale 0))
+    (+zen/toggle)))
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook 'lexic-mode-hook #'my-lexic-buffer-config-h)
 #+end_src
 
 #+caption: autoload/writing.el
@@ -4917,15 +5136,6 @@ cd aspell6-en-custom
 ./configure && make && sudo make install
 cd ..
 rm -rf aspell6-en-custom*
-#+end_src
-
-#+caption: ~/.aspell.conf
-#+begin_src conf :tangle no
-personal       personal.en.pws
-local-data-dir .
-prefix         ~/.local/share/aspell
-master         en-custom
-sug-mode       ultra
 #+end_src
 
 #+caption: config.el
@@ -4964,38 +5174,194 @@ If EXTRA-ARGS is not nil, this function will append its value to the result."
   (setq ispell-really-aspell t)
   (setq ispell-extra-args (my-aspell-cmd-flags t))
 
-  (add-hook! org-mode
-    (defun my-spell-add-extra-ignores-to-org-h ()
-      "Configure `ispell-skip-region-alist' for `org-mode'."
-      (make-local-variable 'ispell-skip-region-alist)
-      (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
-      (add-to-list 'ispell-skip-region-alist '("~" "~"))
-      (add-to-list 'ispell-skip-region-alist '("=" "="))
-      (add-to-list 'ispell-skip-region-alist '("\\[\\[" . "]\\["))
-      (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
-      (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+  ;; (add-hook! org-mode
+  ;;   (defun my-spell-add-extra-ignores-to-org-h ()
+  ;;     "Configure `ispell-skip-region-alist' for `org-mode'."
+  ;;     (make-local-variable 'ispell-skip-region-alist)
+  ;;     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+  ;;     (add-to-list 'ispell-skip-region-alist '("~" "~"))
+  ;;     (add-to-list 'ispell-skip-region-alist '("=" "="))
+  ;;     (add-to-list 'ispell-skip-region-alist '("\\[\\[" . "]\\["))
+  ;;     (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+  ;;     (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
 
-      (setq-local ispell-extra-args (my-aspell-cmd-flags nil
-                                                             "--lset-filter=url:email:context"
-                                                             "--context-visible-first=true"
-                                                             "--add-context-delimiters=~ ~"
-                                                             "--add-context-delimiters== ="
-                                                             "--add-context-delimiters=[[ ][")))))
+  ;;     (setq-local ispell-extra-args (my-aspell-cmd-flags nil
+  ;;                                                            "--lset-filter=url:email:context"
+  ;;                                                            "--context-visible-first=true"
+  ;;                                                            "--add-context-delimiters=~ ~"
+  ;;                                                            "--add-context-delimiters== ="
+  ;;                                                            "--add-context-delimiters=[[ ]["))))
+  )
 #+end_src
 
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! flyspell-correct)
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-spell-fu-find-urls (point-start point-end)
+  (let ((url-ranges (list)))
+    (save-match-data
+      (save-excursion
+        (goto-char point-start)
+        (while (re-search-forward browse-url-button-regexp point-end t)
+          (push (cons (match-beginning 0) (match-end 0)) url-ranges))
+        url-ranges))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-spell-fu-check-range (point-start point-end)
+  "Check spelling for POINT-START & POINT-END ignoring urls."
+  (spell-fu--remove-overlays point-start point-end)
+  (with-syntax-table spell-fu-syntax-table
+    (save-match-data
+      (save-excursion
+        (goto-char point-start)
+        (while (re-search-forward spell-fu-word-regexp point-end t)
+          (let ((url-ranges (my-spell-fu-find-urls point-start point-end))
+                (word-start (match-beginning 0))
+                (word-end (match-end 0)))
+            (unless (seq-some (lambda (range)
+                                (or (and (> word-start (car range))
+                                         (< word-start (cdr range)))
+                                    (and (> word-end (car range))
+                                         (< word-end (cdr range)))))
+                              url-ranges)
+              (when (spell-fu--check-faces-at-point
+                     word-start
+                     spell-fu-faces-include
+                     spell-fu-faces-exclude)
+                (spell-fu-check-word word-start word-end (match-string-no-properties 0))))))))))
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(use-package! flyspell
-  :hook (spell-fu-mode . flyspell-mode))
+(after! spell-fu
+  (setq spell-fu-check-range 'my-spell-fu-check-range))
+#+end_src
 
-(use-package! flyspell-correct
-  :after flyspell
-  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+Rules:
+- https://github.com/textlint-rule/textlint-rule-no-start-duplicated-conjunction
+ 
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! flycheck
+  (setq flycheck-textlint-config "~/.config/textlint/config.json"))
+#+end_src
+
+- https://emacs.stackexchange.com/questions/48587/have-flycheck-skip-certain-regions
+- https://emacs.stackexchange.com/questions/47878/how-can-i-disable-a-specific-lint-error-for-emacs-lisp-using-flycheck
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(defvar my-noflycheck-region-alist
+  '((org-mode ("^[ \\t]*?#\\+begin_src" . "^[ \\t]*?#\\+end_src")))
+  "An association list between major modes and a noflycheck region delimiters.
+
+The region delimiters are two regular expressions that should match the
+beginning and the end of the region respectively.")
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-noflycheck-should-skip-error-h (err)
+  "Ignore flycheck ERR if it happens inside a 'no flycheck' region."
+  (when-let ((region (car (alist-get major-mode my-noflycheck-region-alist)))
+             (_ (save-excursion
+                  (save-match-data
+                    (let* ((start (car region))
+                           (end (cdr region))
+                           (both (format "\\(?:\\(%s\\)\\|%s\\)" start end)))
+                      (goto-char (flycheck-error-pos err))
+                      (and (re-search-backward both nil t)
+                           (match-beginning 1)))))))
+    (setq-local flycheck-current-errors (remove err flycheck-current-errors))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-noflycheck-should-skip-urls-h (err)
+  "Ignore flycheck ERR if it happens inside a 'no flycheck' region."
+  (when-let ((_ (save-excursion
+                  (save-match-data
+                    (when-let ((err-pos (flycheck-error-pos err)))
+                      (goto-char err-pos)
+                      (thing-at-point 'url))))))
+    (setq-local flycheck-current-errors (remove err flycheck-current-errors))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-noflycheck-h ()
+  "Add a skip flycheck for regions defined at `my-noflycheck-region-alist'."
+  (require 'flycheck)
+  (add-hook 'flycheck-process-error-functions #'my-noflycheck-should-skip-error-h nil t)
+  (add-hook 'flycheck-process-error-functions #'my-noflycheck-should-skip-urls-h nil t))
+#+end_src
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! flycheck-posframe)
+#+end_src
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(custom-set-faces!
+  '(flycheck-posframe-border-face :foreground "#000000")
+  '(flycheck-posframe-face :inherit my-default-ui))
+
+(use-package! flycheck-posframe
+  :hook ((flycheck-mode . flycheck-posframe-mode))
+  :init
+  (setq flycheck-posframe-border-width 1
+        flycheck-posframe-prefix
+        (format "%s\t" (all-the-icons-material "close" :height 0.7 :v-adjust -0.1))
+        flycheck-posframe-info-prefix
+        (format "%s\t" (all-the-icons-material "info" :height 0.7 :v-adjust -0.1))
+        flycheck-posframe-warning-prefix
+        (format "%s\t" (all-the-icons-material "warning" :height 0.7 :v-adjust -0.1))
+        flycheck-posframe-error-prefix
+        (format "%s\t" (all-the-icons-material "error" :height 0.7 :v-adjust -0.1)))
+)
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defadvice! my-flycheck-posframe-format-errors-a (fun &rest args)
+  "Advice to add a top and bottom padding to the error message."
+  :around 'flycheck-posframe-format-errors
+  (concat (propertize "  \n" 'face '(:height 60))
+          (apply fun args)
+          (propertize "\n  " 'face '(:height 60))))
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+(defadvice! my-flycheck-posframe-show-posframe-a (errors)
+  "Display ERRORS, using posframe.el library."
+  :override 'flycheck-posframe-show-posframe
+  (posframe-hide flycheck-posframe-buffer)
+  (when (and errors
+             (not (run-hook-with-args-until-success 'flycheck-posframe-inhibit-functions)))
+    (let ((poshandler (intern (format "posframe-poshandler-%s" flycheck-posframe-position))))
+      (unless (functionp poshandler)
+        (setq poshandler nil))
+      (flycheck-posframe-check-position)
+      (posframe-show
+       flycheck-posframe-buffer
+       :string (flycheck-posframe-format-errors errors)
+       :background-color (face-background 'flycheck-posframe-background-face nil t)
+       :position (point)
+       :internal-border-width flycheck-posframe-border-width
+       :internal-border-color (face-foreground 'flycheck-posframe-border-face nil t)
+       :poshandler poshandler
+       :hidehandler #'flycheck-posframe-hidehandler
+       :left-fringe 10
+       :right-fringe 10))))
 #+end_src
 
 *** Templates
@@ -5122,7 +5488,7 @@ The last snippets I consider useful for source blocks are captions. On the two s
 #+caption: $0
 #+end_src
 
-This snippet is fine, but we still have to type the file name there. Let's create another one to make this task even easier:
+This snippet is fine, but we still have to type the filename there. Let's create another one to make this task even easier:
 
 #+caption: snippets/org-mode/caption-file
 #+begin_src snippet :tangle snippets/org-mode/caption-file
@@ -5529,11 +5895,11 @@ Example:
       (error "A capture description requires a text."))
     (if icon
         (progn
-          (unless (and (consp icon)
-                       (my-supported-icons-p (car-safe icon))
-                       (stringp (cdr-safe icon)))
-            (error (concat "A capture description icon must be a cons cell with"
-                           " one of my-supported-icons symbol and a string color.")))
+          ;; (unless (and (consp icon)
+          ;;              (my-supported-icons-p (car-safe icon))
+          ;;              (stringp (cdr-safe icon)))
+          ;;   (error (concat "A capture description icon must be a cons cell with"
+          ;;                  " one of my-supported-icons symbol and a string color.")))
           (format "%s %s" (my-icon (car icon) (cdr icon)) text))
       text)))
 #+end_src
@@ -5637,7 +6003,7 @@ time."
 #+caption: config.el
 #+begin_src emacs-lisp
 (defconst my-roam-dailies-file-name "notes/daily/daily-notes-%<%Y-%m-%d>.org"
-  "File name format for the Daily Notes file.")
+  "Filename format for the Daily Notes file.")
 
 (defconst my-roam-dailies-header (concat "#+TITLE: Daily notes for %<%A, %B %-e, %Y>\n"
                                            "#+STARTUP: overview\n"
@@ -5922,13 +6288,13 @@ frame width to `fill-column' before start editing."
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(after! org-capture
-  (appendq! org-capture-templates
-            `(("c" ,(my-capture-description :text "Contact" :icon `(contact-add . ,(doom-color 'yellow 256)))
-               plain (file+function +org-contacts-file my-capture-position-cursor)
-               ,(my-capture-heading-template "* %|contact|\n\n")
-               :empty-lines-after 1
-               :kill-buffer t))))
+;; (after! org-capture
+;;   (appendq! org-capture-templates
+;;             `(("c" ,(my-capture-description :text "Contact" :icon `(contact-add . ,(doom-color 'yellow 256)))
+;;                plain (file+function +org-contacts-file my-capture-position-cursor)
+;;                ,(my-capture-heading-template "* %|contact|\n\n")
+;;                :empty-lines-after 1
+;;                :kill-buffer t))))
 #+end_src
 
 #+begin_src snippet :tangle share/capture/org-mode/capture-contact
@@ -6314,10 +6680,11 @@ TBD
                                         "\\)")
       deft-time-format "  %A, %B %e %Y (%H:%M)")
 
-(add-hook 'deft-mode-hook (lambda ()
-                            (hl-line-mode 1)
-                            (setq-local evil-normal-state-cursor (list nil)
-                                        evil-insert-state-cursor (list nil))))
+(add-hook! 'deft-mode-hook
+  (defun my-deft-buffer-config-h ()
+    (hl-line-mode 1)
+    (setq-local evil-normal-state-cursor (list nil)
+                evil-insert-state-cursor (list nil))))
 
 (map! :after deft
       (:map deft-mode-map
@@ -6356,13 +6723,8 @@ TBD
   :init
   (setq plantuml-jar-path "/usr/local/var/homebrew/linked/plantuml/libexec/plantuml.jar"
         org-plantuml-jar-path plantuml-jar-path)
-
-  :config
   (set-popup-rule! "^\\*PLANTUML" :size 0.4 :side 'right :select nil :ttl 0))
 #+end_src
-
-#+RESULTS:
-: t
 
 ** TODO Other modes
 Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
@@ -6372,6 +6734,12 @@ Although my writing will be exclusive in =org-mode=, I'm still interaction with 
 #+caption: config.el
 #+begin_src emacs-lisp
 (setq markdown-split-window-direction 'right
+      markdown-list-item-bullets '("•" "‣" "⁍")
+      markdown-blockquote-display-char `(,(propertize "▌" 'face '(:inherit markdown-blockquote-face
+                                                                  :slant normal))
+                                         ,(propertize "┃" 'face '(:inherit markdown-blockquote-face
+                                                                  :slant normal))
+                                         ">")
       markdown-header-scaling t
       markdown-header-scaling-values (list (face-attribute 'my-headline-1 :height)
                                            (face-attribute 'my-headline-2 :height)
@@ -6380,39 +6748,25 @@ Although my writing will be exclusive in =org-mode=, I'm still interaction with 
                                            (face-attribute 'my-headline-5 :height)
                                            (face-attribute 'my-headline-6 :height)))
 
-(defun my-setup-markdown-faces-h ()
-  (custom-set-faces!
-    `(markdown-header-face :inherit unspecified)
-    `(markdown-header-face-1 :inherit my-headline-1
-                             :foreground ,(face-attribute 'outline-1 :foreground)
-                             :weight unspecified
-                             :slant unspecified)
-    `(markdown-header-face-2 :inherit my-headline-2
-                             :foreground ,(face-attribute 'outline-2 :foreground)
-                             :weight unspecified
-                             :slant unspecified)
-    `(markdown-header-face-3 :inherit my-headline-3
-                             :foreground ,(face-attribute 'outline-3 :foreground)
-                             :weight unspecified
-                             :slant unspecified)
-    `(markdown-header-face-4 :inherit my-headline-4
-                             :foreground ,(face-attribute 'outline-4 :foreground)
-                             :weight unspecified
-                             :slant unspecified)
-    `(markdown-header-face-5 :inherit my-headline-5
-                             :foreground ,(face-attribute 'outline-5 :foreground)
-                             :weight unspecified
-                             :slant unspecified)
-    `(markdown-header-face-6 :inherit my-headline-6
-                             :foreground ,(face-attribute 'outline-6 :foreground)
-                             :weight unspecified
-                             :slant unspecified)))
+(my-typography-reset (cl-loop for i from 1 to 6 collect (intern (format "markdown-header-face-%d" i))))
+(my-typography-reset 'markdown-code-face)
+
+(custom-set-faces!
+  `(markdown-header-face-1 :inherit outline-1 :weight unspecified :extend unspecified)
+  `(markdown-header-face-2 :inherit outline-2 :weight unspecified :extend unspecified)
+  `(markdown-header-face-3 :inherit outline-3 :weight unspecified :extend unspecified)
+  `(markdown-header-face-4 :inherit outline-4 :weight unspecified :extend unspecified)
+  `(markdown-header-face-5 :inherit outline-5 :weight unspecified :extend unspecified)
+  `(markdown-header-face-6 :inherit outline-6 :weight unspecified :extend unspecified)
+  '(markdown-code-face :inherit my-default-mono :weight unspecified :extend unspecified)
+  `(markdown-header-face :inherit unspecified)
+  `(markdown-list-face :foreground unspecified :inherit org-list-dt))
 
 (add-hook! (markdown-mode gfm-mode)
-  (defun my-markdown-setup ()
+  (defun my-markdown-buffer-config-h ()
     (+zen/toggle 1)
-    (markdown-toggle-markup-hiding 1)
-    (my-setup-markdown-faces-h)))
+    (variable-pitch-mode 1)
+    (markdown-toggle-markup-hiding 1)))
 #+end_src
 
 * Development
@@ -6457,13 +6811,13 @@ TBD
 #+begin_src emacs-lisp
 (after! magit
   ;; (remove-hook 'server-switch-hook 'magit-commit-diff)
-  (add-hook 'git-commit-setup-hook 'my-git-commit-mode-setup-h))
+  (add-hook 'git-commit-setup-hook 'my-git-commit-buffer-config-h))
 #+end_src
 
 #+caption: autoload/development.el
 #+begin_src emacs-lisp :tangle autoload/development.el
 ;;;###autoload
-(defun my-git-commit-mode-setup-h ()
+(defun my-git-commit-buffer-config-h ()
   "Configure the Git Commit Message buffer."
   (setq-local display-fill-column-indicator-column 72)
   (display-fill-column-indicator-mode 1)
@@ -6537,7 +6891,7 @@ TBD
                   "tasks/main.yml")))
 #+end_src
 
-** TODO Javascript/Typescript
+** TODO Javascript/TypeScript
 ** TODO C/C++
 ** TODO Swift
 ** TODO Kotlin
@@ -6625,7 +6979,7 @@ https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspa
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-treemacs-setup-title-h ()
+(defun my-treemacs-buffer-config-h ()
   (let ((bg (face-attribute 'default :background))
         (fg (face-attribute 'default :foreground)))
     (face-remap-add-relative 'header-line
@@ -6639,7 +6993,7 @@ https://andreyorst.gitlab.io/posts/2020-05-01-dynamic-title-for-treemacs-workspa
 #+end_src
 
 #+begin_src emacs-lisp
-  (add-hook 'treemacs-mode-hook #'my-treemacs-setup-title-h)
+  (add-hook 'treemacs-mode-hook #'my-treemacs-buffer-config-h)
 #+end_src
 
 And finally, we can close our Treemacs configuration
@@ -6822,7 +7176,6 @@ narrow, quit Dired."
 (use-package! dired-collapse :commands (dired dired-noselect))
 (use-package! dired-narrow :after (dired dired-noselect))
 ;; (add-hook 'kill-buffer-hook '+doom--delete-window-if-only-buffer)
-;; (use-package! sunrise-commander :defer t)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -7130,11 +7483,11 @@ TBD
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(use-package! org-contacts
-  :after (org-capture)
-  :init
-  (setq org-contacts-icon-property "PICTURE"
-        org-contacts-icon-use-gravatar t))
+;; (use-package! org-contacts
+;;   :after (org-capture)
+;;   :init
+;;   (setq org-contacts-icon-property "PICTURE"
+;;         org-contacts-icon-use-gravatar t))
 #+end_src
 
 ** TODO Time Management
@@ -7201,7 +7554,7 @@ TBD
 #+caption: autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-org-agenda-setup-buffer-h ()
+(defun my-org-agenda-buffer-config-h ()
   (evil-window-set-width 100)
   (doom-themes-hide-modeline)
   ;; (variable-pitch-mode -1)
@@ -7361,20 +7714,20 @@ Return t if the buffer moved to front."
 ;;;###autoload
 (defun my-bring-org-agenda-to-front-h ()
   (when (my-bring-buffer-to-front org-agenda-buffer)
-    (my-org-agenda-setup-buffer-h)))
+    (my-org-agenda-buffer-config-h)))
 #+end_src
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(after! org-agenda
-  (custom-set-faces!
-    `(org-agenda-current-time :foreground ,(doom-color 'red 256))
-    `(org-agenda-date-today :foreground ,(doom-color 'violet 256)
-                            :height 1.5
-                            :weight bold
-                            :inherit variable-pitch))
+(custom-set-faces!
+  `(org-agenda-current-time :foreground ,(doom-color 'red 256))
+  `(org-agenda-date-today :foreground ,(doom-color 'violet 256)
+                          :height 1.5
+                          :weight bold
+                          :inherit variable-pitch))
 
-  (add-hook 'org-agenda-mode-hook #'my-org-agenda-setup-buffer-h)
+(after! org-agenda
+  (add-hook 'org-agenda-mode-hook #'my-org-agenda-buffer-config-h)
   (add-hook 'org-agenda-finalize-hook #'my-org-agenda-setup-time-grid-h)
   (add-hook 'window-state-change-hook #'my-bring-org-agenda-to-front-h)
   (remove-hook 'org-agenda-finalize-hook '+org-exclude-agenda-buffers-from-workspace-h)
@@ -7384,7 +7737,6 @@ Return t if the buffer moved to front."
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! evil-org-agenda
-  ;; (add-hook 'org-agenda-finalize-hook 'my-exclude-agenda-buffers-from-perspective-h)
   (map! :map evil-org-agenda-mode-map
         :nvm [return] #'org-agenda-goto
         :nvm "RET" #'org-agenda-goto
