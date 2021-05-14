@@ -2649,47 +2649,17 @@ To finish the window changes, I need to make sure Doom does not switch to the fa
 (advice-remove 'kill-current-buffer #'doom--switch-to-fallback-buffer-maybe-a)
 #+end_src
 
-** TODO Special modes
-TBD
+** Special modes
+The configuration in this section, belongs to some modes that I use all over the place or that are not big enough to justify their own section in this document.
+
+In practice, most of the configurations here are about the mode's appearance, and where they show their content.
 
 *** Info mode
-TBD
+The Info mode is where all user manuals exist. Up to now, I'm not used to read and search through the manuals, but I feel this is a habit I must acquire.
 
-#+caption: config.el
-#+begin_src emacs-lisp
-(set-popup-rule! "^\\*info\\*$"
-  :slot 2   :vslot -1     :side 'right  :width 90 :height 0.4
-  :select t :modeline nil :autosave nil :ttl 0    :quit t)
-#+end_src
+First I need to make the manuals to /look/ nicer (if you're rolling your eyes right now, have a remembering read into the section [[Appearances]]).
 
-#+caption: packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(package! info-plus :pin "5ecd4c1e3f1384bffb386e61a8e3788652e55c25")
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-info--fontify-info-h ()
-  (let ((Info-fontify-angle-bracketed-flag nil)
-        (Info-fontify-bookmarked-xrefs-flag nil)
-        (Info-fontify-emphasis-flag nil)
-        (Info-fontify-glossary-words nil)
-        (Info-fontify-isolated-quote-flag nil)
-        (Info-fontify-quotations nil)
-        (Info-fontify-reference-items-flag nil)
-        (Info-fontify-visited-nodes nil))
-    (call-interactively 'Info-toggle-fontify-all)
-    (font-lock-update)))
-#+end_src
-
-#+caption: config.el
-#+begin_src emacs-lisp
-(use-package! info-plus
-  :commands Info-toggle-fontify-all
-  :init
-  (add-hook! Info-selection #'my-info--fontify-info-h))
-#+end_src
+Although this is not a radical change, there are two font lock additions I want to do. The first is a symbol to represent the /menu/ for the current info page, and the second is to replace the =*= character as the list item markup, by the character I will use on all other modes that deal with lists:
 
 #+begin_src emacs-lisp
 (after! info
@@ -2704,10 +2674,62 @@ TBD
            )))) t))
 #+end_src
 
+There is a package called =info+.el=, available through the Emacs Wiki, that fontify the =Info-mode= buffer to make it look nicer.
+
+Unfortunately the latest changes introduced in March broke the package on Emacs 27 and 28, so in order to still have the nice feature it provides with a version that still works on my Emacs, I need to /pin/ the package to the version that still works:
+
+#+caption: packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! info-plus :pin "5ecd4c1e3f1384bffb386e61a8e3788652e55c25")
+#+end_src
+
+Due to the nature of this package, we need to load it only when we need to fontify the buffer:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! info-plus :commands Info-toggle-fontify-all)
+#+end_src
+
+But when this actually happens? The best place to add this, is the hook ~Info-selection-hook~. First I need to define a function that will configure the mode when any info page gets selected:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-info--fontify-info-h ()
+  "Hook called to fontify the Info buffer.
+
+This function lexically bind some configuration for the `into-plus' package,
+and call the `Info-toggle-fontify-all' to perform the fontification work.
+
+Notice we need to update the font lock overlays after this call to guarantee
+the fontification didn't remove any important overlay."
+  (let ((Info-fontify-angle-bracketed-flag nil)
+        (Info-fontify-bookmarked-xrefs-flag nil)
+        (Info-fontify-emphasis-flag nil)
+        (Info-fontify-glossary-words nil)
+        (Info-fontify-isolated-quote-flag nil)
+        (Info-fontify-quotations nil)
+        (Info-fontify-reference-items-flag nil)
+        (Info-fontify-visited-nodes nil))
+    (call-interactively 'Info-toggle-fontify-all)
+    (font-lock-update)))
+#+end_src
+
+Then, I can hook it to the ~Info-selection-hook~ hook:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook! Info-selection #'my-info--fontify-info-h)
+#+end_src
+
+The next step is to make sure the =Info-mode= respects the typography I defined earlier. First we clean up any outstanding setup to the faces that need to get adjusted:
+
 #+begin_src emacs-lisp
 (my-typography-reset (cl-loop for i from 1 to 4 collect (intern (format "info-title-%d" i))))
 (my-typography-reset 'info-menu-header)
 #+end_src
+
+And then, we modify all the faces to match my particular configuration:
 
 #+begin_src emacs-lisp
 (custom-set-faces!
@@ -2732,6 +2754,8 @@ TBD
                      :inherit info-xref))
 #+end_src
 
+There are two remaining configurations. The first one is to make the =Info-mode= buffer to match how it gets displayed on the editor. I will use =writeroom= to make the buffer centralized on the window, and will turn on =variable-pitch-mode=:
+
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
@@ -2743,37 +2767,65 @@ TBD
   (visual-line-mode 1))
 #+end_src
 
+With the function that will configure my buffer in place, I need to hook it to the mode initialization:
+
 #+caption: config.el
 #+begin_src emacs-lisp
 (add-hook! Info-mode #'my-info-buffer-config-h)
 #+end_src
 
-*** Help mode
-TBD
+The last configuration for the =Info-mode= is *where* its buffer gets displayed. For me, it should show up on the right side of my screen. I can achieve that with a popup rule for the buffer:
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(set-popup-rule! "^\\*[Hh]elp"
-  :slot 2   :vslot -1     :side 'right  :width 90 :height 0.4
+(set-popup-rule! "^\\*info\\*$"
+  :slot 2   :vslot -1     :side 'right  :width 85 :height 0.4
   :select t :modeline nil :autosave nil :ttl 0    :quit t)
 #+end_src
+
+*** Help mode and Man mode
+I want to give a similar treatment I did to the =Info-mode= to both these modes, and like the =Info-mode=, the first thing to do is to create the functions that will configure these modes:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
-(defun my-help-buffer-config-h ()
+(defun my-help-man-buffer-config-h ()
   (setq writeroom-width 75)
   (let ((+zen-text-scale 0))
     (+zen/toggle))
   (visual-line-mode 1))
 #+end_src
 
+And then, hook them up to their modes hooks:
+
 #+caption: config.el
 #+begin_src emacs-lisp
-(add-hook! (help-mode helpful-mode) #'my-help-buffer-config-h)
+(add-hook! (help-mode
+            helpful-mode
+            Man-mode
+            WoMan-mode)
+           #'my-help-man-buffer-config-h)
+#+end_src
+
+The last step on these configuration is to add a popup rule for each mode to make their buffers to open on the right side of the editor:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*[Hh]elp"
+  :slot 2   :vslot -1     :side 'right  :width 85 :height 0.4
+  :select t :modeline nil :autosave nil :ttl 0    :quit t)
+
+(set-popup-rule! "^\\*\\(?:Wo\\)?Man "
+  :slot 2   :vslot -1     :side 'right  :width 88 :height 0.4
+  :select t :modeline nil :autosave nil :ttl 0     :quit t)
 #+end_src
 
 *** Rainbow mode
+The Rainbow mode is a small visual helper to display colors on the buffer, whenever it finds a string that can be a color.
+
+I already configured a key binding (=SPC t R=) to toggle this mode.
+
+What I still need to do, is to make sure that I use a fixed font when displaying the color text, unfortunately, the =rainbow-mode= uses an anonymous face to display the colors, so the only way for me to customize it, is to override the ~rainbow-colorize-match~ with a function that add any property I want to the face (in this case, to inherit from the ~fixed-pitch~ face):
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
