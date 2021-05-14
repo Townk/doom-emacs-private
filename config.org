@@ -899,6 +899,15 @@ The main adjustments I want to do, is to make sure the child frame /width/ is bi
   (which-key-posframe-parameters '((min-width . 44))))
 #+end_src
 
+And respect the border color for popups:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(custom-set-faces!
+  `(which-key-posframe-border :background "#000000")
+  `(which-key-posframe :background "#21242b"))
+#+end_src
+
 I need also to set the ~which-key-posframe-poshandler~ variable, to allow a special behavior regarding positioning the child frame on the screen.
 
 This special behavior is simply to most of the times, show the shortcut hints on the right side of the frame, but if I invoke an Embark action, I want the shortcut hints child frame to show up right besides the cursor point.
