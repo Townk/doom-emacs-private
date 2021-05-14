@@ -5420,7 +5420,7 @@ Rules:
 #+caption: config.el
 #+begin_src emacs-lisp
 (defvar my-noflycheck-region-alist
-  '((org-mode ("^[ \\t]*?#\\+begin_src" . "^[ \\t]*?#\\+end_src")))
+  '((org-mode ("^[ \\t]*?#\\+begin_\\(?:src\\|quote\\)" . "^[ \\t]*?#\\+end_\\(?:src\\|quote\\)")))
   "An association list between major modes and a noflycheck region delimiters.
 
 The region delimiters are two regular expressions that should match the
