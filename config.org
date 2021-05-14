@@ -2325,16 +2325,28 @@ There are 4 types of buffer that this function handles:
                          (funcall tab-line-tabs-buffer-list-function)))))
 #+end_src
 
-And as with the ~tab-line-tabs-function~, the ~tab-line-tabs-buffer-list-function~ holds a symbol of a function that returns all buffers to consider during ~tab-line-tabs-function~ execution, and I should set them to their proper functions:
+And as with the ~tab-line-tabs-function~, the ~tab-line-tabs-buffer-list-function~ holds a symbol of a function that returns all buffers to consider during ~tab-line-tabs-function~ execution, and I should set them to their proper functions, unfortunately the ~persp-current-buffers~ (which is the function we need to call), is a macro, and according to the Emacs [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Calling-Functions.html][documentation]], we can't pass macros to ~funcall~ or ~apply~.
+
+To workaround this problem, I will create an alias function to call the same functions the ~persp-current-buffers~ macro do:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defalias 'my-persp-current-buffers
+  (lambda () (persp-buffers (persp-curr)))
+  "Wrapper for the `persp-current-buffers' macro.")
+#+end_src
+
+Now we can properly define the two variables we need to make =tab-line= find the tab buffers:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (after! tab-line
   (setq tab-line-tabs-function #'my-tabs-mode-persp-window
-        tab-line-tabs-buffer-list-function #'persp-current-buffers))
+        tab-line-tabs-buffer-list-function #'my-persp-current-buffers))
 #+end_src
 
-The last variable to configure is the ~tab-line-exclude-modes~. This variable holds a list of modes that will not have ~tab-line-mode~ enabled on them, even when ~global-tab-line-mode~ is enabled:
+The last variable to configure is the ~tab-line-exclude-modes~. This variable holds a list of modes that will not have ~tab-line-mode~ enabled on them, even when ~global-tab-line-mode~ gets enabled:
 
 #+caption: config.el
 #+begin_src emacs-lisp
