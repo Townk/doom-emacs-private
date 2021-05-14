@@ -555,6 +555,15 @@ With the function defined, I can simply add it to a key bind to start using it. 
        :g [s-return] #'yas-exit-snippet))
 #+end_src
 
+The last configuration for snippets is to guarantee the ~yas-describe-tables~ shows up on the right side of the screen:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*YASnippet Tables\\*"
+  :slot 2   :vslot -1     :side 'right   :width 104 :height 0.4
+  :select t :modeline nil :autosave nil  :ttl 0     :quit t)
+#+end_src
+
 Throughout this document, you will find helpful snippets I like to define for certain features. I decided to spread the snippets across different features because I want to indicate to the reader to consider the snippet in question as an integral part of the configuration at hand.
 
 ** Inline completion
@@ -606,23 +615,26 @@ The order for this selection is:
 The action selection happens in this order and stops as soon as the first action
 works."
   (interactive "P")
-  (cond ((org-table-p) (orgtbl-tab arg))
-        ((or (not yas-minor-mode) (null (yas-expand))) t)
-        ((use-region-p) (indent-region (region-beginning) (region-end)))
-        (t (let ((old-point (point))
-                     (old-tick (buffer-chars-modified-tick))
-                     (tab-always-indent t))
-                 (indent-for-tab-command arg)
-                 (when (and (eq old-point (point))
-                            (eq old-tick (buffer-chars-modified-tick)))
-                   (unless (pcase major-mode
-                             ('org-mode (or (org-indent-line)
-                                            (org-cycle-level)
-                                            (org-cycle-item-indentation)))
-                             ('markdown-mode (markdown-indent-line))
-                             ('rst-mode (rst-indent-line nil))
-                             (_ nil))
-                     (company-complete-common)))))))
+  (if (org-table-p)
+      (orgtbl-tab arg)
+    (if (or (not yas-minor-mode)
+            (null (yas-expand)))
+        (cond ((use-region-p) (indent-region (region-beginning) (region-end)))
+              (t (let ((old-point (point))
+                       (old-tick (buffer-chars-modified-tick))
+                       (tab-always-indent t))
+                   (indent-for-tab-command arg)
+                   (when (and (eq old-point (point))
+                              (eq old-tick (buffer-chars-modified-tick)))
+                     (unless (pcase major-mode
+                               ('org-mode (or (org-indent-line)
+                                              (org-cycle-level)
+                                              (org-cycle-item-indentation)))
+                               ('markdown-mode (markdown-indent-line))
+                               ('rst-mode (rst-indent-line nil))
+                               (_ nil))
+                       (company-complete-common))))))
+      (company-abort))))
 #+end_src
 
 This function incorporates the source code of ~company-indent-or-complete-common~ to allow me to handle special cases like in Org mode when I want to indent a list item or headline. It first tries to expand the previous word on a snippet. If it can't, it falls back to the altered Company function, where it also tries to do an Org indent, or a Markdown indent, or a reStructuredText before settling on ~company-complete-common~.
@@ -689,22 +701,22 @@ With all auxiliary functions created, I just need to setup Company according to 
 
 One configuration that worth mention why I choose it is to set ~company-box-doc-enable~ to =nil=. I did this, not because I don't like the documentation as another child frame, is the fact that if I do show it, I can't move my popup completion without aborting Company.
 
-Last, I ned to setup the proper keymaps for the package:
+Last, I need to setup the proper keymaps for the package:
 
 #+caption: config.el
 #+begin_src emacs-lisp
 (map! :after company
- (:map global-map
-  :i [tab] #'my-company-indent-or-complete-common)
- (:map company-active-map
-  :g [tab] #'my-completion-yasnippet-or-completion
-  :g [backtab] #'company-select-previous
-  :g [down] #'company-select-next
-  :g [up] #'company-select-previous
-  :g [return] #'my-completion-complete-selection-or-return
-  :g "C-S-j" #'company-next-page
-  :g "C-S-k" #'company-previous-page
-  :g "C-/" #'company-show-doc-buffer))
+      (:map global-map
+       :i [tab] #'my-company-indent-or-complete-common)
+      (:map company-active-map
+       :g [tab] #'my-completion-yasnippet-or-completion
+       :g [backtab] #'company-select-previous
+       :g [down] #'company-select-next
+       :g [up] #'company-select-previous
+       :g [return] #'my-completion-complete-selection-or-return
+       :g "C-S-j" #'company-next-page
+       :g "C-S-k" #'company-previous-page
+       :g "C-/" #'company-show-doc-buffer))
 #+end_src
 
 ** Automatic indentation
