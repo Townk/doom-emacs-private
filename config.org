@@ -7504,6 +7504,13 @@ Two is the window navigation mapping:
        :in "C-l" #'evil-window-right))
 #+end_src
 
+#+caption: config.el
+#+begin_src emacs-lisp
+(set-popup-rule! "^\\*doom:\\(?:v?term\\|e?shell\\)-popup"
+  :slot 2   :vslot -1     :side 'bottom  :width 110 :height 0.4
+  :select t :modeline nil :autosave nil  :ttl nil   :quit nil)
+#+end_src
+
 And three is to fix =magit-status=. When I'm on the terminal, if I open =magit-status=, everything works as expected, but when I exit back to the terminal, Emacs switch the buffer on my terminal window to something else.
 
 The ideal behavior would be to any app launch from the terminal to take over eshell's window until done. Then, revert back to the terminal.
