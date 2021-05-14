@@ -2098,270 +2098,47 @@ icons."
                    'display (my-raw-icon icon)))))
 #+end_src
 
-** TODO Editor Tabs
-TBD
+** Editor Tabs
+I've been all over the place regarding the use of tabs on editors. I use to think they were useless, since all files on my editor were buffers, not tabs. I though that using tabs as a sort of layout manager was a great idea, because I would have the visual cue of /workspaces/ I had configured.
 
-https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/
-https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/
+Recently, I spent time thinking about this and I changed my mind regarding tabs. First of all, I believe the common knowledge that one tab represents one file, is too ingrained into our collective minds by all other software that use them (web browsers, IDEs, file managers, etc.). This causes a weird feeling when I look to the tabs and they do not represent opened files. Also, as I work on my editor, I lose track of files opened without tabs.
+
+For some Emacs users, all these arguments are silly because they are too used to the way Emacs works. But I believe that this argument should be the other way around. Because of the way Emacs developers decided to use the tab paradigm inside the editor, Emacs users accepted and got used to it.
+
+But, as if to point out things I'm arguing for, there are way too many packages that say they /fix the Emacs window system/ on GitHub these days.
+
+On 2020, I read a blog post from [[https://andreyorst.gitlab.io/][Andrey Listopadov]] about his desire to have [[https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/][Emacs tabs behaving more like tabs on Atom]]. The post itself is a really good read, but I would like to reproduce here Andrey's description of how he believes the tab behavior should be:
+
+#+begin_quote
+In Emacs, however, we can’t close tab via close button, because it will cycle buffers, so instead we can switch to second policy of killing buffer instead. But it will not work either, because it will not kill the window, and it will kill buffer in all windows. So how do we fix this?
+
+First let’s establish some logical rules:
+
+- Buffer can exist without a tab, but tab can not exist without a buffer,
+- If tab was closed buffer should be killed only if there are no tabs for this buffer left,
+- If tab was closed and there are no more tabs in the window, window should be killed.
+
+These three rules are basically how tabs work in modern editors.
+#+end_quote
+
+The configuration you're reading here is almost a copy from Andrey's posts (there is a sequel to the aforementioned post called [[https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/][Making Emacs tabs look like in Atom]], that I also copy snippets in order fully configure tabs here.) with minor modifications to adjust it to my code style.
+
+The way to achieve this configuration, is to define a set of =tab-line= variables and let Emacs do its thing.
+
+My tab configuration uses dynamic values in almost all of it, but there are two constants that I have to decide beforehand: ~tab-line-tab-min-width~ and ~tab-line-tab-max-width~.
 
 #+caption: config.el
 #+begin_src emacs-lisp
-(use-package! tab-line
-  :when window-system
-  :hook ((after-init . global-tab-line-mode))
-  :init
-  (defcustom tab-line-tab-min-width 20
-    "Minimum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
+(defconst tab-line-tab-min-width 20
+  "Minimum width of a tab in characters.")
 
-  (defcustom tab-line-tab-max-width 60
-    "Maximum width of a tab in characters."
-    :type 'integer
-    :group 'tab-line)
-
-  (add-hook 'doom-load-theme-hook #'my-tabs--setup-faces-h)
-  (add-hook 'window-configuration-change-hook #'my-tabs--drop-caches-h)
-
-  :config
-  (setq tab-line-close-button-show t)
-  (setq tab-line-new-button-show nil)
-  (setq tab-line-separator "")
-  (setq tab-line-tab-name-function #'my-tabs-name-buffer)
-  (setq tab-line-tabs-function #'my-tabs-mode-persp-window)
-  (setq tab-line-tabs-buffer-list-function #'persp-current-buffers)
-  (setq tab-line-right-button (propertize (if (char-displayable-p ?▶) " ▶ " " > ")
-                                          'keymap tab-line-right-map
-                                          'mouse-face 'tab-line-highlight
-                                          'help-echo "Click to scroll right"))
-  (setq tab-line-left-button (propertize (if (char-displayable-p ?◀) " ◀ " " < ")
-                                         'keymap tab-line-left-map
-                                         'mouse-face 'tab-line-highlight
-                                         'help-echo "Click to scroll left"))
-  (setq tab-line-close-icon (all-the-icons-material "close"))
-  (setq tab-line-close-button (propertize (format "%s " tab-line-close-icon)
-                                          'keymap tab-line-tab-close-map
-                                          'mouse-face 'tab-line-close-highlight
-                                          'face 'tab-line-tab-curent
-                                          'help-echo "Click to close tab"))
-  (setq tab-line-exclude-modes '(+doom-dashboard-mode
-                                 cfw:calendar-mode
-                                 Info-mode
-                                 calendar-mode
-                                 ediff-mode
-                                 eshell-mode
-                                 help-mode
-                                 helpful-mode
-                                 imenu-list-major-mode
-                                 lexic-mode
-                                 process-menu-mode
-                                 term-mode
-                                 treemacs-mode
-                                 vterm-mode
-                                 wordnut-mode
-                                 reb-mode))
-
-  (add-hook 'doom-switch-buffer-hook #'my-tabs-hide-tab-line-maybe-h)
-
-  (map!
-   :ne "s-1" #'my-tab-line-switch-to-0
-   :ne "s-2" #'my-tab-line-switch-to-1
-   :ne "s-3" #'my-tab-line-switch-to-2
-   :ne "s-4" #'my-tab-line-switch-to-3
-   :ne "s-5" #'my-tab-line-switch-to-4
-   :ne "s-6" #'my-tab-line-switch-to-5
-   :ne "s-7" #'my-tab-line-switch-to-6
-   :ne "s-8" #'my-tab-line-switch-to-7
-   :ne "s-9" #'my-tab-line-switch-to-8
-   :ne "s-0" #'my-tab-line-switch-to-final
-
-   (:prefix "g"
-    :desc "Go to tab on the right" :n "t" #'tab-line-switch-to-next-tab
-    :desc "Go to tab on the left"  :n "T" #'tab-line-switch-to-prev-tab))
-
-  (my-tabs--setup-faces-h))
+(defconst tab-line-tab-max-width 70
+  "Maximum width of a tab in characters.")
 #+end_src
 
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-(defun my-tabs-close-buffer-tab (buffer-or-name &optional window)
-  (let ((buffer (get-buffer buffer-or-name))
-        (window (or window (get-buffer-window))))
-    (if window
-        (with-selected-window window
-          (let ((tab-list (my-tabs-mode-persp-window))
-                (buffer-list (flatten-list
-                              (seq-reduce (lambda (list window)
-                                            (select-window window t)
-                                            (cons (my-tabs-mode-persp-window) list))
-                                          (window-list) nil))))
-            (select-window window)
-            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
-                (progn
-                  (if (eq buffer (current-buffer))
-                      (bury-buffer)
-                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
-                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
-                  (unless (cdr tab-list)
-                    (ignore-errors (delete-window window))))
-              (and (kill-buffer buffer)
-                   (unless (cdr tab-list)
-                     (ignore-errors (delete-window window)))))))
-      (if (persp-buffer-in-other-p buffer)
-          (persp-remove-buffer buffer)
-        (kill-buffer buffer)))))
+It might look an exaggeration to use the values I chose, but since I will use a variable pitch face to draw the tabs, these numbers become more realistic.
 
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defadvice! my-tabs-close-tab-a (&optional mouse-event)
-  "Close the selected tab.
-
-If buffer on tab is present in another window, close the tab by using
-`bury-buffer' function. If buffer on tab is unique to all existing windows, kill
-the buffer with `kill-buffer' function. Lastly, if no tabs left in the window,
-it will delete it with `delete-window' function."
-  :override 'tab-line-close-tab
-  (let* ((posnp (and mouse-event (event-start mouse-event)))
-         (window (and posnp (posn-window posnp)))
-         (buffer (or (and posnp (get-pos-property 1 'tab (car (posn-string posnp))))
-                     (current-buffer)))
-         (window (or window (get-buffer-window buffer))))
-    (my-tabs-close-buffer-tab buffer window)
-    (force-mode-line-update)))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tabs-name-buffer (buffer &rest _buffers)
-  "Create name for tab with padding and truncation.
-
-If buffer name is shorter than `tab-line-tab-max-width' it gets centered with
-spaces, otherwise it gets truncated, to preserve equal width for all tabs. This
-function also tries to fit as many tabs in window as possible, so if there are
-no room for tabs with maximum width, it calculates new width for each tab and
-truncates text if needed. You can set the minimal width with
-`tab-line-tab-min-width' variable."
-  (with-current-buffer buffer
-    (let* ((window-width (window-width (get-buffer-window)))
-           (close-button-size (if tab-line-close-button-show
-                                  (length (substring-no-properties tab-line-close-button))
-                                0))
-           (tab-amount (length (funcall tab-line-tabs-function)))
-           (window-max-tab-width (/ window-width tab-amount))
-           (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
-                                tab-line-tab-max-width)
-                               ((< window-max-tab-width tab-line-tab-min-width)
-                                tab-line-tab-min-width)
-                               (t window-max-tab-width))
-                         close-button-size))
-           (buffer-name (string-trim (buffer-name)))
-           (name-width (length buffer-name)))
-      (if (>= name-width (- tab-width 3))
-          (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
-        (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
-               (buffer-name (concat padding buffer-name))
-               (name-width (length buffer-name)))
-          (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tabs-mode-persp-window ()
-  "Return a list of buffers that should have a tab for them.
-
-This functio treat 2 kinds of buffers differentely than the others. The first
-are org-capture buffers, which should never have a tab associated with them. And
-the second, dired buffers. Dired buffers should always have just the last buffer
-displayed on the tab line."
-  (let ((win-buffs (tab-line-tabs-window-buffers))
-        (last-dired-buf (seq-find 'doom-dired-buffer-p (buffer-list (selected-frame)))))
-    (reverse (seq-filter (lambda (buf)
-                           (let ((buf-name (buffer-name buf)))
-                             (and (member buf win-buffs)
-                                  (doom-real-buffer-p buf)
-                                  (not (string-prefix-p buf-name "CAPTURE-"))
-                                  (or (not (doom-dired-buffer-p buf))
-                                      (eq buf last-dired-buf)))))
-                         (and (fboundp 'persp-current-buffers)
-                              (persp-current-buffers))))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tabs-hide-tab-line-maybe-h ()
-  "Disable `tab-line-modee' for non-real buffers.
-
-For a definition of what is a non-real buffer, check the documentation of
-`doom-real-buffer-p'."
-  (when (not (doom-real-buffer-p (current-buffer)))
-    (tab-line-mode -1)))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tab-line-switch-to-tab (tab)
-  "Switch to the buffer associated with TAB."
-  (let ((buffer (if (bufferp tab) tab (cdr (assq 'buffer tab)))))
-    (when (bufferp buffer)
-        (switch-to-buffer buffer))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tab-line-switch-to (pos)
-  "Switch to the tab on position POS.
-
-If POS is negative, access the tab on the reverse order.
-
-If POS is bigger than the number of tabs, return nil. The same is valid for
-negative numbers, so if POS is negative and its absolute value minus 1 is bigger
-than the number of tabs, return nil."
-  (let* ((tabs (funcall tab-line-tabs-function))
-         (tabs (if (< pos 0) (reverse tabs) tabs))
-         (pos (if (< pos 0) (1- (- pos)) pos))
-         (tab (nth pos tabs)))
-    (unless (my-tab-line-switch-to-tab tab)
-      (user-error "There is no tab on position %s" (1+ pos)))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tab-line-switch-to-final ()
-  "Switch to the last tab."
-  (interactive)
-  (let* ((tab (car (last (funcall tab-line-tabs-function)))))
-    (unless (my-tab-line-switch-to-tab tab)
-      (user-error "Tab line is not visible to go to the last tab"))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(dotimes (i 9)
-  (defalias (intern (format "my-tab-line-switch-to-%d" i))
-    (lambda () (interactive) (my-tab-line-switch-to i))
-    (format
-     "Thin wrapper around `+workspace/switch-to' function where we pass #%d as the INDEX parameter."
-     (1+ i))))
-#+end_src
-
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-tabs--drop-caches-h ()
-  "Drops `tab-line' cache in every window."
-  (dolist (window (window-list))
-    (set-window-parameter window 'tab-line-cache nil)))
-#+end_src
+So let's configure the faces used on my tabs:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2408,13 +2185,365 @@ than the number of tabs, return nil."
                         :foreground fg
                         :background nil
                         :inherit 'tab-line-tab
+                        :overline overline
                         :box box-bg)
     (set-face-attribute 'tab-line-close-highlight nil
                         :foreground overline
+                        :overline overline
                         :background nil
                         :inherit 'tab-line-tab
                         :box box-bg)))
 #+end_src
+
+And I need to make sure I call this function after Doom loads the editor's theme:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook 'doom-load-theme-hook #'my-tabs--setup-faces-h)
+#+end_src
+
+To configure the look and feel of /non-tab/ elements of the =tab-line=, I need to set the ~tab-line-right-button~, ~tab-line-left-button~, ~tab-line-new-button-show~, and ~tab-line-separator~ variables:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! tab-line
+  (setq tab-line-right-button (propertize (if (char-displayable-p ?▸) " ▸ " " > ")
+                                          'keymap tab-line-right-map
+                                          'mouse-face 'tab-line-highlight
+                                          'help-echo "Click to scroll right")
+        tab-line-left-button (propertize (if (char-displayable-p ?◂) " ◂ " " < ")
+                                         'keymap tab-line-left-map
+                                         'mouse-face 'tab-line-highlight
+                                         'help-echo "Click to scroll left")
+        tab-line-new-button-show nil
+        tab-line-separator ""))
+#+end_src
+
+And to configure the tab itself, I need to set the ~tab-line-close-button-show~, ~tab-line-close-button~, and the ~tab-line-tab-name-function~ variables:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! tab-line
+  (setq tab-line-close-button-show t
+        tab-line-close-button (propertize (format "%s " (all-the-icons-material "close"))
+                                          'keymap tab-line-tab-close-map
+                                          'mouse-face 'tab-line-close-highlight
+                                          'face 'tab-line-tab-curent
+                                          'help-echo "Click to close tab")
+        tab-line-tab-name-function #'my-tabs-name-buffer))
+#+end_src
+
+While the ~tab-line-close-button-show~ and the ~tab-line-close-button~ variables control the appearance of the tab close button, the ~tab-line-tab-name-function~ is responsible for everything else on the tab. The ~my-tabs-name-buffer~ function will return a string representing the tab name for each tab, and is also this function's responsibility to return the normalized tab size in form of blank spaces:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tabs-name-buffer (buffer &rest _buffers)
+  "Create name for tab with padding and truncation.
+
+If buffer name is shorter than `tab-line-tab-max-width' it gets centered with
+spaces, otherwise it gets truncated, to preserve equal width for all tabs. This
+function also tries to fit as many tabs in window as possible, so if there are
+no room for tabs with maximum width, it calculates new width for each tab and
+truncates text if needed. You can set the minimal width with
+`tab-line-tab-min-width' variable."
+  (with-current-buffer buffer
+    (let* ((window-width (window-width (get-buffer-window)))
+           (close-button-size (if tab-line-close-button-show
+                                  (length (substring-no-properties tab-line-close-button))
+                                0))
+           (tab-amount (length (funcall tab-line-tabs-function)))
+           (window-max-tab-width (/ window-width tab-amount))
+           (tab-width (- (cond ((>= window-max-tab-width tab-line-tab-max-width)
+                                tab-line-tab-max-width)
+                               ((< window-max-tab-width tab-line-tab-min-width)
+                                tab-line-tab-min-width)
+                               (t window-max-tab-width))
+                         close-button-size))
+           (buffer-name (string-trim (buffer-name)))
+           (name-width (length buffer-name)))
+      (if (>= name-width (- tab-width 3))
+          (concat  " " (truncate-string-to-width buffer-name (- tab-width 3)) "… ")
+        (let* ((padding (make-string (/ (- tab-width name-width) 2) ?\s))
+               (buffer-name (concat padding buffer-name))
+               (name-width (length buffer-name)))
+          (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
+#+end_src
+
+The reader might have noticed I use the size of the list returned by the function ~tab-line-tabs-function~ to calculate single tab size, and as you imagine, the function symbol used in this variable is responsible to return a list of tabs on the current window, so I will also use such function to filter some unwanted buffers on the tab bar. The function docstring, explains these exceptional cases in a bit more detail:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tabs-mode-persp-window ()
+  "Return a list of buffer tabs of the current window.
+
+This function take in account the active perspective (or workspace) so it does
+not display tabs from other perspectives on the current one.
+
+There are 4 types of buffer that this function handles:
+
+1. Real buffers
+
+   These buffers are the normal buffers that have a tab associated with them. To
+   be a real buffer, the function `doom-real-buffer-p' must return t for the
+   buffer.
+
+2. Popup buffers (or non-real buffers)
+
+   These are the inverse of real buffers.
+
+3. Org capture buffers
+
+   These buffers are the ones created to perform the `org-capture'. Such buffers
+   should never have a tab associated with them.
+
+4. Dired buffers
+
+   These are real buffers that should never exist in more than one per window.
+   When jumping from one Dired buffer to another, Emacs creates one buffer per
+   directory, but the tab bar should not display any other then the current
+   buffer."
+  (let ((win-buffs (tab-line-tabs-window-buffers))
+        (last-dired-buf (seq-find 'doom-dired-buffer-p (buffer-list (selected-frame)))))
+    (reverse (seq-filter (lambda (buf)
+                           (let ((buf-name (buffer-name buf)))
+                             (and (member buf win-buffs)
+                                  (doom-real-buffer-p buf)
+                                  (not (string-prefix-p buf-name "CAPTURE-"))
+                                  (or (not (doom-dired-buffer-p buf))
+                                      (eq buf last-dired-buf)))))
+                         (funcall tab-line-tabs-buffer-list-function)))))
+#+end_src
+
+And as with the ~tab-line-tabs-function~, the ~tab-line-tabs-buffer-list-function~ holds a symbol of a function that returns all buffers to consider during ~tab-line-tabs-function~ execution, and I should set them to their proper functions:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! tab-line
+  (setq tab-line-tabs-function #'my-tabs-mode-persp-window
+        tab-line-tabs-buffer-list-function #'persp-current-buffers))
+#+end_src
+
+The last variable to configure is the ~tab-line-exclude-modes~. This variable holds a list of modes that will not have ~tab-line-mode~ enabled on them, even when ~global-tab-line-mode~ is enabled:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(after! tab-line
+  (setq tab-line-exclude-modes '(+doom-dashboard-mode
+                                 cfw:calendar-mode
+                                 Info-mode
+                                 calendar-mode
+                                 ediff-mode
+                                 eshell-mode
+                                 help-mode
+                                 helpful-mode
+                                 imenu-list-major-mode
+                                 lexic-mode
+                                 process-menu-mode
+                                 Man-mode
+                                 WoMan-mode
+                                 term-mode
+                                 treemacs-mode
+                                 vterm-mode
+                                 wordnut-mode
+                                 reb-mode)))
+#+end_src
+
+Even with the ~tab-line-exclude-modes~ list, some /non-real/ buffers get displayed. I need to create an extra function to help me get rid of the =tab-line= when I load such buffers:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tabs-hide-tab-line-maybe-h ()
+  "Disable `tab-line-mode' for non-real buffers.
+
+For a definition of what is a non-real buffer, check the documentation of
+`doom-real-buffer-p'."
+  (when (not (doom-real-buffer-p (current-buffer)))
+    (tab-line-mode -1)))
+#+end_src
+
+With the helper function defined, I need to make sure I call it when I switch buffers. The reason for that is that I could explicitly request to load a /non-real/ buffer, which would create the =tab-line= on such buffer:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook 'doom-switch-buffer-hook #'my-tabs-hide-tab-line-maybe-h)
+#+end_src
+
+Also, when Emacs calls the ~window-configuration-change-hook~ hooks, I need to clean all =tab-line= cache to make sure Emacs will re-consider all the proper buffers when re-displaying it:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook 'window-configuration-change-hook #'my-tabs--drop-caches-h)
+#+end_src
+
+The implementation of ~my-tabs--drop-caches-h~ simply /nullify/ the value of the ~tab-line-cache~ window parameter for all windows:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tabs--drop-caches-h ()
+  "Drops `tab-line' cache in every window."
+  (dolist (window (window-list))
+    (set-window-parameter window 'tab-line-cache nil)))
+#+end_src
+
+With all that in place, we can make sure the =tab-line= gets loaded when Emacs start:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(use-package! tab-line
+  :when window-system
+  :hook ((after-init . global-tab-line-mode)))
+#+end_src
+
+*** Tab actions
+There are two main actions that I need to address here: selection and closing.
+
+I would like to start talking about the later. Unfortunately, the Emacs implementation of ~tab-line-close-tab~ does not leave room to customize its behavior the way I want it. Instead, I will implement my own version (more like "I'll copy Andrey's version and change it a bit"):
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+(defun my-tabs-close-buffer-tab (buffer-or-name &optional window)
+  (let ((buffer (get-buffer buffer-or-name))
+        (window (or window (get-buffer-window))))
+    (if window
+        (with-selected-window window
+          (let ((tab-list (my-tabs-mode-persp-window))
+                (buffer-list (flatten-list
+                              (seq-reduce (lambda (list window)
+                                            (select-window window t)
+                                            (cons (my-tabs-mode-persp-window) list))
+                                          (window-list) nil))))
+            (select-window window)
+            (if (> (seq-count (lambda (b) (eq b buffer)) buffer-list) 1)
+                (progn
+                  (if (eq buffer (current-buffer))
+                      (bury-buffer)
+                    (set-window-prev-buffers window (assq-delete-all buffer (window-prev-buffers)))
+                    (set-window-next-buffers window (delq buffer (window-next-buffers))))
+                  (unless (cdr tab-list)
+                    (ignore-errors (delete-window window))))
+              (and (kill-buffer buffer)
+                   (unless (cdr tab-list)
+                     (ignore-errors (delete-window window)))))))
+      (if (persp-buffer-in-other-p buffer)
+          (persp-remove-buffer buffer)
+        (kill-buffer buffer)))))
+#+end_src
+
+With the function implemented, I need to override the original one with it using an advice:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defadvice! my-tabs-close-tab-a (&optional mouse-event)
+  "Close the selected tab.
+
+If buffer on tab is present in another window, close the tab by using
+`bury-buffer' function. If buffer on tab is unique to all existing windows, kill
+the buffer with `kill-buffer' function. Lastly, if no tabs left in the window,
+it will delete it with `delete-window' function."
+  :override 'tab-line-close-tab
+  (let* ((posnp (and mouse-event (event-start mouse-event)))
+         (window (and posnp (posn-window posnp)))
+         (buffer (or (and posnp (get-pos-property 1 'tab (car (posn-string posnp))))
+                     (current-buffer)))
+         (window (or window (get-buffer-window buffer))))
+    (my-tabs-close-buffer-tab buffer window)
+    (force-mode-line-update)))
+#+end_src
+
+Now, any code calling the ~tab-line-close-tab~ will use the algorithm defined in this section.
+
+#+begin_center
+◆
+#+end_center
+
+The next and final action to handle is actually a group of actions related to /switching between tabs/.
+
+The first step to configure tab switching, is to create a function that allows me to switch to any tab, by passing a tab to it. The only special thing about this function is that you can pass a buffer or an association list representing a tab. Other than that, this function behaves much like the ~switch-to-buffer~ one:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to-tab (tab)
+  "Switch to the buffer associated with TAB."
+  (let ((buffer (if (bufferp tab) tab (cdr (assq 'buffer tab)))))
+    (when (bufferp buffer)
+        (switch-to-buffer buffer))))
+#+end_src
+
+Next, I need a way to select a tab by its position of the displayed tabs:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to (pos)
+  "Switch to the tab on position POS.
+
+If POS is negative, access the tab on the reverse order.
+
+If POS is bigger than the number of tabs, return nil. The same is valid for
+negative numbers, so if POS is negative and its absolute value minus 1 is bigger
+than the number of tabs, return nil."
+  (let* ((tabs (funcall tab-line-tabs-function))
+         (tabs (if (< pos 0) (reverse tabs) tabs))
+         (pos (if (< pos 0) (1- (- pos)) pos))
+         (tab (nth pos tabs)))
+    (unless (my-tab-line-switch-to-tab tab)
+      (user-error "There is no tab on position %s" (1+ pos)))))
+#+end_src
+
+And a helper function to select the last tab on the list:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-tab-line-switch-to-final ()
+  "Switch to the last tab."
+  (interactive)
+  (let* ((tab (car (last (funcall tab-line-tabs-function)))))
+    (unless (my-tab-line-switch-to-tab tab)
+      (user-error "Tab line is not visible to go to the last tab"))))
+#+end_src
+
+These functions should be enough to allow me to switch tabs on any way I defined here. To get a good set of key bindings, I need to create aliases for calling ~my-tab-line-switch-to~ from 1 to 9:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(dotimes (i 9)
+  (defalias (intern (format "my-tab-line-switch-to-%d" i))
+    (lambda () (interactive) (my-tab-line-switch-to i))
+    (format
+     "Thin wrapper around `+workspace/switch-to' function where we pass #%d as the INDEX parameter."
+     (1+ i))))
+#+end_src
+
+And my keymap for all these functions should allow me to switch tabs using =Cmd= plus a number from =1= to =9=. The =Cmd-0= shortcut will call the ~my-tab-line-switch-to-final~:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(map! :after tab-line
+      :ne "s-1" #'my-tab-line-switch-to-0
+      :ne "s-2" #'my-tab-line-switch-to-1
+      :ne "s-3" #'my-tab-line-switch-to-2
+      :ne "s-4" #'my-tab-line-switch-to-3
+      :ne "s-5" #'my-tab-line-switch-to-4
+      :ne "s-6" #'my-tab-line-switch-to-5
+      :ne "s-7" #'my-tab-line-switch-to-6
+      :ne "s-8" #'my-tab-line-switch-to-7
+      :ne "s-9" #'my-tab-line-switch-to-8
+      :ne "s-0" #'my-tab-line-switch-to-final
+
+      (:prefix "g"
+       :desc "Go to tab on the right" :n "t" #'tab-line-switch-to-next-tab
+       :desc "Go to tab on the left"  :n "T" #'tab-line-switch-to-prev-tab))
+#+end_src
+
+One final configuration I need to do is to make sure Emacs selects the correct tab when I click on it with the mouse:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2425,18 +2554,10 @@ than the number of tabs, return nil."
   (select-window (posn-window (event-start e))))
 #+end_src
 
-** TODO Windows
-TBD
+*** Windows
+It's impossible to get the tab configuration right without adjusting the Emacs window behavior.
 
-#+caption: autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-;;;###autoload
-(defun my-window-single-buffer-p (&optional win)
-  (let ((win (or win (selected-window))))
-    (or (window-dedicated-p win)
-        (not (or (window-next-buffers win)
-                 (window-prev-buffers win))))))
-#+end_src
+The main behavior I want to guarantee, is that Emacs should close a window if there are no buffers left on the list of previous buffers:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2444,10 +2565,30 @@ TBD
 (defun my-close-window-when-kill-buffer-h (&optional buffer-or-name)
   (let* ((buf (get-buffer (or buffer-or-name (current-buffer))))
          (win (get-buffer-window buf)))
-    (when (and win
-               (my-window-single-buffer-p win))
+    (when (and win (my-window-single-buffer-p win))
       (delete-window win))))
 #+end_src
+
+Because this function needs to know if there are no buffer lefts on the list of buffers associated with the window, I will implement a helper function for that:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defsubst my-window-single-buffer-p (&optional win)
+  (let ((win (or win (selected-window))))
+    (or (window-dedicated-p win)
+        (not (or (window-next-buffers win)
+                 (window-prev-buffers win))))))
+#+end_src
+
+Now I just need to make sure Emacs calls the ~my-close-window-when-kill-buffer-h~ function when I kill a buffer:
+
+#+caption: config.el
+#+begin_src emacs-lisp
+(add-hook 'kill-buffer-hook 'my-close-window-when-kill-buffer-h)
+#+end_src
+
+These covers most of the closing behavior regarding windows. The one exception is the ~kill-current-buffer~ that needs to not switch buffers as we kill the current buffer. I will implement this behavior as a /before/ advice to the ~kill-current-buffer~ function:
 
 #+caption: autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2480,74 +2621,11 @@ TBD
       t))))
 #+end_src
 
+To finish the window changes, I need to make sure Doom does not switch to the fallback buffer (a.k.a. the Dashboard buffer) when there are no more buffers left on the window:
+
 #+caption: config.el
 #+begin_src emacs-lisp
-
-(add-hook 'kill-buffer-hook 'my-close-window-when-kill-buffer-h)
-
 (advice-remove 'kill-current-buffer #'doom--switch-to-fallback-buffer-maybe-a)
-
-(set-popup-rules!
-  '(("^\\*" :slot 2 :vslot -1 :side bottom :size 0.4 :select t)
-    ("^ \\*" :slot 2 :vslot -1 :side bottom :size +popup-shrink-to-fit)
-    ("^\\*Completions" :ignore t)
-    ("^\\*Local variables\\*$"
-     :slot 2     :vslot -1   :side bottom :size +popup-shrink-to-fit
-     :select nil :modeline t :autosave t  :ttl 0 :quit t)
-    ("^\\*\\(?:[Cc]ompil\\(?:ation\\|e-Log\\)\\|Messages\\)"
-     :slot 2     :vslot -1   :side bottom :width 110 :height 0.4
-     :select nil :modeline t :autosave t  :ttl nil   :quit t)
-    ("^\\*\\(?:doom \\|Pp E\\)"
-     :slot 2     :vslot -1   :side bottom :size +popup-shrink-to-fit
-     :select nil :modeline t :autosave t  :ttl 0 :quit t)
-    ("^\\*doom:"
-     :slot 2   :vslot -1   :side bottom :width 110 :height 0.4
-     :select t :modeline t :autosave t  :ttl t     :quit nil)
-    ("^\\*doom:\\(?:v?term\\|e?shell\\)-popup"
-     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
-     :select t :modeline nil :autosave nil :ttl nil   :quit nil)
-    ("^\\*\\(?:Wo\\)?Man "
-     :slot 2   :vslot -1     :side right  :width 110 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*Calc"
-     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit nil)
-    ("^\\*eww\\*"
-     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*Customize"
-     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit nil)
-    ("^\\*\\(?:doom:\\)?scratch\\*"
-     :slot 2   :vslot -1     :side right   :width 0.4 :height 0.4
-     :select t :modeline nil :autosave nil :ttl nil   :quit t)
-    ("^ \\*undo-tree\\*"
-     :slot 2   :vslot -1     :side left    :width 20 :height 0.5
-     :select t :modeline nil :autosave nil :ttl 0    :quit t)
-
-    ("^\\*YASnippet Tables\\*"
-     :slot 2   :vslot -1     :side right   :width 104 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*WordNut\\*$"
-     :slot 2   :vslot -1     :side right   :width 100 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*Warnings"
-     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
-     :select nil :modeline nil :autosave nil :ttl nil   :quit t)
-    ("^\\*Backtrace"
-     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
-     :select nil :modeline nil :autosave nil :ttl nil   :quit nil)
-    ("^\\*CPU-Profiler-Report "
-     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
-     :select nil :modeline nil :autosave nil :ttl 0     :quit nil)
-    ("^\\*Memory-Profiler-Report "
-     :slot 2     :vslot -1     :side bottom  :width 110 :height 0.4
-     :select nil :modeline nil :autosave nil :ttl 0     :quit nil)
-    ("^\\*Process List\\*"
-     :slot 2   :vslot -1     :side bottom  :width 110 :height 0.4
-     :select t :modeline nil :autosave nil :ttl 0     :quit t)
-    ("^\\*\\(?:Proced\\|timer-list\\|Abbrevs\\|Output\\|Occur\\|unsent mail\\)\\*" :ignore t)
-    ))
 #+end_src
 
 ** TODO Special modes
