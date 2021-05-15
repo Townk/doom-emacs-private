@@ -58,6 +58,14 @@ The core difference, is the fact that each piece of code in this document may no
 ** Acknowledgments
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
 
+I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the amazing theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
+
+#+begin_src org :tangle no
+,#+setupfile: https://townk.github.io/doom-emacs-private/assets/html-export.setup
+#+end_src
+
+Last, but not least, I like to give a shout to [[https://github.com/justinbondoc][Justin Bondoc]] for his CSS tutorial on "[[https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/][Creating Styled Boxes for Notes, Warnings, Examples, and Tips]]". You will notice that I not only got his CSS here, but also his icons for the note and warning boxes!
+
 ** Investigating issues
 If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
 
@@ -7564,9 +7572,6 @@ The only configuration we need to get this mode working, is to let Emacs enable 
   :defer t
   :hook ((eshell-mode . esh-autosuggest-mode)))
 #+end_src
-
-
-*** TODO Find a way to fix this behavior
 
 ** TODO Emails
 
