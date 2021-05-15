@@ -5798,7 +5798,7 @@ On the end of each day, I will sit down in front of my computer to review the no
 
 I will be able to search notes using their reference label, title, tags, or content (a great package for this is [[https://github.com/jrblevin/deft][Deft]]).
 
-*** TODO Capturing
+*** Capturing
 
 Talk about capture in general:
 - How am I going to use it?
@@ -6767,7 +6767,7 @@ capture buffer."
     (message ""))))
 #+end_src
 
-*** TODO Journal
+*** Journal
 TBD
 
 #+caption: $DOOMDIR/config.el
@@ -6829,7 +6829,7 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
                                   (org-read-date t t nil "New entry"))))))
 #+end_src
 
-*** TODO Zettelkasten
+*** Zettelkasten
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -6861,7 +6861,7 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
   (advice-add 'org-roam-dailies-capture-date :filter-return #'+org-capture-open-frame-get-info-a))
 #+end_src
 
-*** TODO Deft
+*** Deft
 TBD
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -6886,7 +6886,7 @@ TBD
        :i   "C-k"      #'widget-backward))
 #+end_src
 
-*** TODO Utilities
+*** Utilities
 
 #+caption: $DOOMDIR/autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
