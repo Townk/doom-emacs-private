@@ -23,7 +23,7 @@ jobs:
       - name: Checkout private config
         uses: actions/checkout@v2
         with:
-          ref: gh-pages
+          ref: master
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Workaround for org-roam bug
@@ -34,6 +34,5 @@ jobs:
         uses: tecosaur/org-knit-action@v0.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
           config: https://github.com/Townk/doom-emacs-private.git
           files: config.org
