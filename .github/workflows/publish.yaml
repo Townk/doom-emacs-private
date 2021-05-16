@@ -46,6 +46,8 @@ jobs:
         with:
           ref: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push tangled file to gh-pages
         run: |
           cp ~/.config/doom/config.html index.html
           git config user.name github-actions
