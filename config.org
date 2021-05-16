@@ -5052,11 +5052,7 @@ Then, we use =use-package!= to defer its loading (we will load it manually later
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(use-package! org-fragtog
-  :defer t
-  :init
-  (add-hook! evil-insert-state-entry (org-fragtog-mode 1))
-  (add-hook! evil-insert-state-exit (org-fragtog-mode -1)))
+(use-package! org-fragtog :defer t)
 #+end_src
 
 Another nice plugin to have is the =valign= plugin. It will align your Org tables nicely, even when you have formulas and images on them.
@@ -5172,9 +5168,7 @@ At this point we can tight up everything and setup our buffer when we open an or
   :defer t
   :init
   (setq org-appear-autolinks t
-        org-appear-autosubmarkers t)
-  (add-hook! evil-insert-state-entry (org-appear-mode 1))
-  (add-hook! evil-insert-state-exit (org-appear-mode -1)))
+        org-appear-autosubmarkers t))
 #+end_src
 
 To separate my configuration from initialization logic, let's create another autoload function, but this time on a file used for /Org things/ (=autoload/org.el=):
@@ -5194,7 +5188,14 @@ To separate my configuration from initialization logic, let's create another aut
   ;; Ignore flycheck errors on source blocks
   (my-noflycheck-h)
   ;; Force a buffer refresh to guarantee all setup is in use
-  (set-window-buffer nil (current-buffer)))
+  (set-window-buffer nil (current-buffer))
+
+  (add-hook! evil-insert-state-entry :local
+    (org-fragtog-mode 1)
+    (org-appear-mode 1))
+  (add-hook! evil-insert-state-exit :local
+    (org-fragtog-mode -1)
+    (org-appear-mode -1)))
 #+end_src
 
 With this function in place, we can /hook/ it to our Org major mode:
