@@ -5206,11 +5206,12 @@ With this function in place, we can /hook/ it to our Org major mode:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! org-ol-tree
-  :recipe (:host github
-           :repo "Townk/org-ol-tree"))
-;; (package! org-ol-tree
-;;   :recipe (:local-repo "~/workplace/personal/emacs/org-ol-tree"))
+(if (getenv "GITHUB_WORKFLOW")
+    (package! org-ol-tree
+      :recipe (:host github
+               :repo "Townk/org-ol-tree"))
+  (package! org-ol-tree
+    :recipe (:local-repo "~/workplace/personal/emacs/org-ol-tree")))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -6999,11 +7000,12 @@ TBD
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! org-ol-tree
-  :recipe (:host github
-           :repo "Townk/gitmoji"))
-;; (package! gitmoji
-;;   :recipe (:local-repo "~/workplace/personal/emacs/gitmoji"))
+(if (getenv "GITHUB_WORKFLOW")
+    (package! gitmoji
+      :recipe (:host github
+               :repo "Townk/gitmoji"))
+  (package! gitmoji
+    :recipe (:local-repo "~/workplace/personal/emacs/gitmoji")))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
