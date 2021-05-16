@@ -39,7 +39,7 @@ jobs:
       - name: Tangle config file
         run: |
           cd ~/.config/doom
-          emacs --batch --eval "(require 'org)" --eval '(progn (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file "config.org"))'
+          emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(require 'htmlize)" --eval '(org-html-export-to-html)'
 
       - name: Checkout private config
         uses: actions/checkout@v2
