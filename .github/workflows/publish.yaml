@@ -26,7 +26,8 @@ jobs:
           version: 27.2
 
       - name: Clone Doom
-        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+        run: |
+          git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
 
       - name: Clone my private config
         run: |
@@ -34,7 +35,8 @@ jobs:
           git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
 
       - name: Installing Doom Emacs
-        run: ~/.emacs.d/bin/doom install --no-env --no-fonts
+        run: |
+          ~/.emacs.d/bin/doom -d install --no-config --no-env --no-fonts || true
 
       - name: Tangle config file
         run: |
