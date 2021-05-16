@@ -31,5 +31,4 @@ jobs:
           config:
             - init.el
           keep_files: "assets/*"
-          files:
-            - config.org
+          files: config.org
