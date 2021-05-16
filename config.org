@@ -5212,8 +5212,7 @@ With this function in place, we can /hook/ it to our Org major mode:
       :recipe (:host github
                :repo "Townk/org-ol-tree"))
   (package! org-ol-tree
-    :recipe (:local-repo "~/workplace/personal/emacs/org-ol-tree")
-    :build '(:not compile)))
+    :recipe (:local-repo "~/workplace/personal/emacs/org-ol-tree")))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -7014,8 +7013,7 @@ TBD
       :recipe (:host github
                :repo "Townk/gitmoji"))
   (package! gitmoji
-    :recipe (:local-repo "~/workplace/personal/emacs/gitmoji")
-    :build '(:not compile)))
+    :recipe (:local-repo "~/workplace/personal/emacs/gitmoji")))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
