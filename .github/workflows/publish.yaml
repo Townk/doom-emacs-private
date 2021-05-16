@@ -26,7 +26,9 @@ jobs:
           version: 27.2
 
       - name: Clone Doom
-        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+        run: |
+          git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+          echo "#!/usr/bin/env sh\necho 'Done'" > /tmp/doom.sh
 
       - name: Clone my private config
         run: |
@@ -38,8 +40,12 @@ jobs:
 
       - name: Tangle config file
         run: |
-          cd ~/.config/doom
-          emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(require 'htmlize)" --eval '(org-html-export-to-html)'
+          emacs --batch \
+            --load ~/.config/emacs/early-init.el \
+            --load ~/.config/emacs/init.el \
+            --file ~/.config/doom/config.org \
+            --eval "(require 'htmlize)" \
+            --eval "(org-html-export-to-html)"
 
       - name: Checkout private config
         uses: actions/checkout@v2
