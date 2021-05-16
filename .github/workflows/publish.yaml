@@ -38,7 +38,7 @@ jobs:
       - name: Installing Doom Emacs
         run: |
           ~/.emacs.d/bin/doom install --no-config --no-env --no-fonts || true
-          ~/.emacs.d/bin/doom sync
+          ~/.emacs.d/bin/doom sync || true
 
       - name: Tangle config file
         run: |
