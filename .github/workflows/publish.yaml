@@ -20,20 +20,36 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Setup Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: 27.2
+
+      - name: Clone Doom
+        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+
+      - name: Clone my private config
+        run: |
+          mkdir -p ~/.config
+          git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
+
+      - name: Installing Doom Emacs
+        run: ~/.emacs.d/bin/doom install --no-env --no-fonts
+
+      - name: Tangle config file
+        run: |
+          cd ~/.config/doom
+          emacs --batch --eval "(require 'org)" --eval '(progn (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file "config.org"))'
+
       - name: Checkout private config
         uses: actions/checkout@v2
         with:
-          ref: master
+          ref: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Workaround for org-roam bug
         run: |
-          mkdir -p /home/runner/org/roam
-
-      - name: Export Org files to GitHub Pages
-        uses: tecosaur/org-knit-action@v0.3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          config: https://github.com/Townk/doom-emacs-private.git
-          files: config.org
+          cp ~/.config/doom/config.html index.html
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Auto-tangled from $GITHUB_SHA"
+          git push
