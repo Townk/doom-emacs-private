@@ -28,6 +28,7 @@ jobs:
       - name: Clone Doom
         run: |
           git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+          mkdir -p ~/org/roam
 
       - name: Clone my private config
         run: |
@@ -36,7 +37,8 @@ jobs:
 
       - name: Installing Doom Emacs
         run: |
-          ~/.emacs.d/bin/doom -d install --no-config --no-env --no-fonts || true
+          ~/.emacs.d/bin/doom install --no-config --no-env --no-fonts || true
+          ~/.emacs.d/bin/doom sync
 
       - name: Tangle config file
         run: |
