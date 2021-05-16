@@ -33,6 +33,8 @@ jobs:
       - name: Clone my private config
         run: |
           mkdir -p ~/.config
+          mkdir -p ~/.local/share/aspell
+          touch ~/.local/share/aspell/personal.en.pws
           git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
 
       - name: Installing Doom Emacs
