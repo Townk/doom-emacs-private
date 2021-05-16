@@ -22,12 +22,13 @@ jobs:
     steps:
       - name: Checkout private config
         uses: actions/checkout@v2
+        with:
+          path: "~/.config/doom"
 
       - name: Export Org files to GitHub Pages
         uses: tecosaur/org-knit-action@v0.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          config: git@github.com:Townk/doom-emacs-private.git
           keep_files: "./assets/*"
           files: config.org
