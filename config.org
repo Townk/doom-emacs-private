@@ -246,8 +246,8 @@ To help Emacs to find its own source code, first clone it from the Emacs [[https
 
 #+caption: Commands to clone Emacs to local directory
 #+begin_src shell :tangle no
-mkdir -p $HOME/workplace/vendor/gnu
-cd $HOME/workplace/vendor/gnu
+mkdir -p ~/workplace/vendor/gnu
+cd ~/workplace/vendor/gnu
 git clone https://git.savannah.gnu.org/git/emacs.git
 #+end_src
 
