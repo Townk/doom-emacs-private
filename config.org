@@ -6844,6 +6844,13 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
 
 *** Zettelkasten
 
+- https://tecosaur.github.io/emacs-config/config.html#basic-settings
+
+#+caption: $DOOMDIR/packages.el
+#+begin_src emacs-lisp :noweb-ref none :tangle (if (file-exists-p "~/depot/Dropbox/org/notes") "no" "packages.el")
+(package! org-roam :disable t)
+#+end_src
+
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (use-package org-roam
