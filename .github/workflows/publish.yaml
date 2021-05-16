@@ -41,7 +41,7 @@ jobs:
       - name: Tangle config file
         run: |
           cd ~/.config/doom
-          emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(require 'htmlize)" --eval "(org-html-export-to-html)"
+          emacs --batch --load ~/.emacs.d/early-init.el --load ~/.emacs.d/init.el --file ~/.config/doom/config.org --eval "(require 'htmlize)" --eval "(org-html-export-to-html)"
 
       - name: Checkout private config
         uses: actions/checkout@v2
