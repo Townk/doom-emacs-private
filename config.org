@@ -18,6 +18,8 @@ This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (
 
 Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://paypal.me/henriklissner][creator]].
 
+For instance, when one installs Doom without a previous private configuration, the installer creates the file =$DOOMDIR/config.el= with the following comments:
+
 #+caption: $DOOMDIR/From the =config.el= file comments
 #+begin_note
 In your journey configuring Emacs the way you want, you might need to use more functions then I'm using in this configuration. Here are some additional functions or macros that could help you configure Doom:
@@ -42,9 +44,9 @@ I want to stress out to the reader, that you are, ultimately, reading a personal
 
 I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences, still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]], so I will focus the configuration at that point, to adjust Emacs and Org to fit my personal workflow.
 
-After configuring Emacs for writing prose, I will focus this document on programming (which is what I do for work). I will cover [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], and [[https://developer.apple.com/swift/][Swift]]. Some in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
+After configuring Emacs for writing prose, I will focus this document on programming (which is what I do for work). I will cover [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
 
-Overall, my intention is to make changes on Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
+Overall, my intention is to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
 
 ** About literate configuration
 A long time ago I found out about [[http://literateprogramming.com][Literate Programming]] when I read my first Emacs configuration with Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], which I have to say, it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
@@ -54,6 +56,25 @@ I believe the mentality shift happened when I finally decided to read the origin
 Since this document is about a text editor configuration, I have to highlight couple differences between Mr. Knuth's Literate Programming and my Literate Configuration.
 
 The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
+
+** About Doom configuration style
+One of the major hurdles for new comers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
+
+The first point to keep in mind:
+
+/"Doom has its own package manager"/.
+
+Even though Doom uses =use-package= and =streight.el=, it uses them as support tools for the package manager to work. This means that if you try to copy a configuration using these packages into your private configuration, most likely you will get some sort of error. So, keep this in mind when you blindly paste some configuration in your =config.el=.
+
+If you want to configure a package using =use-package=, use the ~use-package!~ (with the exclamation point at the end) macro to do so. This macro make sure nothing gets loaded if you disable a package on =packages.el=, and it allows you to use multiple calls of it (it also has some special options you can use, so you should definitely check its documentation).
+
+The second and the most important point is the order a configuration loads. There are four loading spots for each package, and you must always decide which one is the best option to apply your particular configuration:
+
+- Directly on =config.el= :: This is the most direct point of configuration. As Emacs read the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded";
+- Inside the ~:init~ section of ~use-package!~ :: tbd;
+- Inside the ~:config~ section of ~use-package!~ :: tbd;
+- Inside an ~after!~ macro :: tbd;
+
 
 ** Acknowledgments
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
@@ -65,6 +86,8 @@ I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for t
 #+end_src
 
 Last, but not least, I like to give a shout to [[https://github.com/justinbondoc][Justin Bondoc]] for his CSS tutorial on "[[https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/][Creating Styled Boxes for Notes, Warnings, Examples, and Tips]]". You will notice that I not only got his CSS here, but also his icons for the note and warning boxes!
+
+By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font as [[https://github.com/mickeynp][Mickey Petersen]] uses on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
 
 ** Investigating issues
 If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
@@ -355,7 +378,7 @@ In this section, I will go through configurations and other packages related dir
 ◆
 #+end_center
 
-If you're new to Vim, when you learn about the modes, on of the first /it's weird/ feelings you'll have is when you are in /Normal Mode/, then, you decide to go into /Insert Mode/, but right after that, you change your mind and press =<ESC>=... What just happened? you didn't act on anything, you didn't press any movement key, still, the cursor moved one character to the left!
+If you're new to Vim, when you learn about the modes, on of the first /it's weird/ feelings you'll have is when you are in /Normal Mode/, then, you decide to go into /Insert Mode/ by pressing =i=, but right after that, you change your mind and press =<ESC>=... What just happened? you didn't act on anything, you didn't press any movement key, still, the cursor moved one character to the left!
 
 Well, I have to tell you that this behavior is not a bug, is just how we should expect the change of modes to be.
 
@@ -367,6 +390,8 @@ To fix the moving back the cursor annoyance, set the variable ~evil-move-cursor-
 #+begin_src emacs-lisp
 (setq evil-move-cursor-back nil)
 #+end_src
+
+After this configuration, one might realize that going to /Insert Mode/ using =a= and pressing =<ESC>= has the opposite effect of moving the cursor to the right. In this case, at least for me, this is an acceptable behavior since the user explicitly requested to go to /Insert Mode/ *after* the current character, is reasonable the editor to move your cursor to the next position.
 
 #+begin_center
 ◆
