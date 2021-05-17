@@ -5085,24 +5085,6 @@ Now that I have a narrower width, the text will wrap more often, but the normal 
 
 To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in =org-moode=, we want it bound to ~evil-next-visual-line~:
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-;; (map! :after org
-;;       (:map org-mode-map
-;;        :nvm "j" #'evil-next-visual-line
-;;        :nvm "k" #'evil-previous-visual-line
-;;        :nv "0" #'evil-beginning-of-visual-line
-;;        :nvm "^" #'evil-first-non-blank-of-visual-line
-;;        :nvm "$" #'evil-end-of-visual-line
-
-;;        (:prefix ("g" . "goto")
-;;         :desc "Next real line" :nvm "j" #'evil-next-line
-;;         :desc "Previous real line" :nvm "k" #'evil-previous-line
-;;         :desc "Beginning of real line" :nvm "0" #'evil-beginning-of-line
-;;         :desc "First non blank of line" :nvm "^" #'evil-first-non-blank
-;;         :desc "End of real line" :nvm "$" #'evil-end-of-line)))
-#+end_src
-
 While I'm sure I'm missing a command or two, these will get me started.
 
 I also need to adjust the window navigation keys that clash with default Org bindings:
