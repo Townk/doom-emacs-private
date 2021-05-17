@@ -7333,7 +7333,7 @@ narrow, quit Dired."
   (dired-file-marker (dired-get-file-for-visit)))
 
 ;;;###autoload
-(defun my-dired/toggle-mark (&optional args)
+(defun my-dired-toggle-mark (&optional _)
   "Toggle mark of file at point."
   (interactive)
   (if (my-dired-marked-file-p)
@@ -7404,7 +7404,7 @@ narrow, quit Dired."
        :ne "U"        #'dired-up-directory
        :ne "R"        #'dired-do-rename
        :ne "d"        #'dired-do-delete
-       :ne "x"        #'my-dired/toggle-mark
+       :ne "x"        #'my-dired-toggle-mark
        (:prefix ("t" . "toggle")
         :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
         :desc "Toggle git info"       :ne "g" #'my-dired/toggle-git-mode
