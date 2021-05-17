@@ -55,7 +55,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
-          git fetch master
-          git checkout master -- assets/html-export.setup
+          git fetch origin master
+          git checkout origin/master -- assets/html-export.setup
           git commit -m "Auto-tangled from $GITHUB_SHA"
           git push
