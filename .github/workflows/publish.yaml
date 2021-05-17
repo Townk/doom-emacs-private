@@ -25,27 +25,23 @@ jobs:
         with:
           version: 27.2
 
+      - name: Prepare home config
+        run: mkdir -p ~/.config
+
       - name: Clone Doom
-        run: |
-          git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
-          mkdir -p ~/org/roam
+        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
 
       - name: Clone my private config
-        run: |
-          mkdir -p ~/.config
-          mkdir -p ~/.local/share/aspell
-          touch ~/.local/share/aspell/personal.en.pws
-          git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
+        run: git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
 
       - name: Installing Doom Emacs
-        run: |
-          ~/.emacs.d/bin/doom install --no-config --no-env --no-fonts || true
-          ~/.emacs.d/bin/doom sync || true
+        run: ~/.emacs.d/bin/doom install --no-config --no-env --no-fonts
+
+      - name: Synchronizing private config with Doom
+        run: ~/.emacs.d/bin/doom sync
 
       - name: Tangle config file
-        run: |
-          cd ~/.config/doom
-          emacs --batch --load ~/.emacs.d/early-init.el --load ~/.emacs.d/init.el --file ~/.config/doom/config.org --eval "(require 'htmlize)" --eval "(org-html-export-to-html)"
+        run: emacs --batch --load ~/.emacs.d/early-init.el --load ~/.emacs.d/init.el --file ~/.config/doom/config.org --eval "(org-html-export-to-html)"
 
       - name: Checkout private config
         uses: actions/checkout@v2
@@ -59,5 +55,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
+          git fetch master
+          git checkout master -- assets/html-export.setup
           git commit -m "Auto-tangled from $GITHUB_SHA"
           git push

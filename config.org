@@ -4,12 +4,12 @@
 #+EMAIL: thiago@rapinialves.com
 #+DATE: Fri, Jan 1 2021
 
-#+setupfile: https://townk.github.io/doom-emacs-private/assets/html-export.setup
 #+language: en
 #+startup: num
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :comments link :shebang ";;; -*- lexical-binding: t; -*-\n"
 #+property: header-args:snippet :padline no
+#+setupfile: assets/html-export.setup
 
 * Prologue
 Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to this community that is always available to help me when I have any question about Emacs.
@@ -5179,23 +5179,24 @@ To separate my configuration from initialization logic, let's create another aut
 (defun my-org-buffer-config-h ()
   "Configure all aspects of an Org buffer right before we display it to the user."
   ;; Enable minor modes
-  (+zen/toggle)
-  (valign-mode 1)
-  (variable-pitch-mode 1)
+  (when window-system
+    (+zen/toggle)
+    (valign-mode 1)
+    (variable-pitch-mode 1)
+
+    (add-hook! evil-insert-state-entry :local
+      (org-fragtog-mode 1)
+      (org-appear-mode 1))
+    (add-hook! evil-insert-state-exit :local
+      (org-fragtog-mode -1)
+      (org-appear-mode -1)))
   (visual-line-mode 1)
   ;; Call org configuration functions
   (org-display-inline-images)
   ;; Ignore flycheck errors on source blocks
   (my-noflycheck-h)
   ;; Force a buffer refresh to guarantee all setup is in use
-  (set-window-buffer nil (current-buffer))
-
-  (add-hook! evil-insert-state-entry :local
-    (org-fragtog-mode 1)
-    (org-appear-mode 1))
-  (add-hook! evil-insert-state-exit :local
-    (org-fragtog-mode -1)
-    (org-appear-mode -1)))
+  (set-window-buffer nil (current-buffer)))
 #+end_src
 
 With this function in place, we can /hook/ it to our Org major mode:
@@ -5346,6 +5347,9 @@ rm -rf aspell6-en-custom*
 #+begin_src emacs-lisp
 (defconst my-aspell-local-data-dir (expand-file-name "~/.local/share/aspell")
   "Directory of Aspell dictionaries.")
+
+(unless (file-exists-p my-aspell-local-data-dir)
+  (mkdir my-aspell-local-data-dir t))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
