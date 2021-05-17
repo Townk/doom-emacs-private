@@ -29,19 +29,19 @@ jobs:
         run: mkdir -p ~/.config
 
       - name: Clone Doom
-        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
+        run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.config/emacs
 
       - name: Clone my private config
         run: git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
 
       - name: Installing Doom Emacs
-        run: ~/.emacs.d/bin/doom install --no-config --no-env --no-fonts
+        run: ~/.config/emacs/bin/doom install --no-config --no-env --no-fonts
 
       - name: Synchronizing private config with Doom
-        run: ~/.emacs.d/bin/doom sync
+        run: ~/.config/emacs/bin/doom sync
 
       - name: Tangle config file
-        run: emacs --batch --load ~/.emacs.d/early-init.el --load ~/.emacs.d/init.el --file ~/.config/doom/config.org --eval "(org-html-export-to-html)"
+        run: emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(org-html-export-to-html)"
 
       - name: Checkout private config
         uses: actions/checkout@v2
