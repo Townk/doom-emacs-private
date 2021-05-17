@@ -124,6 +124,42 @@
 #+HTML_HEAD:         padding: 0;
 #+HTML_HEAD:         border: none;
 #+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-1 {
+#+HTML_HEAD:         color: #c39900
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-2 {
+#+HTML_HEAD:         color: #00bfff
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-3 {
+#+HTML_HEAD:         color: #c39900
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-4 {
+#+HTML_HEAD:         color: #00bfff
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-5 {
+#+HTML_HEAD:         color: #c39900
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-6 {
+#+HTML_HEAD:         color: #00bfff
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-7 {
+#+HTML_HEAD:         color: #c39900
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-8 {
+#+HTML_HEAD:         color: #00bfff
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-rainbow-delimiters-depth-9 {
+#+HTML_HEAD:         color: #c39900
+#+HTML_HEAD:     }
 #+HTML_HEAD: }
 
 #+HTML_HEAD: @media screen {
