@@ -1,8 +1,8 @@
 name: publish
 
-# Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+  # Triggers the workflow on push or pull request events but only for
+  # the master branch
   push:
     branches: [ master ]
   pull_request:
@@ -11,35 +11,41 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+  # This workflow contains a single job called "publish"
   publish:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Setup Emacs
         uses: purcell/setup-emacs@master
         with:
           version: 27.2
 
+      # I don't know if the runner has anything configured that uses
+      # the XDG directory layout, so is better to guarantee the
+      # ~/.config exists
       - name: Prepare home config
         run: mkdir -p ~/.config
 
       - name: Clone Doom
         run: git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.config/emacs
 
-      - name: Clone my private config
-        run: git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
-
+      # This installation is simply to cache Doom packages
       - name: Installing Doom Emacs
         run: ~/.config/emacs/bin/doom install --no-config --no-env --no-fonts
 
+      - name: Clone my private config
+        run: git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
+
+      # This step is required to make sure any package I installed
+      # extra gets installed. Also it removes packages I don't use
       - name: Synchronizing private config with Doom
         run: ~/.config/emacs/bin/doom sync
 
+      # This command tries to simulate the normal Emacs startup before
+      # tangling the config file
       - name: Tangle config file
         run: emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(org-html-export-to-html)"
 
@@ -49,6 +55,10 @@ jobs:
           ref: gh-pages
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # This step, besides committing the tangled file to the gh-pages
+      # branch, it also fetches the setup file from the master branch
+      # and commit it to the gh-pages branch in order to allow others
+      # to use it by including the github.io address
       - name: Push tangled file to gh-pages
         run: |
           cp ~/.config/doom/config.html index.html
