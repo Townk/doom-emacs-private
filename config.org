@@ -18,7 +18,7 @@ This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (
 
 Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://paypal.me/henriklissner][creator]].
 
-For instance, when one installs Doom without a previous private configuration, the installer creates the file =$DOOMDIR/config.el= with the following comments:
+For instance, a Doom installation without a previous private configuration creates the file =$DOOMDIR/config.el= with the following comments:
 
 #+caption: $DOOMDIR/From the =config.el= file comments
 #+begin_note
@@ -40,41 +40,54 @@ The organization of my Emacs configuration tries to structure the design and bui
 
 Some of these needs are technology related (e.g. programming languages, diagrams tooling, etc.), while others are aesthetic or productivity related.
 
-I want to stress out to the reader, that you are, ultimately, reading a personal opinion, and what works for me may or may not work for you.
+I want to stress out to you, that ultimately, you are reading a personal opinion, and what works for me may or may not work for you.
 
-I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences, still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]], so I will focus the configuration at that point, to adjust Emacs and Org to fit my personal workflow.
+I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]] and will focus the configuration, at that point, to adjust Emacs and Org to fit my personal workflow.
 
-After configuring Emacs for writing prose, I will focus this document on programming (which is what I do for work). I will cover [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
+After configuring Emacs for writing prose, my next focus is programming (which is what I do for work). I will setup [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
 
 Overall, my intention is to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
 
 ** About literate configuration
-A long time ago I found out about [[http://literateprogramming.com][Literate Programming]] when I read my first Emacs configuration with Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], which I have to say, it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
+A long time ago I found out about [[http://literateprogramming.com][Literate Programming]] when I read my first Emacs configuration with Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], which was a fantastic reading. I tried couple times to do the same with past configurations without much success.
 
-I believe the mentality shift happened when I finally decided to read the original paper about [[http://literateprogramming.com/knuthweb.pdf][Literate Programming]] by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]], and just like that, I want to practice Literate Programming on about everything I do.
+I believe the mentality shift happened when I finally decided to read the original paper about [[http://literateprogramming.com/knuthweb.pdf][Literate Programming]] by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]], and just like that, I wanted to practice Literate Programming on about everything I do.
 
 Since this document is about a text editor configuration, I have to highlight couple differences between Mr. Knuth's Literate Programming and my Literate Configuration.
 
-The core difference, is the fact that each piece of code in this document may not be a self contained snippet. When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
+The core difference, is the fact that each piece of code in this document may not be a self contained snippet (although I will try my best to do so). When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
 ** About Doom configuration style
 One of the major hurdles for new comers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
 
-The first point to keep in mind:
+This section describes some aspects of Doom that I felt important to understand before I was able to properly configure it.
+
+The first thing to keep in mind is:
 
 /"Doom has its own package manager"/.
 
-Even though Doom uses =use-package= and =streight.el=, it uses them as support tools for the package manager to work. This means that if you try to copy a configuration using these packages into your private configuration, most likely you will get some sort of error. So, keep this in mind when you blindly paste some configuration in your =config.el=.
+Even though Doom uses =use-package= and =streight.el=, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration that uses one of these packages into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
 
-If you want to configure a package using =use-package=, use the ~use-package!~ (with the exclamation point at the end) macro to do so. This macro make sure nothing gets loaded if you disable a package on =packages.el=, and it allows you to use multiple calls of it (it also has some special options you can use, so you should definitely check its documentation).
+If you want to configure a package using =use-package=, use the ~use-package!~ (with the exclamation point at the end) macro to do so. This macro make sure nothing gets loaded if you disable a package on =packages.el=.
 
-The second and the most important point is the order a configuration loads. There are four loading spots for each package, and you must always decide which one is the best option to apply your particular configuration:
+The second thing is:
 
-- Directly on =config.el= :: This is the most direct point of configuration. As Emacs read the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded";
-- Inside the ~:init~ section of ~use-package!~ :: tbd;
-- Inside the ~:config~ section of ~use-package!~ :: tbd;
-- Inside an ~after!~ macro :: tbd;
+/"Lazy load *everything*!"/
 
+You should get used to use the options =:defer=, =:hook=, and =:commands= from ~use-package!~ when configuring any package this way. Not doing so, may cause the package to get loaded during the Emacs initialization, potentially slowing the start of Emacs.
+
+The third and the most important point is the order a configuration loads. There are four loading spots for each package, and you must always decide which one is the best option to apply your particular configuration:
+
+- Directly on =config.el= :: This is the most direct point of configuration. As Emacs read the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/;
+- Inside the ~:init~ section of ~use-package!~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package!~, the code inside =:init= gets evaluated only *after* the resource loads;
+- Inside the ~:config~ section of ~use-package!~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package!~ on the same package. For instance, if you're configuring a package Doom also configure, the you add to the =:config= section may execute before Doom's own configuration, which can potentially erase your configuration with Doom's defaults;
+- Inside an ~after!~ macro :: Code here executes after the resource gets loaded, but also after all instances of ~use-package!~ finish to run code from their =:config= section;
+
+If you have any question about where you should add your configuration, I suggest to follow the following rule of thumb:
+
+- If a package requires you to configure a variable before Emacs loads it, set the variable directly on the =config.el=;
+- If you're configuring a package that Doom installs as part of a module, and it does not required to define the configuration before Emacs loads the package, use the ~after!~ macro;
+- If you're adding a new package to your configuration, configure it using the ~use-package!~ macro. To know if you should use ~use-package!~ just check if you had to add the package to your =packages.el= file. If you did, then use ~use-package!.
 
 ** Acknowledgments
 Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
