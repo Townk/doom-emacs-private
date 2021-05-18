@@ -60,47 +60,44 @@ The core difference, is the fact that each piece of code in this document may no
 ** About Doom configuration style
 One of the major hurdles for new comers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
 
-This section describes some aspects of Doom that I felt important to understand before I was able to properly configure it.
+This section describes four aspects of Doom that I felt important to understand before I was able to properly configure it.
 
-The first thing to keep in mind is:
+*** Doom has its own package manager
 
-/"Doom has its own package manager"/.
+Doom does not use =package.el=, it has its own package manager system and even though, it uses =use-package= and =streight.el= packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
 
-Even though Doom uses =use-package= and =streight.el=, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration that uses one of these packages into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
+*** Lazy load everything
 
-If you want to configure a package using =use-package=, use the ~use-package!~ (with the exclamation point at the end) macro to do so. This macro make sure nothing gets loaded if you disable a package on =packages.el=.
+You should get used to use the options =:defer=, =:hook=, =:after=, =:mode=, and =:commands= from ~use-package~ (check the [[https://github.com/jwiegley/use-package][package documentation]] for more details) when configuring any package with it. Not doing so, may cause the package to get loaded during the Emacs initialization, potentially slowing the start of Emacs.
 
-The second thing is:
+*** Configuration evaluation order
 
-/"Lazy load *everything*!"/
+There are four potential loading /spots/ for each configuration you want do tweak, and you must always decide which one is the best option to apply your particular case:
 
-You should get used to use the options =:defer=, =:hook=, and =:commands= from ~use-package!~ when configuring any package this way. Not doing so, may cause the package to get loaded during the Emacs initialization, potentially slowing the start of Emacs.
-
-The third and the most important point is the order a configuration loads. There are four loading spots for each package, and you must always decide which one is the best option to apply your particular configuration:
-
-- Directly on =config.el= :: This is the most direct point of configuration. As Emacs read the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/;
-- Inside the ~:init~ section of ~use-package!~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package!~, the code inside =:init= gets evaluated only *after* the resource loads;
-- Inside the ~:config~ section of ~use-package!~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package!~ on the same package. For instance, if you're configuring a package Doom also configure, the you add to the =:config= section may execute before Doom's own configuration, which can potentially erase your configuration with Doom's defaults;
-- Inside an ~after!~ macro :: Code here executes after the resource gets loaded, but also after all instances of ~use-package!~ finish to run code from their =:config= section;
+- Directly on =config.el= :: This is the most direct point of configuration. As Emacs evaluates the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/. On Doom's world, any directory or file variable should go to directly into your =config.el=;
+- Inside the ~:init~ section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluate the code inside =:init= only *after* the resource stated on the option loads;
+- Inside the ~:config~ section of ~use-package~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
+- Inside an ~after!~ or ~with-eval-after-load~ macro :: Code here executes after the defined resource gets loaded, but also after all instances of ~use-package~ finish to run code from their =:config= section;
 
 If you have any question about where you should add your configuration, I suggest to follow the following rule of thumb:
 
-- If a package requires you to configure a variable before Emacs loads it, set the variable directly on the =config.el=;
-- If you're configuring a package that Doom installs as part of a module, and it does not required to define the configuration before Emacs loads the package, use the ~after!~ macro;
-- If you're adding a new package to your configuration, configure it using the ~use-package!~ macro. To know if you should use ~use-package!~ just check if you had to add the package to your =packages.el= file. If you did, then use ~use-package!.
+- If a package requires you to configure a variable before Emacs loads such package, set the variable directly on the =config.el=;
+- If you're configuring a package that Doom installs as part of a module, and it does not requires you to define the configuration before Emacs loads the package, use the ~after!~ macro;
+- If you're adding a new package to your configuration, configure it using the ~use-package~ macro. To know if you should use ~use-package~ just check if you had to add the package to your =packages.el= file. If you did, then use ~use-package~.
 
-** Acknowledgments
-Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
+For instance:
 
-I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the amazing theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
+#+begin_src emacs-lisp :tangle no
+(setq org-directory "~/org")
 
-#+begin_src org :tangle no
-,#+setupfile: https://townk.github.io/doom-emacs-private/assets/html-export.setup
+(after! org
+  (setq org-startup-indented nil))
 #+end_src
 
-Last, but not least, I like to give a shout to [[https://github.com/justinbondoc][Justin Bondoc]] for his CSS tutorial on "[[https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/][Creating Styled Boxes for Notes, Warnings, Examples, and Tips]]". You will notice that I not only got his CSS here, but also his icons for the note and warning boxes!
+*** Use the ~map!~ macro to bind keys
+Eventually, you will realize that ~use-package~ has a nice =:bind= option to it, and you may think that your configuration would be so much cleaner if you could have everything under a ~use-package~ call (been there, done that). Unfortunately, this is not a good idea, unless you're aware of all possible gotchas related to =leader= and =localleader=.
 
-By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font as [[https://github.com/mickeynp][Mickey Petersen]] uses on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
+My recommendation to you is to always configure your keybindings using the ~map!~ macro. Check its documentation for more details (on Emacs press =SPC h f map! RET=).
 
 ** Investigating issues
 If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
@@ -126,6 +123,19 @@ What I recommend to do, is to install a package that specializes on benchmarking
 Check my =init.el= file on the [[Appendix][Appendix]], to see how I hook up benchmarking to the =--debug-init= flag.
 
 After starting Emacs with the =--debug-init= flag, you can check the call tree with the =M-x benchmark-init/show-durations-tree= command.
+
+** Acknowledgments
+Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
+
+I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the amazing theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
+
+#+begin_src org :tangle no
+,#+setupfile: https://townk.github.io/doom-emacs-private/assets/html-export.setup
+#+end_src
+
+Last, but not least, I like to give a shout to [[https://github.com/justinbondoc][Justin Bondoc]] for his CSS tutorial on "[[https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/][Creating Styled Boxes for Notes, Warnings, Examples, and Tips]]". You will notice that I not only got his CSS here, but also his icons for the note and warning boxes!
+
+By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font as [[https://github.com/mickeynp][Mickey Petersen]] uses on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
 
 * Standard features
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
