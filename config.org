@@ -402,6 +402,7 @@ I want to press =g +=, and then multiple key strokes of =+= to increase the numb
 
 In order to use it, you have to define a keymap for the /repeatable keys/, and associate that keymap to the command that will start the repeat. This is an example on how to accomplish that:
 
+#+caption: ~repeat-mode~ example for increment or rotate function
 #+begin_src emacs-lisp :tangle no
 (defvar my-inc-or-rotate-repeat-map
   (let ((map (make-sparse-keymap)))
