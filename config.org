@@ -393,6 +393,57 @@ To add a margin on your cursor as it gets on the edge of the screen, set the var
 (setq scroll-margin 2)
 #+end_src
 
+*** Repeatable commands
+There is a new feature available since Emacs 28 that allow you to define a /repeatable map/ for actions that take more than one key stroke to perform, and you want to repeat them with only the last keystroke in sequence.
+
+For instance, on Doom, to increase the value of number, you need to use the key binding =g +=. If you want to increase the same number multiple times, you would have to type the same sequence multiple times (ignore the repeat command associated with the =.= key for didactic reasons).
+
+I want to press =g +=, and then multiple key strokes of =+= to increase the number multiple times, and the ~repeat-mode~ is the new feature that allows me to do that.
+
+In order to use it, you have to define a keymap for the /repeatable keys/, and associate that keymap to the command that will start the repeat. This is an example on how to accomplish that:
+
+#+begin_src emacs-lisp :tangle no
+(defvar my-inc-or-rotate-repeat-map
+  (let ((map (make-sparse-keymap)))
+    ;; Standard keys:
+    (define-key map "=" 'my-inc-or-rotate-at-point)
+    (define-key map "-" 'my-dec-or-rotate-at-point)
+    map)
+  "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
+
+(put 'my-inc-or-rotate-at-point 'repeat-map 'my-inc-or-rotate-repeat-map)
+(put 'my-dec-or-rotate-at-point 'repeat-map 'my-inc-or-rotate-repeat-map)
+#+end_src
+
+This is not bad, but with Lisp we can do better than that! The next macro helps with this process:
+
+#+caption: $DOOMDIR/autoload/editor.el
+#+begin_src emacs-lisp :tangle autoload/editor.el
+;;;###autoload
+(defmacro my-repeat-map! (map-name keys-alist &optional docstring)
+  "A helper macro to create keymaps for repeatable actions.
+
+MAP-NAME is the variable name for the sparse keymap created, and KEYS-ALIST, is
+an association list of functions to keys, where each function is called after
+the associated key is pressed after the repeatable action is triggered."
+  `(defvar ,map-name
+     (let ((map (make-sparse-keymap)))
+       (dolist (cmd ,keys-alist)
+         (define-key map (cdr cmd) (car cmd))
+         (put (car cmd) 'repeat-map ',map-name))
+       map)
+     ,docstring))
+#+end_src
+
+You can find the previous example using the new macro on section [[Plus-Minus]].
+
+In order to be able to use ~repeat-mode~ everywhere, I will turn it on after Emacs initializes:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'repeat-mode)
+#+end_src
+
 ** Modal editing
 As I mentioned on section [[Modal editing]], I do consider /Modal Editing/ far superior then other methods. The main reason is the separation of states while editing a text. At some level, we all do modal editing, but the keybindings style popularized by Vim goes a step forward and /formalize/ these states.
 
@@ -1424,8 +1475,20 @@ With all in place, we just need to define the keybindings:
   :n "C-a" #'my-inc-or-rotate-at-point
   :n "C-x" #'my-dec-or-rotate-at-point
   (:prefix "g"
-    :desc "Inc sequence" :v "C-a" #'+/-:block+
-    :desc "Dec sequence" :v "C-x" #'+/-:block-))
+    :desc "Inc sequence" :v "=" #'+/-:block+
+    :desc "Dec sequence" :v "-" #'+/-:block-
+    :desc "Inc sequence" :n "=" #'my-inc-or-rotate-at-point
+    :desc "Dec sequence" :v "-" #'my-dec-or-rotate-at-point))
+#+end_src
+
+In order to allow me to repeat the last increase or decrease, I will define a /repeatable map/ for my custom increase and decrease functions:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(my-repeat-map! my-inc-or-rotate-repeat-map
+                '((my-inc-or-rotate-at-point . "=")
+                  (my-dec-or-rotate-at-point . "-"))
+                "Keymap to repeat the last number increase or decrease.")
 #+end_src
 
 *** Evil-String-Inflection
@@ -1435,18 +1498,70 @@ I found the [[https://github.com/akicho8/string-inflection][=string-inflection=]
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! evil-string-inflection)
+(package! string-inflection)
 #+end_src
 
-As with the =matchit= package, I'll defer its loading until we need it, but different from =matchit=, I have to defer it using an alternative approach. I will make the package load on the first invocation of the command ~evil-operator-string-inflection~, then, on the =:init= section, I will setup the proper keymap using the Doom ~map!~ function:
+As with the =matchit= package, I'll defer its loading until we need it, but different from =matchit=, I have to defer it using an alternative approach. I will make the package load on the first invocation of one of its main commands:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(use-package! evil-string-inflection
-  :commands (evil-operator-string-inflection)
-  :init
-  (map! :prefix "g"
-        :desc "String inflection" :o "~" #'evil-operator-string-inflection))
+(use-package! string-inflection
+  :commands (string-inflection-all-cycle
+             string-inflection-toggle
+             string-inflection-camelcase
+             string-inflection-lower-camelcase
+             string-inflection-kebab-case
+             string-inflection-underscore
+             string-inflection-capital-underscore
+             string-inflection-upcase))
+#+end_src
+
+I want to have a rich set of mappings for this package, so I will add one key for each inflection plus a toggle and a cycle:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(map! :leader :prefix ("g~" . "string inflection")
+      :desc "cycle" "~" #'string-inflection-all-cycle
+      :desc "toggle" "t" #'string-inflection-toggle
+      :desc "CamelCase" "c" #'string-inflection-camelcase
+      :desc "downCase" "d" #'string-inflection-lower-camelcase
+      :desc "kebab-case" "k" #'string-inflection-kebab-case
+      :desc "under_score" "_" #'string-inflection-underscore
+      :desc "Upper_Score" "u" #'string-inflection-capital-underscore
+      :desc "UP_CASE" "U" #'string-inflection-upcase)
+#+end_src
+
+In order to create a nicer workflow, I want to access the previous shortcuts by pressing the same key after the initial inflection. For instance, I want to press =SPC g ~= to start the inflection, and keep pressing just =~= to cycle through all of the other inflections.
+
+To achieve this behavior I will use the ~my-repeat-map!~ macro introduced on the section [[Repeatable commands]]:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(my-repeat-map! my-string-inflection-repeat-map
+                '((string-inflection-all-cycle . "~")
+                  (string-inflection-toggle . "t")
+                  (string-inflection-camelcase . "c")
+                  (string-inflection-lower-camelcase . "d")
+                  (string-inflection-kebab-case . "k")
+                  (string-inflection-underscore . "_")
+                  (string-inflection-capital-underscore . "u")
+                  (string-inflection-upcase . "U"))
+                "Keymap to repease the last string inflection.")
+#+end_src
+
+To make ~string-inflection~ to work nice with Evil, I will create an /Evil operator/ to allow me to change the string inflection of a target text object:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(after! evil
+  (evil-define-operator my-evil-operator-string-inflection (beg end _type)
+    "Define a new evil operator that cicles underscore -> UPCASE -> CamelCase."
+    :move-point nil
+    (interactive "<R>")
+    (string-inflection-all-cycle)
+    (setq evil-repeat-info (list [?g ?~])))
+
+  (define-key evil-normal-state-map (kbd "g~") 'my-evil-operator-string-inflection))
 #+end_src
 
 ** Keybindings
@@ -1623,6 +1738,64 @@ Because of this, I want to set this mode as a toggable shortcut:
 #+begin_src emacs-lisp
 (map! :leader :prefix ("t" . "toggle")
       :desc "Rainbow mode" :mvn "R" #'rainbow-mode)
+#+end_src
+
+*** Repeatable shortcuts
+Due to the nature of modal edit, some shortcuts need more than one key press to activate. This is usually fine until we try an action designed to repeat (e.g. side scroll and window resizing). This section will use the ~my-repeat-map!~ macro defined on the [[Repeatable commands]] sections to make these actions more ergonomic.
+
+#+begin_center
+◆
+#+end_center
+
+The first candidate for a repeatable pattern is window resizing. On Vim (and also Evil) for instance, the key binding to increase height is =C-w +=. Doom makes this a little bit better by making all key bindings from =C-w= accessible with the prefix =SPC w=, but still, adjusting the size of a window with multiple key strokes like this, is a bad experience.
+
+We can make the window resizing commands safe to repeat, which would allow us to repeat the last resizing with the =.= repeat operator. The problem with this approach, is the fact that we can /change directions/ when repeating the resize. For instance, if we are increasing the height of a window and we press the =.= couple more times we wanted, to decrease its size, we would have to start over with the decrease command and pay attention to not get it wrong this time.
+
+To avoid this issue, I will define a /repeatable map/ for resizing, and because this is a separate map from the normal window map, I can add couple extra keys there to make the operation even smoother, for instance, we can increase the window height with =+= or with the === key
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(my-repeat-map! my-window-resize-repeat-map
+                '((evil-window-increase-height . "+")
+                  (evil-window-increase-height . "=")
+                  (evil-window-decrease-height . "-")
+                  (evil-window-decrease-height . "_")
+                  (evil-window-increase-width . ">")
+                  (evil-window-decrease-width . "<"))
+                "Repeatable map for window resizing")
+#+end_src
+
+#+begin_center
+◆
+#+end_center
+
+Sometimes you're editing a buffer on a window that requires you to scroll to the right and left to read its content. You can achieve that by pressing =z l= to scroll to the right, and =z h= to scroll to the left. While this is ok, besides enabling to repeat this motion with just an =l= or an =h= after the initial scroll, I also want to jump longer distances (the default is to move one character on each =z l= or =z h= shortcuts). To jump more than one character, I need to create a wrapper function that passes a bigger number to the ~evil-scroll-column-right~ or ~evil-scroll-column-left~ functions:
+
+#+caption: autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+;;;###autoload
+(defun my-big-scroll-column-right ()
+  "Wrapper for the `evil-scroll-column-right' that passes 10 as the jump size."
+  (interactive)
+  (evil-scroll-column-right 10))
+
+;;;###autoload
+(defun my-big-scroll-column-left ()
+  "Wrapper for the `evil-scroll-column-left' that passes 10 as the jump size."
+  (interactive)
+  (evil-scroll-column-left 10))
+#+end_src
+
+And with those helper functions I can define the proper /repeatable map/ for side scrolling:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(my-repeat-map! my-side-scrolling-repeat-map
+                '((evil-scroll-column-right . "l")
+                  (my-big-scroll-column-right . "L")
+                  (evil-scroll-column-left . "h")
+                  (my-big-scroll-column-left . "H"))
+                "Repeatable map to scroll the buffer left or right.")
 #+end_src
 
 ** Appearances
