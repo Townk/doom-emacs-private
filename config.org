@@ -12,9 +12,9 @@
 #+setupfile: assets/html-export.setup
 
 * Prologue
-Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to this community that is always available to help me when I have any question about Emacs.
+Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to the community.
 
-This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this configuration (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ in the Doom's community.
+This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] configuration framework (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this document (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ in the Doom's community.
 
 Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://paypal.me/henriklissner][creator]].
 
@@ -48,8 +48,18 @@ After configuring Emacs for writing prose, my next focus is programming (which i
 
 Overall, my intention is to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
 
+#+begin_center
+◆
+#+end_center
+
+Before you move on to the next section I must give you a disclaimer:
+
+Although I'm using Emacs for about six years, I can't consider myself an expert. Was not until the beginning of 2021 that I decided to learn lisp properly, so you may find some code snippets here that are not considered optimal.
+
+Also, do not trust me blindly. I try my best to verify the information I write by reading documentation and some times reaching out to the subject-matter expert of a feature, but for your own good, you should get in the habit of reading the documentation and manuals by yourself, there will be nothing that will build your knowledge better then this.
+
 ** About literate configuration
-A long time ago I found out about [[http://literateprogramming.com][Literate Programming]] when I read my first Emacs configuration with Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], which was a fantastic reading. I tried couple times to do the same with past configurations without much success.
+A long time ago I discovered [[http://literateprogramming.com][Literate Programming]] when I first read an Emacs configuration using Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], and it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
 
 I believe the mentality shift happened when I finally decided to read the original paper about [[http://literateprogramming.com/knuthweb.pdf][Literate Programming]] by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]], and just like that, I wanted to practice Literate Programming on about everything I do.
 
@@ -113,7 +123,7 @@ This will stop Emacs on the first error and print the stack trace for it. As of 
 
 Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensible to package loading.
 
-What I recommend to do, is to install a package that specializes on benchmarking, and use it, when you have the need:
+What I recommend to do, is to install a package called [[https://github.com/dholm/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking, and use it, when you have the need:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -135,18 +145,13 @@ I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for t
 
 Last, but not least, I like to give a shout to [[https://github.com/justinbondoc][Justin Bondoc]] for his CSS tutorial on "[[https://www.madcapsoftware.com/blog/css-tip-creating-styled-boxes-notes-warnings-examples-tips/][Creating Styled Boxes for Notes, Warnings, Examples, and Tips]]". You will notice that I not only got his CSS here, but also his icons for the note and warning boxes!
 
-By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font as [[https://github.com/mickeynp][Mickey Petersen]] uses on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
+By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font used by [[https://github.com/mickeynp][Mickey Petersen]] on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
 
 * Standard features
-Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, I'll be more than happy to link your document here.
+Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, and I'll be more than happy to link your document here.
 
 ** Requirements
-As mentioned on section [[About this document]], this part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all editors.
-
-*** Fast start
-Although this seams like the biggest /no-brainer/ of my requirements, it would be funny if was not sad the fact that Emacs is the worst in this category when loaded with plugins (from here on, referred as /packages/) compared to editors of the same caliber (e.g. [[https://www.vim.org/][Vim]], [[https://www.sublimetext.com][Sublime Text]], [[https://code.visualstudio.com/][Visual Studio Code]], etc.). I personally believe that Emacs compensate with its power, nevertheless, I still want to have an editor that opens on a snap when I need.
-
-By default, Doom starts a fresh emacs process fast, but it take its sweet time to open a buffer depending on the buffer's type and the amount of packages you have available. For sake of being able to have a functional editor with all my requirements, I will say that I have just the requirement of starting it in less than 1.8 seconds. Eventually I will address the other part of this equation (probably using =emacsclient= or some type of memory snapshot).
+This part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all of them.
 
 *** Modal editing
 I need to come clean to the reader about my past experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
@@ -191,7 +196,7 @@ I move my editor all around my desktop, and I resize it just as much, do I'm not
 *** Remote editing
 I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
 
-I also want my text editor to allow me to start this remote editing by picking a server and a remote editor, so it can create a remote /project/ for me to explore.
+I also want my text editor to allow me to start this remote editing by picking a server and a remote path, so it can create a remote /project/ for me to explore.
 
 ** Emacs-only configurations
 This section will cover some changes I like to do on the Emacs (or Doom) default behavior, and some required settings to make sure Emacs have all the information it needs to function properly.
@@ -4814,31 +4819,43 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
-* Writing
-Unfortunately, my main job at work is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, there are way more configuration and adjustments I would need to do on Emacs to get a distance resemblance of those IDEs. Because of this reason, my main usage for Emacs is writing and scripting.
+* Writing :wip:
+In my day-time job, my role, among other things, is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, it lacks a substantial amount of features. The amount of configurations and adjustments I would need to do to get a distance resemblance of those IDEs is prohibitive. Because of this reason, one of my main usage for Emacs is writing and scripting.
 
-My intention is to do any writing I need, using Org mode. And that is the reason this section of my setup is as big as it can be.
+I decided to use Org mode as my writing platform. And because of that, this section is as big and detailed as it can be.
 
-I come up with a directory infrastructure for my writings that will hold all type of text I need to produce:
+#+begin_center
+◆
+#+end_center
+
+I come up with a directory infrastructure for my writings that will hold all type of text I need to produce, while keeping them well organized:
 
 #+caption: My org directory structure
-#+begin_src text :tangle no
-   org
-  ├──  .archives
-  ├──  .attach
-  ├──  agenda
-  │  ├──  calendars
-  │  │  ├──  personal.org
-  │  │  └──  work.org
-  │  ├──  tasks
-  │  │  ├──  someday.org
-  │  │  └──  todo.org
-  │  ├──  contacts.org
-  │  └──  habits.org
-  ├──  documents
-  ├──  journal
-  ├──  notes
-  └──  presentations
+#+begin_src plantuml :file assets/org-dir-struct.png :tangle no
+@startsalt
+!theme cerulean-outline
+scale 2
+{
+  {T
+    + <&folder> org
+    ++ <&folder> .archives
+    ++ <&folder> .attach
+    ++ <&folder> agenda
+    +++ <&folder> calendars
+    ++++ <&file> personal.org
+    ++++ <&file> work.org
+    +++ <&folder> tasks
+    ++++ <&file> someday.org
+    ++++ <&file> todo.org
+    +++ <&file> contacts.org
+    +++ <&file> habits.org
+    ++ <&folder> documents
+    ++ <&folder> journal
+    ++ <&folder> notes
+    ++ <&folder> presentations
+  }
+}
+@endsalt
 #+end_src
 
 Most of these directories are straightforward to understand their purpose, but I still want to go through them to document my need.
@@ -4847,7 +4864,7 @@ Most of these directories are straightforward to understand their purpose, but I
 - =.attach= :: This is the Doom's directory to store attached files;
 - =agenda= :: The root folder for task management:
   + =calendars= :: Here is where I will add the events for my calendars. Each calendar I have will have its own file here. These files are not intended to manage my calendars, and I will consider them as /read-only files/. Outside Emacs, I will have process running and synchronizing these files;
-  + =tasks= :: Directory to store Org files with tasks. The main file, which I will track on Org Agenda is thee =todo.org=, but I have this extra file called =someday.org= as a dump for tasks I wish to accomplish but are not essentials;
+  + =tasks= :: Directory to store Org files with tasks. The main file, which I will track on Org Agenda is the =todo.org=, but I have this extra file called =someday.org= as a dump for tasks I wish to accomplish but are not essentials;
   + =contacts.org= :: The Org file used to record my contacts. I still need to find a good way to synchronize this file with my phone contacts, but this is out of the scope of this document;
   + =habits.org= :: Once I'm ready to try tracking my habits, this is the file I should use;
 - =documents= :: This is the dumping ground for any type of document (articles, design architecture, blog posts, wiki entries, etc.). Inside of it, I will have one directory per area (work, home, personal site, etc.);
@@ -4855,16 +4872,38 @@ Most of these directories are straightforward to understand their purpose, but I
 - =notes= :: My curated notes. All files in this directory have no name (I use UUID as their name), and I can access their content by using the Zettelkasten method on my system;
 - =presentations= :: The directory for my presentation projects using =reveal.js=;
 
-Regarding my configuration for Org mode, I will split it into 6 distinct sections, one per usage I will have for Org:
+Regarding my configuration for writing, I will split it into 7 distinct sections:
 
+- Org configuration
 - Prose writing
 - Reading or reviewing
 - Publishing
 - Presenting
 - Note Taking
-- Time Management
+- Other writing modes
 
 ** TODO Requirements
+- Fonts
+  + Variable pitch
+  + Variable size
+- Text quality
+  + Spell-checking
+  + Grammar check
+  + Dictionary/Thesaurus
+  + Text linting
+    - Insensible words
+    - Weasel words
+- Revisions
+  + Annotations / Document comments
+- Exports
+  + Hugo
+  + XWiki
+  + Confluense
+  + Book format?
+  + RevealJS
+- Notes
+  + ???
+
 ** TODO Common Org configurations
 But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
 
@@ -6989,6 +7028,7 @@ TBD
 Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
 
 *** Markdown
+TBD
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
