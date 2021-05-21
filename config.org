@@ -5182,6 +5182,15 @@ I also need to adjust the window navigation keys that clash with default Org bin
 #+begin_src emacs-lisp
 (map! :after org
       :map org-mode-map
+      :prefix ("g" . "action")
+      :desc "org-ctrl-c-ctrl-c" :n [return] #'org-ctrl-c-ctrl-c
+      :desc "org-ctrl-c-ctrl-c" :n "RET" #'org-ctrl-c-ctrl-c)
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(map! :after org
+      :map org-mode-map
       :n "s-j" #'org-next-visible-heading
       :n "s-k" #'org-previous-visible-heading
       :n "C-s-j" #'org-forward-heading-same-level
