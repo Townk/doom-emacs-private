@@ -7208,6 +7208,12 @@ TBD
   (set-popup-rule! "^\\*PLANTUML" :size 0.4 :side 'right :select nil :ttl 0))
 #+end_src
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp :noweb-ref none :tangle (if (file-exists-p "/usr/local/var/homebrew/linked/plantuml/libexec/plantuml.jar") "no" "config.el")
+(setq plantuml-jar-path "/tmp/plantuml.jar"
+      org-plantuml-jar-path plantuml-jar-path)
+#+end_src
+
 ** TODO Other modes
 Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
 

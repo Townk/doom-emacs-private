@@ -40,6 +40,9 @@ jobs:
       - name: Clone my private config
         run: git clone --depth 1 https://github.com/Townk/doom-emacs-private ~/.config/doom
 
+      - name: Install PlantUML jar
+        run: curl -sSfL https://sourceforge.net/projects/plantuml/files/plantuml.jar/download -o /tmp/plantuml.jar
+
       # This step is required to make sure any package I installed
       # extra gets installed. Also it removes packages I don't use
       - name: Synchronizing private config with Doom
