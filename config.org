@@ -784,7 +784,7 @@ I appreciate the fact that majority of editor these days can keep the indentatio
 
 Emacs offers a mode called ~electric-indent-mode~ where the ultimate goal, is to achieve exactly what I described, but unfortunately, the current state of the mode is falling short of it.
 
-The solution I found, is an external package called ~aggressive-indent~ that re-indent the entire file on every change.
+The solution I found, is an external package called [[https://github.com/Malabarba/aggressive-indent-mode][~aggressive-indent~]] that re-indent the entire file on every change.
 
 It is a bit too aggressive, but so far is working just fine for me, so let's add it to our packages:
 
@@ -890,7 +890,7 @@ In most editors (as far as editors go, I only saw Emacs allowing balanced pairs)
 
 Emacs has some packages that help you keep the balance on pair characters, even if you try to remove a line containing just one of the pairs.
 
-Among the packages I checked, the two top two contenders for me are =lispville= and =smartparens= + (=evil-cleverparens= or =evil-smartparens=).
+Among the packages I checked, the two top two contenders for me are [[https://github.com/noctuid/lispyville][~lispville~]] and [[https://github.com/Fuco1/smartparens][~smartparens~]]  + ([[https://github.com/luxbock/evil-cleverparens][=evil-cleverparens=]] or [[https://github.com/expez/evil-smartparens][~evil-smartparens~]]).
 
 From the two, =lispville= seams to be the most maintained, but it depends on =lispy= and even though you can use it just for the balance protection, it requires much more code and effort to do it right, so my choice is =smartparens= + =evil-cleverparens=. I tried =evil-smartparens= before, and it is not as polished as =evil-cleverparens=.
 
@@ -941,7 +941,7 @@ The good thing about this feature is that Emacs already covers almost all of my 
 
 One aspect of which key that bothered me is not so much a =which-key= thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one on the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupt my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more then the =which-key= timeout.
 
-To remediate this situation, I found this package called =which-key-posframe= that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
+To remediate this situation, I found this package called  [[https://github.com/yanghaoxie/which-key-posframe][=which-key-posframe=]] that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1321,7 +1321,7 @@ To the reader not familiar with this plugin, let me give a brief overview of it.
 
 The =matchit= plugin, extends this functionality to other types of pairs, like XML/HTML tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
 
-Since =evil-matchit= is not distributed with Doom, I need to bring its package in:
+Since [[https://github.com/redguardtoo/evil-matchit][=evil-matchit=]] is not distributed with Doom, I need to bring its package in:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1339,7 +1339,7 @@ Then, need to make sure to enable the plugin itself. In order to not slow the Em
 #+end_src
 
 *** Plus-Minus
-=plus-minus= is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
+[[https://github.com/peterwu/plus-minus][=plus-minus=]] is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
 
 I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using =evil-numbers= (which Doom provides as a core package), I'll try a brand new package called =plus-minus=:
 
@@ -1426,7 +1426,7 @@ With all in place, we just need to define the keybindings:
 *** Evil-String-Inflection
 I've been on situations where I realized that I used /camelCase/ for all my variables, where the standard coding style of the language, request to use /snake_case/ style. There are packages available, that allow you to cycle through all case styles on a given word.
 
-I found the =evil-string-inflection= to have one of the best integration with Evil, so I will stick with it for a while to evaluate things:
+I found the [[https://github.com/akicho8/string-inflection][=string-inflection=]] package to be one of the best available. There is the package [[https://github.com/ninrod/evil-string-inflection][=evil-string-inflection= ]]to integrate with Evil but it turns out to not work as expected, so I will have to configure Evil integration myself. Let's start with the package itself:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -2741,7 +2741,7 @@ Although this is not a radical change, there are two font lock additions I want 
            )))) t))
 #+end_src
 
-There is a package called =info+.el=, available through the Emacs Wiki, that fontify the =Info-mode= buffer to make it look nicer.
+There is a package called [[https://www.emacswiki.org/emacs/InfoPlus][=info+.el=]], available through the Emacs Wiki, that fontify the =Info-mode= buffer to make it look nicer.
 
 Unfortunately the latest changes introduced in March broke the package on Emacs 27 and 28, so in order to still have the nice feature it provides with a version that still works on my Emacs, I need to /pin/ the package to the version that still works:
 
@@ -5087,7 +5087,7 @@ After all these tweaks, we can close our parenthesis:
   '(org-indent :inherit (org-hide fixed-pitch)))
 #+end_src
 
-Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called =org-fragtog=. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
+Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called [[https://github.com/io12/org-fragtog][=org-fragtog=]]. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
 
 First we add the plugin on our =packages.el= file:
 
@@ -5103,7 +5103,7 @@ Then, we use =use-package!= to defer its loading (we will load it manually later
 (use-package! org-fragtog :defer t)
 #+end_src
 
-Another nice plugin to have is the =valign= plugin. It will align your Org tables nicely, even when you have formulas and images on them.
+Another nice plugin to have is the [[https://github.com/casouri/valign][=valign=]] plugin. It will align your Org tables nicely, even when you have formulas and images on them.
 
 As with the =org-fragtog=, let's first add it to our =packages.el=:
 
@@ -5185,6 +5185,8 @@ I also need to adjust the window navigation keys that clash with default Org bin
 
 At this point we can tight up everything and setup our buffer when we open an org file.
 
+https://github.com/awth13/org-appear
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! org-appear
@@ -5236,6 +5238,8 @@ With this function in place, we can /hook/ it to our Org major mode:
 (add-hook 'org-mode-hook #'my-org-buffer-config-h)
 #+end_src
 
+- https://github.com/Townk/org-ol-tree
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (if (getenv "GITHUB_WORKFLOW")
@@ -5281,6 +5285,8 @@ Let's look into my list of requirements for writing:
 Although we already covered most of this list of the previous section, we still need to configure /File templates,/ some personal /Snippets/, and /Focus Writing/, so let's get to it.
 
 *** Dictionary and writing helpers
+
+- https://github.com/tecosaur/lexic
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -5540,6 +5546,8 @@ beginning and the end of the region respectively.")
   (add-hook 'flycheck-process-error-functions #'my-noflycheck-should-skip-urls-h nil t))
 #+end_src
 
+- https://github.com/alexmurray/flycheck-posframe
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! flycheck-posframe)
@@ -5629,6 +5637,8 @@ beginning and the end of the region respectively.")
 **** TODO Define a Hydra for /new documents/ to use my templates
 
 *** Focus Writing
+
+- https://github.com/larstvei/Focus
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -5783,6 +5793,8 @@ This snippet is fine, but we still have to type the filename there. Let's create
 - Annotations
   + Referenceable
   + Annotate external documents (default to Doom)
+
+- https://depp.brause.cc/nov.el/
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -7040,6 +7052,8 @@ TBD
 (use-package! magit-todo :defer t)
 #+end_src
 
+- https://github.com/Townk/gitmoji
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (if (getenv "GITHUB_WORKFLOW")
@@ -7609,6 +7623,8 @@ The ideal behavior would be to any app launch from the terminal to take over esh
 
 I like to have a hint of the next possible completion while I'm working on shell. Zsh and Fish have great plugins for such feature, so I decided to add one for eshell as well:
 
+- https://github.com/dieggsy/esh-autosuggest
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! esh-autosuggest)
@@ -8026,6 +8042,9 @@ Return t if the buffer moved to front."
                                                (goto-char (point-min))
                                                (org-agenda-next-item 1)))))
 #+end_src
+
+- https://github.com/alphapapa/org-super-agenda
+- https://github.com/alphapapa/org-ql
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
