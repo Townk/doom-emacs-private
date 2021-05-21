@@ -50,7 +50,7 @@ jobs:
 
       # This command tries to simulate the normal Emacs startup before
       # tangling the config file
-      - name: Publish GitHub Page
+      - name: Export config.org to HTML
         run: ~/.config/doom/.github/support/scripts/publish.sh
 
       - name: Checkout private config
@@ -63,7 +63,7 @@ jobs:
       # branch, it also fetches the setup file from the master branch
       # and commit it to the gh-pages branch in order to allow others
       # to use it by including the github.io address
-      - name: Push tangled file to gh-pages
+      - name: Publish GitHub Page
         run: |
           cp ~/.config/doom/config.html index.html
           cp -R ~/.config/doom/assets/* assets/
