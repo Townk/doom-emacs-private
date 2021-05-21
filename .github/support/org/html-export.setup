@@ -12,12 +12,20 @@
 #+HTML_HEAD:         color: #222
 #+HTML_HEAD:     }
 
+#+HTML_HEAD:     .org-src-container {
+#+HTML_HEAD:         padding: 0.3em 0.8em;
+#+HTML_HEAD:     }
+
 #+HTML_HEAD:     label.org-src-name {
 #+HTML_HEAD:         float: right;
-#+HTML_HEAD:         bottom: -0.5em;
 #+HTML_HEAD:         position: absolute;
-#+HTML_HEAD:         right: 1em;
+#+HTML_HEAD:         bottom: -0.7em;
+#+HTML_HEAD:         right: 0.8em;
 #+HTML_HEAD:         font-size: 0.5em;
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     .org-src-name, .org-src-name * {
+#+HTML_HEAD:         color: #b3b3b3;
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     .listing-number {
