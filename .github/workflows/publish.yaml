@@ -50,7 +50,7 @@ jobs:
 
       # This command tries to simulate the normal Emacs startup before
       # tangling the config file
-      - name: Tangle config file
+      - name: Publish GitHub Page
         run: ~/.config/doom/.github/support/scripts/publish.sh
 
       - name: Checkout private config
@@ -71,6 +71,5 @@ jobs:
           git config user.email github-actions@github.com
           git add .
           git fetch origin master
-          git checkout origin/master -- assets/html-export.setup
           git commit -m "Auto-tangled from $GITHUB_SHA"
           git push
