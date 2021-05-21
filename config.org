@@ -2403,7 +2403,9 @@ To workaround this problem, I will create an alias function to call the same fun
 #+begin_src emacs-lisp :tangle autoload/preferences.el
 ;;;###autoload
 (defalias 'my-persp-current-buffers
-  (lambda () (persp-buffers (persp-curr)))
+  (lambda ()
+    (when (fboundp 'persp-buffers)
+      (persp-buffers (persp-curr))))
   "Wrapper for the `persp-current-buffers' macro.")
 #+end_src
 
