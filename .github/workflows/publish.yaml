@@ -51,7 +51,7 @@ jobs:
       # This command tries to simulate the normal Emacs startup before
       # tangling the config file
       - name: Tangle config file
-        run: emacs --batch --load ~/.config/emacs/early-init.el --load ~/.config/emacs/init.el --file ~/.config/doom/config.org --eval "(org-html-export-to-html)"
+        run: ~/.config/doom/.github/support/scripts/publish.sh
 
       - name: Checkout private config
         uses: actions/checkout@v2

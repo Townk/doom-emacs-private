@@ -9,7 +9,7 @@
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :comments link :shebang ";;; -*- lexical-binding: t; -*-\n"
 #+property: header-args:snippet :padline no
-#+setupfile: assets/html-export.setup
+#+setupfile: .github/support/org/html-export.setup
 
 * Prologue
 Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to the community.
@@ -7113,13 +7113,6 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
 
 *** Zettelkasten
 
-- https://tecosaur.github.io/emacs-config/config.html#basic-settings
-
-#+caption: $DOOMDIR/packages.el
-#+begin_src emacs-lisp :noweb-ref none :tangle (if (file-exists-p "~/depot/Dropbox/org/notes") "no" "packages.el")
-(package! org-roam :disable t)
-#+end_src
-
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (use-package org-roam
@@ -7206,12 +7199,6 @@ TBD
   (setq plantuml-jar-path "/usr/local/var/homebrew/linked/plantuml/libexec/plantuml.jar"
         org-plantuml-jar-path plantuml-jar-path)
   (set-popup-rule! "^\\*PLANTUML" :size 0.4 :side 'right :select nil :ttl 0))
-#+end_src
-
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp :noweb-ref none :tangle (if (file-exists-p "/usr/local/var/homebrew/linked/plantuml/libexec/plantuml.jar") "no" "config.el")
-(setq plantuml-jar-path "/tmp/plantuml.jar"
-      org-plantuml-jar-path plantuml-jar-path)
 #+end_src
 
 ** TODO Other modes
