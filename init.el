@@ -265,8 +265,9 @@
          +bindings
          +smartparens))
 
-;; (require 'benchmark-init)
-;; (add-hook 'doom-first-input-hook #'benchmark-init/deactivate
+(when doom-debug-p
+  (require 'benchmark-init)
+  (add-hook 'doom-first-input-hook #'benchmark-init/deactivate))
 
 ;; I need this hook here to make sure my tangle runs this autoloaded function.
 (add-hook 'org-babel-post-tangle-hook
