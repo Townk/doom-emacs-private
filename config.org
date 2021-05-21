@@ -7365,37 +7365,48 @@ not the current one."
 And to finalize the Treemacs configuration, let's make it respect my window navigation keys:
 
 #+caption: $DOOMDIR/autoload/extras.el
-#+begin_src emacs-lisp :tangleautoload/files.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/toggle-git-mode ()
+(defun my-dired-toggle-git-mode ()
   "Toggle `dired-git-info-mode' in git repos."
   (interactive)
   (when (and (not (file-remote-p default-directory))
              (locate-dominating-file "." ".git"))
     (call-interactively 'dired-git-info-mode)))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/open-directory ()
+(defun my-dired-open-directory ()
   "Enters in the directory at point. If the cursor is not on a directory, do
 nothing."
   (interactive)
-  (when (file-directory-p (dired-get-file-for-visit))
-    (dired-find-file)))
+  (let ((target-file (dired-get-file-for-visit)))
+    (when (or (file-directory-p target-file)
+              (dired-avfs--archive-p target-file))
+      (dired-find-file))))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/mac-quick-view ()
+(defun my-dired-mac-quick-view ()
   "Invoke the macOS Quiclview on the file under point."
   (interactive)
   (shell-command (concat "qlmanage -p \""
                          (dired-get-file-for-visit)
                          "\" > /dev/null 2>&1")))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/widen-or-quit-all ()
+(defun my-dired-widen-or-quit-all ()
   "If `dired-narow' is on, revert to the normal view. If there is no active
 narrow, quit Dired."
   (interactive)
-  (if (buffer-modified-p)
+  (if dired-narrow-mode
       (revert-buffer)
     (mapc (lambda (buf)
             (let ((win (get-buffer-window buf)))
@@ -7403,48 +7414,70 @@ narrow, quit Dired."
                 (delete-window win))
               (kill-buffer buf)))
           (doom-buffers-in-mode 'dired-mode))))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/narrow (narrow-func)
+(defun my-dired-narrow (narrow-func)
   "Start a dynamic narrowing of files in current view."
   (interactive
    (list (if current-prefix-arg
              'dired-narrow-fuzzy
            'dired-narrow-regexp)))
   (call-interactively narrow-func))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/yank-absolute-path ()
+(defun my-dired-yank-absolute-path ()
   "Copy the absolute path of file on pointer to kill ring."
   (interactive)
   (dired-copy-filename-as-kill 0))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/yank-relative-path ()
+(defun my-dired-yank-relative-path ()
   "Copy the relative path of file on pointer to kill ring."
   (interactive)
   (dired-copy-filename-as-kill))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/open-externally ()
+(defun my-dired-open-externally ()
   "Open file with application defined by OS."
   (interactive)
   (shell-command (concat "open \""
                          (dired-get-file-for-visit)
                          "\" > /dev/null 2>&1")))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/reveal-on-finder ()
+(defun my-dired-reveal-on-finder ()
   "Show current file in Finder."
   (interactive)
   (shell-command (concat "open --reveal \""
                          (dired-get-file-for-visit)
                          "\" > /dev/null 2>&1")))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
+;;;###autoload
 (defun my-dired-marked-file-p ()
   "Return non-nil if we have marked file at point."
   (dired-file-marker (dired-get-file-for-visit)))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
 (defun my-dired-toggle-mark (&optional _)
   "Toggle mark of file at point."
@@ -7452,17 +7485,23 @@ narrow, quit Dired."
   (if (my-dired-marked-file-p)
       (dired-unmark 1)
     (dired-mark 1)))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/open-split-right ()
+(defun my-dired-open-split-right ()
   (interactive)
   (select-window
    (window--display-buffer (find-file-noselect (dired-get-file-for-visit))
                            (split-window-right)
                            'window)))
+#+end_src
 
+#+caption: $DOOMDIR/autoload/extras.el
+#+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-dired/open-split-bellow ()
+(defun my-dired-open-split-bellow ()
   (interactive)
   (select-window
    (window--display-buffer (find-file-noselect (dired-get-file-for-visit))
@@ -7470,11 +7509,17 @@ narrow, quit Dired."
                            'window)))
 #+end_src
 
+- https://github.com/Fuco1/dired-hacks for all packages
+- https://blog.breadncup.com/2012/05/27/emacs-sunrise-commander-and-avfs-fuse-unionfs-fuse-in-mac-os-x-lion/ for starting the avfsd service
+
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! dired-collapse)
 (package! dired-narrow)
-;; (package! sunrise-commander)
+(package! dired-ranger)
+(package! dired-quick-sort)
+(package! dired-avfs)
+(package! peep-dired)
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -7490,11 +7535,24 @@ narrow, quit Dired."
         dired-use-ls-dired t
         global-auto-revert-non-file-buffers t
         insert-directory-program "gls"
-        ))
+        wdired-allow-to-change-permissions t
+        wdired-allow-to-redirect-links t
+        wdired-confirm-overwrite t))
 
-(use-package! dired-collapse :commands (dired dired-noselect))
-(use-package! dired-narrow :after (dired dired-noselect))
-;; (add-hook 'kill-buffer-hook '+doom--delete-window-if-only-buffer)
+(use-package! peep-dired
+  :after dired
+  :init
+  (setq peep-dired-cleanup-on-disable t
+        peep-dired-cleanup-eagerly t
+        peep-dired-enable-on-directories nil))
+(use-package! dired-collapse :after dired)
+(use-package! dired-narrow :after dired)
+(use-package! dired-quick-sort
+  :hook ((dired-mode . dired-quick-sort)))
+(use-package! dired-avfs
+  :after dired
+  :init
+  (setq dired-avfs-root "~/.local/var/avfs"))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -7506,39 +7564,28 @@ narrow, quit Dired."
        :ne "c"        nil
        :ne "o"        nil
        :ne "m"        nil
-       :ne "/"        #'my-dired/narrow
-       :ne "<escape>" #'my-dired/widen-or-quit-all
-       :ne "q"        #'my-dired/widen-or-quit-all
+       :ne "/"        #'my-dired-narrow
+       :ne "<escape>" #'my-dired-widen-or-quit-all
+       :ne "q"        #'my-dired-widen-or-quit-all
        :ne "RET"      #'dired-find-file
-       :ne "TAB"      #'my-dired/open-directory
-       :ne "<tab>"    #'my-dired/open-directory
-       :ne "l"        #'my-dired/open-directory
+       :ne "TAB"      #'my-dired-open-directory
+       :ne "<tab>"    #'my-dired-open-directory
+       :ne "j"        #'dired-next-line
+       :ne "k"        #'dired-previous-line
+       :ne "l"        #'my-dired-open-directory
        :ne "h"        #'dired-up-directory
        :ne "U"        #'dired-up-directory
        :ne "R"        #'dired-do-rename
        :ne "d"        #'dired-do-delete
        :ne "x"        #'my-dired-toggle-mark
-       (:prefix ("t" . "toggle")
-        :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
-        :desc "Toggle git info"       :ne "g" #'my-dired/toggle-git-mode
-        :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
-        :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks)
-       (:prefix ("y" . "yank")
-        :desc "Copy absolut path"     :ne "a" #'my-dired/yank-absolute-path
-        :desc "Copy file"             :ne "f" #'dired-do-copy
-        :desc "Copy with regexp"      :ne "r" #'dired-do-copy-regexp
-        :desc "Copy relative path"    :ne "y" #'my-dired/yank-relative-path)
+       :ne "p"        #'dired-ranger-paste
+       :ne "M"        #'dired-ranger-move
+       :ne "`"        #'dired-ranger-bookmark
+       :ne "'"        #'dired-ranger-bookmark-visit
        (:prefix ("c" . "create")
-        :desc "Create empty file"     :ne "f" #'dired-do-touch
+        :desc "Create empty file"     :ne "f" #'dired-create-empty-file
         :desc "Create directory"      :ne "d" #'dired-create-directory
         :desc "Create project"        :ne "p" #'xxx)
-       (:prefix ("o" . "open")
-        :desc "Open no split"         :ne "o" #'dired-find-alternate-file
-        :desc "Quick view"            :ne "p" #'my-dired/mac-quick-view
-        :desc "Reveal on Finder"      :ne "f" #'my-dired/reveal-on-finder
-        :desc "Open vertically"       :ne "s" #'my-dired/open-split-bellow
-        :desc "Open horizontally"     :ne "v" #'my-dired/open-split-right
-        :desc "Open externally"       :ne "x" #'my-dired/open-externally)
        (:prefix ("m" . "mark")
         :ne "h" nil
         :desc "Mark directories"  :ne "d" #'dired-mark-directories
@@ -7548,7 +7595,34 @@ narrow, quit Dired."
         :desc "Mark subdir files" :ne "s" #'dired-mark-omitted
         :desc "Unmark all files"  :ne "u" #'dired-unmark-all-files
         :desc "Remove all marks"  :ne "U" #'dired-unmark-all-marks
-        :desc "Mark executables"  :ne "x" #'dired-mark-executables)))
+        :desc "Mark executables"  :ne "x" #'dired-mark-executables)
+       (:prefix ("o" . "open")
+        :desc "Open no split"         :ne "o" #'dired-find-alternate-file
+        :desc "Quick view"            :ne "q" #'my-dired-mac-quick-view
+        :desc "Reveal on Finder"      :ne "f" #'my-dired-reveal-on-finder
+        :desc "Open vertically"       :ne "s" #'my-dired-open-split-bellow
+        :desc "Open horizontally"     :ne "v" #'my-dired-open-split-right
+        :desc "Open externally"       :ne "x" #'my-dired-open-externally)
+       (:prefix ("t" . "toggle")
+        :desc "Toggle collapsed dirs" :ne "c" #'dired-collapse-mode
+        :desc "Toggle details"        :ne "d" #'dired-hide-details-mode
+        :desc "Toggle git info"       :ne "g" #'my-dired-toggle-git-mode
+        :desc "Toggle hidden files"   :ne "h" #'dired-omit-mode
+        :desc "Toggle all marks"      :ne "m" #'dired-toggle-marks
+        :desc "Toggle preview"        :ne "p" #'peep-dired
+        :desc "Toggle sorting"        :ne "s" #'hydra-dired-quick-sort/body
+        :desc "Toggle edit mode"      :ne "w" #'wdired-change-to-wdired-mode)
+       (:prefix ("y" . "yank")
+        :desc "Yank files"            :ne "y" #'dired-ranger-copy
+        :desc "Copy absolut path"     :ne "a" #'my-dired-yank-absolute-path
+        :desc "Copy file"             :ne "f" #'dired-do-copy
+        :desc "Copy with regexp"      :ne "R" #'dired-do-copy-regexp
+        :desc "Copy relative path"    :ne "r" #'my-dired-yank-relative-path))
+      (:map wdired-mode-map
+        :in "s-RET" #'wdired-finish-edit
+        :in [s-return] #'wdired-finish-edit
+        :in "s-ESC" #'wdired-revert
+        :in [s-escape] #'wdired-revert))
 #+end_src
 
 ** TODO Project management
