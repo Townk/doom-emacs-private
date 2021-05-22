@@ -7322,11 +7322,6 @@ TBD
 
 *** Version control system
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-(use-package! magit-todo :defer t)
-#+end_src
-
 - https://github.com/Townk/gitmoji
 
 #+caption: $DOOMDIR/packages.el
