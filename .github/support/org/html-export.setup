@@ -21,6 +21,10 @@
 #+HTML_HEAD:         padding: 0.3em 0.8em;
 #+HTML_HEAD:     }
 
+#+HTML_HEAD:     table caption {
+#+HTML_HEAD:         font-size: 0.6em;
+#+HTML_HEAD:     }
+
 #+HTML_HEAD:     label.org-src-name {
 #+HTML_HEAD:         float: right;
 #+HTML_HEAD:         position: absolute;

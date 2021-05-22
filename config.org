@@ -368,9 +368,8 @@ To make Emacs not jump then necessary when cursor goes outside the screen, set t
 
 #+caption: $DOOMDIR/config.el
 #+begin_src  emacs-lisp
-;; (setq scroll-conservatively most-positive-fixnum)
 (setq scroll-margin 3
-      scroll-conservatively 1000
+      scroll-conservatively most-positive-fixnum
       scroll-up-aggressively 0.001
       scroll-down-aggressively 0.001)
 #+end_src
