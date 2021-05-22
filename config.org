@@ -74,7 +74,7 @@ This section describes four aspects of Doom that I felt important to understand 
 
 *** Doom has its own package manager
 
-Doom does not use =package.el=, it has its own package manager system and even though, it uses =use-package= and =streight.el= packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
+Doom does not use =package.el=, it has its own package manager system and even though, it uses ~use-package~ and ~straight.el~ packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
 
 *** Lazy load everything
 
@@ -85,8 +85,8 @@ You should get used to use the options =:defer=, =:hook=, =:after=, =:mode=, and
 There are four potential loading /spots/ for each configuration you want do tweak, and you must always decide which one is the best option to apply your particular case:
 
 - Directly on =config.el= :: This is the most direct point of configuration. As Emacs evaluates the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/. On Doom's world, any directory or file variable should go to directly into your =config.el=;
-- Inside the ~:init~ section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluate the code inside =:init= only *after* the resource stated on the option loads;
-- Inside the ~:config~ section of ~use-package~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
+- Inside the =:init= section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluate the code inside =:init= only *after* the resource stated on the option loads;
+- Inside the =:config= section of ~use-package~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
 - Inside an ~after!~ or ~with-eval-after-load~ macro :: Code here executes after the defined resource gets loaded, but also after all instances of ~use-package~ finish to run code from their =:config= section;
 
 If you have any question about where you should add your configuration, I suggest to follow the following rule of thumb:
@@ -270,7 +270,7 @@ To adjust this values according to table [[macos-keys]], set each one of them to
 *** Training wheels
 By default, Emacs prevent you from executing certain /dangerous/ commands inadvertently. While I understand and sympathize with the need of such feature, I personally prefer to turn it off.
 
-To change this option, set the variable ~disabled-command-function~ to ~nil~:
+To change this option, set the variable ~disabled-command-function~ to =nil=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -283,7 +283,7 @@ On Emacs, you can set variables when open files, we call those [[https://www.gnu
 The next configuration can lead to Emacs executing malicious code upon opening a file. By allowing Emacs to enable local ~eval~ you gain some nice ways to configure Emacs per file, on the cost of a high risk of vulnerability, so... think a little bit about how do you indiscriminately open files on your editor before enabling this one.
 #+end_warning
 
-To enable Emacs to use ~eval~ as a file variable, set the variable ~enable-local-eval~ to a non-~nil~ value:
+To enable Emacs to use ~eval~ as a file variable, set the variable ~enable-local-eval~ to a non-=nil= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -314,7 +314,7 @@ Then, set the variable ~source-directory~ to the cloned repository's path:
 *** Line numbers
 I like to have line numbers displayed on the side of any source code I edit, but I don't like them everywhere (e.g. during prose writing), so I always make them turned off by default, and let the appropriate modes to set them on when they needed it:
 
-To disable line numbers by default, set the variable ~display-line-numbers-type~ to ~nil~:
+To disable line numbers by default, set the variable ~display-line-numbers-type~ to =nil=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -327,7 +327,7 @@ When Emacs is showing line numbers, it do so on the window's left /gutter/. To s
 
 It would be incredible inefficient to read the entire file just to check what is the biggest line number, so we can instruct Emacs do the second best thing: to only grow the gutter's size, and never shrink it.
 
-To have such configuration, set the variable ~display-line-numbers-grow-only~ to a non-~nil~ value:
+To have such configuration, set the variable ~display-line-numbers-grow-only~ to a non-=nil= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -344,7 +344,7 @@ I prefer to always indent my files with =4= spaces with some rare exceptions for
 (setq-default tab-width 4)
 #+end_src
 
-And to force emacs to always use spaces instead of tabs, set the ~indent-tabs-mode~ variable to ~nil~:
+And to force emacs to always use spaces instead of tabs, set the ~indent-tabs-mode~ variable to =nil=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -354,7 +354,7 @@ And to force emacs to always use spaces instead of tabs, set the ~indent-tabs-mo
 *** Line wrapping
 Until the writing of this document, I had the opinion that /soft wrap/ was evil, and it had no place on any editor. Since then, I learned to appreciate /soft wrap/ for prose, and later in this document, you will see all the other setup around /soft wrap/ and have an idea why I was so against it.
 
-To prevent Emacs from wrapping your text as it goes over the size of thee screen, set the variable ~truncate-lines~ to a non-~nil~ value:
+To prevent Emacs from wrapping your text as it goes over the size of thee screen, set the variable ~truncate-lines~ to a non-=nil= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -379,7 +379,7 @@ By default, Emacs will move the cursor with the text as you scroll, but only unt
 
 After some lookup, I believe Emacs does not support such feature yet, so I decided to go with the best alternative for usability, which is to not move the cursor from its screen position at all. This way, my eyes will keep track of its position as I scroll, and I won't have any surprises as I type.
 
-To prevent Emacs from moving the cursor up to the edge of the screen, set the variable ~scroll-preserve-screen-position~ to a non-~nil~ value, and if you want this behavior to be the same for horizontal and vertical scroll, set it to a non-~nil~ and non-~t~ value:
+To prevent Emacs from moving the cursor up to the edge of the screen, set the variable ~scroll-preserve-screen-position~ to a non-=nil= value, and if you want this behavior to be the same for horizontal and vertical scroll, set it to a non-=nil= and non-=t= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src  emacs-lisp
@@ -466,7 +466,7 @@ Well, I have to tell you that this behavior is not a bug, is just how we should 
 
 I said /should/, because I disliked this behavior since I first used Vim. I never understood the rationale behind it and I always tried to fix it in my configurations. The good news is, Evil developers added an option to do just that.
 
-To fix the moving back the cursor annoyance, set the variable ~evil-move-cursor-back~ to ~nil~:
+To fix the moving back the cursor annoyance, set the variable ~evil-move-cursor-back~ to =nil=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -483,7 +483,7 @@ On the same lines of /moving back the cursor/, there is another /expected/ behav
 
 I'm sure that, at some point, this behavior made sense for a lot of developers, but in my personal opinion, if you are pasting the clipboard on top of a selected text, is highly unlikely that you want to use the contents of such selection right after pasting something on top of it. I believe the natural behavior of developers these days, is to consider the selected text you just paste on top of it, as gone.
 
-And just like with the previous annoyance, Evil also offers an option to change this behavior. If you want to *not* copy the content of a selection you just paste something on top of it, set the variable ~evil-kill-on-visual-paste~ to ~nil~:
+And just like with the previous annoyance, Evil also offers an option to change this behavior. If you want to *not* copy the content of a selection you just paste something on top of it, set the variable ~evil-kill-on-visual-paste~ to =nil=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -498,7 +498,7 @@ Because Evil tries to stay faithful to Vim, it does not force Emacs objects into
 
 However, Evil is an Emacs package, and it also tries to integrate with existent packages and features, and it offers a configuration that makes Evil visual selection, to expand the Emacs selection region when we select something. The net effect of this, is that we can use the terms selection and region interchangeability for all practical purposes.
 
-If you want Evil to synchronize its visual selection with the Emacs region, set the variable ~evil-visual-region-expanded~ to a non-~nil~ value:
+If you want Evil to synchronize its visual selection with the Emacs region, set the variable ~evil-visual-region-expanded~ to a non-=nil= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -567,7 +567,7 @@ public class MyClassName {
 }
 #+end_src
 
-I could make this text as a snippet, and I would have to replace ~MyClassName~ with whatever name I want, but I could go a step further and make my snippet something like this:
+I could make this text as a snippet, and I would have to replace =MyClassName= with whatever name I want, but I could go a step further and make my snippet something like this:
 
 #+begin_src java :tangle no
 public class ${1:MyClassName} {
@@ -722,15 +722,15 @@ Since I've been using [[https://github.com/company-mode/company-mode][company-mo
 
 One of the best features I like on [[https://github.com/company-mode/company-mode][company-mode]], is its architecture design, where the author decided to modularize the package, allowing other packages to integrate with it where they actually mater. For instance, if my package offers a major mode to edit files from the /Foo/ language, I can create a =foo-company-backend= to integrate it on the Company ecosystem, or if my package provides a new cool way to display inline completions, I can create a /company frontend/ to make such integration
 
-For the most part, Doom does a pretty good job configuring [[https://github.com/company-mode/company-mode][company-mode]] to my liking, I just need to adjust some small behaviors and keymaps.
+For the most part, Doom does a pretty good job configuring [[https://github.com/company-mode/company-mode][~company-mode~]] to my liking, I just need to adjust some small behaviors and keymaps.
 
-One of the most prominent differences on my configuration is the fact that I don't like to let [[https://github.com/company-mode/company-mode][company-mode]] to show its popup automatically. It is a nice feature, but with certain backends, it can slow down the edit experience (I'm looking at you [[https://github.com/company-mode/company-mode/blob/master/company-ispell.el][company-ispell]]). For that reasons (and also because I rather the experience of [[https://github.com/ervandew/supertab][supertab]] on Vim's world), I decided to not /auto-display/ Company's popup.
+One of the most prominent differences on my configuration is the fact that I don't like to let [[https://github.com/company-mode/company-mode][~company-mode~]] to show its popup automatically. It is a nice feature, but with certain backends, it can slow down the edit experience (I'm looking at you [[https://github.com/company-mode/company-mode/blob/master/company-ispell.el][~company-ispell~]]). For that reasons (and also because I rather the experience of [[https://github.com/ervandew/supertab][=supertab=]] on Vim's world), I decided to not /auto-display/ Company's popup.
 
 In order to display the completion on my configuration, one has to press =TAB= after type couple characters of the word, or type a "=.=" character after a keyword on programming modes that support it.
 
 Such behavior is so wildly used that Company offers a helper function (~company-indent-or-complete-common~) to help the user to handle /inserting a "=\t=" character/ versus displaying the completion. That is all and good, but unfortunately, as seen on section [[Text snippets]], I have a third function for the =TAB= key.
 
-In order to help me handle my three cases for =TAB= I need to create small wrapper function to add the =yasnippet= check before handling completion to Company:
+In order to help me handle my three cases for =TAB= I need to create small wrapper function to add the ~yasnippet~ check before handling completion to Company:
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -965,18 +965,18 @@ entire line, but keep the correct indentation on it."
       (delete-char (- line-pos)))))
 #+end_src
 
-Adding this advice as an /autoload/ function on our configuration is all we need to get the functionality working. When Doom loads the =smartparens= on the default module, it replaces the Emacs ~delete-backward-char~ function with its ~+default--delete-backward-char-a~ advice, which will load our function, which, in turn, installs itself as a =:before= advice on Doom's function.
+Adding this advice as an /autoload/ function on our configuration is all we need to get the functionality working. When Doom loads the ~smartparens~ on the default module, it replaces the Emacs ~delete-backward-char~ function with its ~+default--delete-backward-char-a~ advice, which will load our function, which, in turn, installs itself as a =:before= advice on Doom's function.
 
 ** Balanced pairs
 In most editors (as far as editors go, I only saw Emacs allowing balanced pairs), there is no balanced pair protection. If you remove a line where a closing character is, without removing its open pair, your buffer becomes unbalanced.
 
 Emacs has some packages that help you keep the balance on pair characters, even if you try to remove a line containing just one of the pairs.
 
-Among the packages I checked, the two top two contenders for me are [[https://github.com/noctuid/lispyville][~lispville~]] and [[https://github.com/Fuco1/smartparens][~smartparens~]]  + ([[https://github.com/luxbock/evil-cleverparens][=evil-cleverparens=]] or [[https://github.com/expez/evil-smartparens][~evil-smartparens~]]).
+Among the packages I checked, the two top two contenders for me are [[https://github.com/noctuid/lispyville][~lispville~]] and [[https://github.com/Fuco1/smartparens][~smartparens~]]  + ([[https://github.com/luxbock/evil-cleverparens][~evil-cleverparens~]] or [[https://github.com/expez/evil-smartparens][~evil-smartparens~]]).
 
-From the two, =lispville= seams to be the most maintained, but it depends on =lispy= and even though you can use it just for the balance protection, it requires much more code and effort to do it right, so my choice is =smartparens= + =evil-cleverparens=. I tried =evil-smartparens= before, and it is not as polished as =evil-cleverparens=.
+From the two, ~lispville~ seams to be the most maintained, but it depends on ~lispy~ and even though you can use it just for the balance protection, it requires much more code and effort to do it right, so my choice is ~smartparens~ + ~evil-cleverparens~. I tried ~evil-smartparens~ before, and it is not as polished as ~evil-cleverparens~.
 
-To install them, make sure =smartparens= is enable in your =init.el=:
+To install them, make sure ~smartparens~ is enable in your =init.el=:
 
 #+caption: $DOOMDIR/init.el
 #+begin_src emacs-lisp :tangle no
@@ -986,7 +986,7 @@ To install them, make sure =smartparens= is enable in your =init.el=:
       +smartparens)
 #+end_src
 
-And =evil-cleverparens= is on the =packages.el= file as well:
+And ~evil-cleverparens~ is on the =packages.el= file as well:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -995,11 +995,11 @@ And =evil-cleverparens= is on the =packages.el= file as well:
 
 These changes will make Doom download them into its local cache when you run =doom sync=.
 
-Before I configure these packages, I would like to explain why I turn on balance protection only on Emacs modes deriving from =prog-mode=.
+Before I configure these packages, I would like to explain why I turn on balance protection only on Emacs modes deriving from ~prog-mode~.
 
-The simplest explanation is that you don't really need pair balance protection in any other place then you coding buffers. I did some informal experiments on this area, and found that pair protection turned on when you write prose is magnitudes more annoying then useful, so I will stick with protection only in =prog-mode=.
+The simplest explanation is that you don't really need pair balance protection in any other place then you coding buffers. I did some informal experiments on this area, and found that pair protection turned on when you write prose is magnitudes more annoying then useful, so I will stick with protection only in ~prog-mode~.
 
-To make Emacs turn =smartparens= and related packages correctly, make sure that you turn on =evil-cleverparens-mode= on the =smartparens-enabled-hook=, and only enable the strict mode when editing a =prog-mode= buffer:
+To make Emacs turn ~smartparens~ and related packages correctly, make sure that you turn on ~evil-cleverparens-mode~ on the ~smartparens-enabled-hook~, and only enable the strict mode when editing a ~prog-mode~ buffer:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1008,9 +1008,9 @@ To make Emacs turn =smartparens= and related packages correctly, make sure that 
   :hook ((prog-mode . smartparens-strict-mode)))
 #+end_src
 
-Doom will turn on =smartparens= appropriately, so we don't need to hook anything else to get this feature working, but there is one more configuration that I like to have on, all the time. It is the ability of Emacs to highlight the /other pair/ when the cursor is on top of a character pair.
+Doom will turn on ~smartparens~ appropriately, so we don't need to hook anything else to get this feature working, but there is one more configuration that I like to have on, all the time. It is the ability of Emacs to highlight the /other pair/ when the cursor is on top of a character pair.
 
-To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=:
+To do so, enable the ~show-smartparens-global-mode~ after enabling ~smartparens~:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1019,11 +1019,11 @@ To do so, enable the =show-smartparens-global-mode= after enabling =smartparens=
 #+end_src
 
 ** Rich keybindings
-The good thing about this feature is that Emacs already covers almost all of my [[Rich keybindings][requirements]] for free, and doom ships with a package that covers the rest of it (=which-key=). What I need to do here, is to tweak =which-key= to /look/ and /feel/ like I want it.
+The good thing about this feature is that Emacs already covers almost all of my [[Rich keybindings][requirements]] for free, and doom ships with a package that covers the rest of it (~which-key~). What I need to do here, is to tweak ~which-key~ to /look/ and /feel/ like I want it.
 
-One aspect of which key that bothered me is not so much a =which-key= thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one on the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupt my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more then the =which-key= timeout.
+One aspect of which key that bothered me is not so much a ~which-key~ thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one on the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupt my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more then the ~which-key~ timeout.
 
-To remediate this situation, I found this package called  [[https://github.com/yanghaoxie/which-key-posframe][=which-key-posframe=]] that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
+To remediate this situation, I found this package called  [[https://github.com/yanghaoxie/which-key-posframe][~which-key-posframe~]] that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1083,7 +1083,7 @@ about the INFO structure."
             (/ (- frame-height posframe-height) 2)))))
 #+end_src
 
-In order to connect =embark= to =which-key=, I need to advice the function I defined to invoke =which-key= when I invoke =embark=:
+In order to connect ~embark~ to ~which-key~, I need to advice the function I defined to invoke ~which-key~ when I invoke ~embark~:
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -1097,7 +1097,7 @@ It passes ARGS to ORIGIN-FUN without altering them. "
     (apply orig-fun args)))
 #+end_src
 
-With the =which-key-posframe= configured, I just need to do some minor adjustments on the =which-key= package to make it display the hints on a single column with a single description occupying up to 40 characters of such column:
+With the ~which-key-posframe~ configured, I just need to do some minor adjustments on the ~which-key~ package to make it display the hints on a single column with a single description occupying up to 40 characters of such column:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1210,9 +1210,9 @@ Doom documentation offers a partial solution to this problem asking us to remove
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
 
-Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures =ws-butler=. While I understand the rational behind the choice of always remove blank spaces regardless the cursor position.
+Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures ~ws-butler~. While I understand the rational behind the choice of always remove blank spaces regardless the cursor position.
 
-To adjust that, let's make =ws-butler= behave how I expect it:
+To adjust that, let's make ~ws-butler~ behave how I expect it:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1274,7 +1274,7 @@ This section will show the reader, some of the small changes I decided to implem
 ** Evil
 For most of it, Doom integration of Evil is pretty amazing, I found just one package I don't use (or don't want to use at all), two configurations that I want to do some adjustments, and three packages missing.
 
-The package I don't use is =evil-escape=, and its purpose, is to allow one to type =j k= fast enough on insert mode to force moving from insert mode to normal mode.
+The package I don't use is ~evil-escape~, and its purpose, is to allow one to type =j k= fast enough on insert mode to force moving from insert mode to normal mode.
 
 If you're used to this feature, good for you, but I was never able to adjust my muscle memory to it, so I rather disable it on =packages.el=:
 
@@ -1283,12 +1283,12 @@ If you're used to this feature, good for you, but I was never able to adjust my 
 (package! evil-escape :disable t)
 #+end_src
 
-The first Evil configuration I want to adjust to my liking is on =evil-goggles=. I understand Henrik (Doom's creator) has a good rational on why he setup =evil-goggles= the way it is, but I like the original design where *all* changes get the highlight treatment.
+The first Evil configuration I want to adjust to my liking is on ~evil-goggles~. I understand Henrik (Doom's creator) has a good rational on why he setup ~evil-goggles~ the way it is, but I like the original design where *all* changes get the highlight treatment.
 
-Also, I use =evil-cleverparens=, and its editing operations are not configured on =evil-goggles=, so, in order to make it work for me I have to do two things:
+Also, I use ~evil-cleverparens~, and its editing operations are not configured on ~evil-goggles~, so, in order to make it work for me I have to do two things:
 
 1. Re-enable the change feedback disabled by default on Doom;
-2. Add all =evil-cleverparens= commands to the ~evil-goggles--commands~ to allow =evil-goggles= to handle changes from those commands as well.
+2. Add all ~evil-cleverparens~ commands to the ~evil-goggles--commands~ to allow ~evil-goggles~ to handle changes from those commands as well.
 
 I can perform those changes using ~use-package~:
 
@@ -1362,7 +1362,7 @@ I can perform those changes using ~use-package~:
               :after t)))
 #+end_src
 
-After this I can sneak a quick modification to allow =evil-goggles= to use the same faces used on =diff=:
+After this I can sneak a quick modification to allow ~evil-goggles~ to use the same faces used on =diff=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1392,18 +1392,18 @@ And to make this behavior more consistent throughout the editor, I will add the 
 
 And finally, for the packages I'm missing, they are:
 
-- =evil-matchit=
-- =plus-minus=
-- =evil-string-inflection=
+- ~evil-matchit~
+- ~plus-minus~
+- ~evil-string-inflection~
 
 *** Evil-MatchIt
-In all fairness, =matchit= (the one originally from Vim) is also disabled by default, but it provides such useful feature that I can't understand why it is not part of the standard Vim/Evil.
+In all fairness, ~matchit~ (the one originally from Vim) is also disabled by default, but it provides such useful feature that I can't understand why it is not part of the standard Vim/Evil.
 
 To the reader not familiar with this plugin, let me give a brief overview of it. You probably know that pressing the key =%= on a pair character (e.g. =(=, =)=, =[=, =]=, etc.), makes the cursor jump to the other pair.
 
-The =matchit= plugin, extends this functionality to other types of pairs, like XML/HTML tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
+The ~matchit~ plugin, extends this functionality to other types of pairs, like XML/HTML tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
 
-Since [[https://github.com/redguardtoo/evil-matchit][=evil-matchit=]] is not distributed with Doom, I need to bring its package in:
+Since [[https://github.com/redguardtoo/evil-matchit][~evil-matchit~]] is not distributed with Doom, I need to bring its package in:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1421,9 +1421,9 @@ Then, need to make sure to enable the plugin itself. In order to not slow the Em
 #+end_src
 
 *** Plus-Minus
-[[https://github.com/peterwu/plus-minus][=plus-minus=]] is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
+[[https://github.com/peterwu/plus-minus][~plus-minus~]] is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
 
-I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using =evil-numbers= (which Doom provides as a core package), I'll try a brand new package called =plus-minus=:
+I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using ~evil-numbers~ (which Doom provides as a core package), I'll try a brand new package called ~plus-minus~:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1443,7 +1443,7 @@ Since this package provides the correct ~autoloads~ on it, I can simply configur
 
 Before defining the keybindings for this I would like to have an extra behavior when I try to increase or decrease a number at point. I would like to rotate the text at point with the same keybinding if the /thing at point/ is not a number.
 
-Doom ships with the =rotate-text= package by default, but I need couple helper functions to define which package should handle the key press:
+Doom ships with the ~rotate-text~ package by default, but I need couple helper functions to define which package should handle the key press:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -1520,14 +1520,14 @@ In order to allow me to repeat the last increase or decrease, I will define a /r
 *** Evil-String-Inflection
 I've been on situations where I realized that I used /camelCase/ for all my variables, where the standard coding style of the language, request to use /snake_case/ style. There are packages available, that allow you to cycle through all case styles on a given word.
 
-I found the [[https://github.com/akicho8/string-inflection][=string-inflection=]] package to be one of the best available. There is the package [[https://github.com/ninrod/evil-string-inflection][=evil-string-inflection= ]]to integrate with Evil but it turns out to not work as expected, so I will have to configure Evil integration myself. Let's start with the package itself:
+I found the [[https://github.com/akicho8/string-inflection][~string-inflection~]] package to be one of the best available. There is the package [[https://github.com/ninrod/evil-string-inflection][~evil-string-inflection~ ]]to integrate with Evil but it turns out to not work as expected, so I will have to configure Evil integration myself. Let's start with the package itself:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! string-inflection)
 #+end_src
 
-As with the =matchit= package, I'll defer its loading until we need it, but different from =matchit=, I have to defer it using an alternative approach. I will make the package load on the first invocation of one of its main commands:
+As with the ~matchit~ package, I'll defer its loading until we need it, but different from ~matchit~, I have to defer it using an alternative approach. I will make the package load on the first invocation of one of its main commands:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1936,7 +1936,7 @@ Another extra for the editor visuals is rendering the character =^L=, which repr
 
 The page break character is consider a /space/ or /empty/ character, which allows one to add it on a coding file without breaking the build for such file.
 
-There are a couple packages that achieve this goal but I set on the [[https://github.com/purcell/page-break-lines][=page-break-lines=]] from [[https://github.com/purcell][Steve Purcell]] because he chose to implement this feature using glyph composition instead of /font-lock/:
+There are a couple packages that achieve this goal but I set on the [[https://github.com/purcell/page-break-lines][~page-break-lines~]] from [[https://github.com/purcell][Steve Purcell]] because he chose to implement this feature using glyph composition instead of /font-lock/:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1945,7 +1945,7 @@ There are a couple packages that achieve this goal but I set on the [[https://gi
 
 There is just one configuration I prefer to change over the defaults, which is the size of thee horizontal line. I like the horizontal like to stop at the ~fill-column~ column, which gives this nice /box feeling/ to the code.
 
-Besides this change, I only enable the mode on =prog-mode= buffers, and I like to define a shortcut key to jump to the next or previous page break:
+Besides this change, I only enable the mode on ~prog-mode~ buffers, and I like to define a shortcut key to jump to the next or previous page break:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1975,7 +1975,7 @@ I believe this section to be the most volatile section on this text. Since I got
 
 I decided to give /Doom-One/ a try, and so far I'm enjoying. I will admit that the purple-ish feeling of the palette is not my style, but overall, I'm not finding a bed choice.
 
-So, to make /Doom-One/ the default theme, set the variable ~doom-theme~ to the symbol ~'doom-one~ to let Doom know what is the theme it should load:
+So, to make /Doom-One/ the default theme, set the variable ~doom-theme~ to the symbol ='doom-one= to let Doom know what is the theme it should load:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2032,7 +2032,7 @@ The first rule to define is the simplest one: which fonts to use throughout the 
 
 Currently, I narrowed my selection to these 3 fonts:
 
-- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default monospaced font. The actual font I'm using is the [[https://www.nerdfonts.com/][Nerd Fonts]] version, known as /"iMWritingMonoS Nerd Font"/ due to its support for the =all-the-icons= package;
+- [[https://github.com/iaolo/iA-Fonts][iA Writer Mono]] :: Used as my default monospaced font. The actual font I'm using is the [[https://www.nerdfonts.com/][Nerd Fonts]] version, known as /"iMWritingMonoS Nerd Font"/ due to its support for the ~all-the-icons~ package;
 - [[https://github.com/iaolo/iA-Fonts][iA Writer Quattro]] :: Used as my default font for prose writing. For this font in particular, I can't use the Nerd Fonts version, nor the version distributed through [[https://brew.sh/][Homebrew]]. These versions, use the static version of the font that does not support different weights. For my configuration I use the [[https://github.com/iaolo/iA-Fonts/tree/master/iA%20Writer%20Quattro/Variable][Veriable]] version of the font;
 - [[https://github.com/googlefonts/roboto][Roboto]] :: Used on UI elements like the project drawer, tab names, and tooltips;
 
@@ -2204,7 +2204,7 @@ To make my typography rules easy to refer to, I create one face for each rule as
   :group 'my-typography)
 #+end_src
 
-The goal is to customize the fonts I want to have follow one of these rules by resetting all its values to ~'unspecified~ and inheriting one of my typography faces.
+The goal is to customize the fonts I want to have follow one of these rules by resetting all its values to ='unspecified= and inheriting one of my typography faces.
 
 To help the tedious task of resetting a face, I want to have a helper function that will do the work for me:
 
@@ -2258,7 +2258,7 @@ It would be great if Doom could accept a /face/ as the value for these variables
 
 The next step is to make sure the base faces used on the editor match my base typography. The process to do so is the same I will use throughout this document whenever I find a mode that I need to adjust to match the defined typography.
 
-I first clean up all styles except color on the faces I want to configure, in this case the faces are =fixed-pitch= and =variable-pitch=:
+I first clean up all styles except color on the faces I want to configure, in this case the faces are ~fixed-pitch~ and ~variable-pitch~:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2284,7 +2284,7 @@ To close out the typography section, I like to enable font smoothing on macOS. T
 #+end_src
 
 *** Iconography
-Doom offers the =all-the-icons= package, which allow one to insert Unicode glyphs on buffers. That is a great start, but the problem I see here is how inconsistent the size of these icons are.
+Doom offers the ~all-the-icons~ package, which allow one to insert Unicode glyphs on buffers. That is a great start, but the problem I see here is how inconsistent the size of these icons are.
 
 The idea for this section is to create a list of curated icons, adjusted to occupy exactly 2 ASCII characters on the buffer. This allows for a better alignment of text when we use an Icon.
 
@@ -2401,7 +2401,7 @@ These three rules are basically how tabs work in modern editors.
 
 The configuration you're reading here is almost a copy from Andrey's posts (there is a sequel to the aforementioned post called [[https://andreyorst.gitlab.io/posts/2020-05-10-making-emacs-tabs-look-like-in-atom/][Making Emacs tabs look like in Atom]], that I also copy snippets in order fully configure tabs here.) with minor modifications to adjust it to my code style.
 
-The way to achieve this configuration, is to define a set of =tab-line= variables and let Emacs do its thing.
+The way to achieve this configuration, is to define a set of ~tab-line~ variables and let Emacs do its thing.
 
 My tab configuration uses dynamic values in almost all of it, but there are two constants that I have to decide beforehand: ~tab-line-tab-min-width~ and ~tab-line-tab-max-width~.
 
@@ -2480,7 +2480,7 @@ And I need to make sure I call this function after Doom loads the editor's theme
 (add-hook 'doom-load-theme-hook #'my-tabs--setup-faces-h)
 #+end_src
 
-To configure the look and feel of /non-tab/ elements of the =tab-line=, I need to set the ~tab-line-right-button~, ~tab-line-left-button~, ~tab-line-new-button-show~, and ~tab-line-separator~ variables:
+To configure the look and feel of /non-tab/ elements of the ~tab-line~, I need to set the ~tab-line-right-button~, ~tab-line-left-button~, ~tab-line-new-button-show~, and ~tab-line-separator~ variables:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2608,7 +2608,7 @@ To workaround this problem, I will create an alias function to call the same fun
   "Wrapper for the `persp-current-buffers' macro.")
 #+end_src
 
-Now we can properly define the two variables we need to make =tab-line= find the tab buffers:
+Now we can properly define the two variables we need to make ~tab-line~ find the tab buffers:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2642,7 +2642,7 @@ The last variable to configure is the ~tab-line-exclude-modes~. This variable ho
                                  reb-mode)))
 #+end_src
 
-Even with the ~tab-line-exclude-modes~ list, some /non-real/ buffers get displayed. I need to create an extra function to help me get rid of the =tab-line= when I load such buffers:
+Even with the ~tab-line-exclude-modes~ list, some /non-real/ buffers get displayed. I need to create an extra function to help me get rid of the ~tab-line~ when I load such buffers:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2656,14 +2656,14 @@ For a definition of what is a non-real buffer, check the documentation of
     (tab-line-mode -1)))
 #+end_src
 
-With the helper function defined, I need to make sure I call it when I switch buffers. The reason for that is that I could explicitly request to load a /non-real/ buffer, which would create the =tab-line= on such buffer:
+With the helper function defined, I need to make sure I call it when I switch buffers. The reason for that is that I could explicitly request to load a /non-real/ buffer, which would create the ~tab-line~ on such buffer:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (add-hook 'doom-switch-buffer-hook #'my-tabs-hide-tab-line-maybe-h)
 #+end_src
 
-Also, when Emacs calls the ~window-configuration-change-hook~ hooks, I need to clean all =tab-line= cache to make sure Emacs will re-consider all the proper buffers when re-displaying it:
+Also, when Emacs calls the ~window-configuration-change-hook~ hooks, I need to clean all ~tab-line~ cache to make sure Emacs will re-consider all the proper buffers when re-displaying it:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2681,7 +2681,7 @@ The implementation of ~my-tabs--drop-caches-h~ simply /nullify/ the value of the
     (set-window-parameter window 'tab-line-cache nil)))
 #+end_src
 
-With all that in place, we can make sure the =tab-line= gets loaded when Emacs start:
+With all that in place, we can make sure the ~tab-line~ gets loaded when Emacs start:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2947,7 +2947,7 @@ Although this is not a radical change, there are two font lock additions I want 
            )))) t))
 #+end_src
 
-There is a package called [[https://www.emacswiki.org/emacs/InfoPlus][=info+.el=]], available through the Emacs Wiki, that fontify the =Info-mode= buffer to make it look nicer.
+There is a package called [[https://www.emacswiki.org/emacs/InfoPlus][~info+.el~]], available through the Emacs Wiki, that fontify the ~Info-mode~ buffer to make it look nicer.
 
 Unfortunately the latest changes introduced in March broke the package on Emacs 27 and 28, so in order to still have the nice feature it provides with a version that still works on my Emacs, I need to /pin/ the package to the version that still works:
 
@@ -2995,7 +2995,7 @@ Then, I can hook it to the ~Info-selection-hook~ hook:
 (add-hook! Info-selection #'my-info--fontify-info-h)
 #+end_src
 
-The next step is to make sure the =Info-mode= respects the typography I defined earlier. First we clean up any outstanding setup to the faces that need to get adjusted:
+The next step is to make sure the ~Info-mode~ respects the typography I defined earlier. First we clean up any outstanding setup to the faces that need to get adjusted:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3029,7 +3029,7 @@ And then, we modify all the faces to match my particular configuration:
                      :inherit info-xref))
 #+end_src
 
-There are two remaining configurations. The first one is to make the =Info-mode= buffer to match how it gets displayed on the editor. I will use =writeroom= to make the buffer centralized on the window, and will turn on =variable-pitch-mode=:
+There are two remaining configurations. The first one is to make the ~Info-mode~ buffer to match how it gets displayed on the editor. I will use ~writeroom~ to make the buffer centralized on the window, and will turn on ~variable-pitch-mode~:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -3049,7 +3049,7 @@ With the function that will configure my buffer in place, I need to hook it to t
 (add-hook! Info-mode #'my-info-buffer-config-h)
 #+end_src
 
-The last configuration for the =Info-mode= is *where* its buffer gets displayed. For me, it should show up on the right side of my screen. I can achieve that with a popup rule for the buffer:
+The last configuration for the ~Info-mode~ is *where* its buffer gets displayed. For me, it should show up on the right side of my screen. I can achieve that with a popup rule for the buffer:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3059,7 +3059,7 @@ The last configuration for the =Info-mode= is *where* its buffer gets displayed.
 #+end_src
 
 *** Help mode and Man mode
-I want to give a similar treatment I did to the =Info-mode= to both these modes, and like the =Info-mode=, the first thing to do is to create the functions that will configure these modes:
+I want to give a similar treatment I did to the ~Info-mode~ to both these modes, and like the ~Info-mode~, the first thing to do is to create the functions that will configure these modes:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -3100,7 +3100,7 @@ The Rainbow mode is a small visual helper to display colors on the buffer, whene
 
 I already configured a key binding (=SPC t R=) to toggle this mode.
 
-What I still need to do, is to make sure that I use a fixed font when displaying the color text, unfortunately, the =rainbow-mode= uses an anonymous face to display the colors, so the only way for me to customize it, is to override the ~rainbow-colorize-match~ with a function that add any property I want to the face (in this case, to inherit from the ~fixed-pitch~ face):
+What I still need to do, is to make sure that I use a fixed font when displaying the color text, unfortunately, the ~rainbow-mode~ uses an anonymous face to display the colors, so the only way for me to customize it, is to override the ~rainbow-colorize-match~ with a function that add any property I want to the face (in this case, to inherit from the ~fixed-pitch~ face):
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -3156,7 +3156,7 @@ To configure all these packages on Doom, I have to do it in the following order:
 - Alter the standard behavior of Doom Emacs, to fit my preferences;
 
 *** Filtering and highlighting
-The first package I want to install is =orderless=. This package augment the standard Emacs completion system providing multiple matches for your input.
+The first package I want to install is ~orderless~. This package augment the standard Emacs completion system providing multiple matches for your input.
 
 First, we need to add it to =packages.el=:
 
@@ -3185,7 +3185,7 @@ And then configure it with ~use-package!~:
                                       without-if-bang)))
 #+end_src
 
-You might have noticed that the last configuration we perform on =orderless=, uses two functions not implemented by default. The idea on these two functions is to create extra dispatchers to allow us more control on our searches.
+You might have noticed that the last configuration we perform on ~orderless~, uses two functions not implemented by default. The idea on these two functions is to create extra dispatchers to allow us more control on our searches.
 
 The first of the functions is ~flex-if-twiddle~. This dispatcher allows one to type a =~= on the input to trigger the /flex/ search style (which is a resemblance of fuzzy finder).
 
@@ -3224,11 +3224,11 @@ So, while you can’t get different faces for different components, you can at l
 #+end_src
 
 *** Sorting
-=orderless= works pretty well, but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use =prescient= (recommended by the =selectrum= author) and lose the nice things I like about =orderless=, or use =orderless= and lose the sorting and remembering mechanism of =prescient=.
+~orderless~ works pretty well, but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use ~prescient~ (recommended by the ~selectrum~ author) and lose the nice things I like about ~orderless~, or use ~orderless~ and lose the sorting and remembering mechanism of ~prescient~.
 
 Then it hit me: why not use both?
 
-The idea is to install =prescient= but not call ~(selectrum-prescient-mode 1)~. Instead, setup the two required hooks for remembering, and the one variable, later on =selectum=, to use the /preprocessing/ from =prescient=. So let's start with =packages.el=:
+The idea is to install ~prescient~ but not call ~(selectrum-prescient-mode 1)~. Instead, setup the two required hooks for remembering, and the one variable, later on ~selectum~, to use the /preprocessing/ from ~prescient~. So let's start with =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -3249,9 +3249,9 @@ Then, let's configure it, and set the persistent mode:
 #+end_src
 
 *** Candidates annotations
-The next package is =marginalia=. This package will add annotations on candidates depending on the context of it. Think about it as a sort of =ivy-rich=, but more organized and use to customize.
+The next package is ~marginalia~. This package will add annotations on candidates depending on the context of it. Think about it as a sort of ~ivy-rich~, but more organized and use to customize.
 
-As with =ordeless=, we need to first, add it to the =packages.el=:
+As with ~ordeless~, we need to first, add it to the =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -3270,12 +3270,12 @@ Then, configure it using ~use-packages!~:
   (add-to-list 'marginalia-command-categories '(persp-switch-to-buffer . buffer)))
 #+end_src
 
-At this point, our completion system can filter its candidates (=orderless=) and display extra information for each one of them (=marginalia=), all that using the Emacs default completion system and UI, which is not up to my taste, so let's get the main package of this section.
+At this point, our completion system can filter its candidates (~orderless~) and display extra information for each one of them (~marginalia~), all that using the Emacs default completion system and UI, which is not up to my taste, so let's get the main package of this section.
 
 *** Completion UI
-I like to have a vertical and more dynamic completion UI. Here is where =selectrum= comes in play. So let's install it.
+I like to have a vertical and more dynamic completion UI. Here is where ~selectrum~ comes in play. So let's install it.
 
-First add =selectrum= itself to =packages.el=:
+First add ~selectrum~ itself to =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -3319,7 +3319,7 @@ And set it up with ~use-packages!~:
 #+end_src
 
 *** Contextual Menu
-The next package is a kind of gem I read about. It will allow you to select different actions on a completion candidate based on its context. This package is =embark=. And again, let's start with =packages.el=:
+The next package is a kind of gem I read about. It will allow you to select different actions on a completion candidate based on its context. This package is ~embark~. And again, let's start with =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -3327,7 +3327,7 @@ The next package is a kind of gem I read about. It will allow you to select diff
 (package! embark-consult)
 #+end_src
 
-Now we can configure =embark= with ~use-package!~:
+Now we can configure ~embark~ with ~use-package!~:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3366,14 +3366,14 @@ Now we can configure =embark= with ~use-package!~:
 #+end_src
 
 *** Extra commands
-In order to be a full replacement for =ivy= + =counsel=, we need to install =consult=, which comes with a bundle of useful helper commands. Let's start with =packages.el=:
+In order to be a full replacement for ~ivy~ + ~counsel~, we need to install ~consult~, which comes with a bundle of useful helper commands. Let's start with =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! consult)
 #+end_src
 
-Now we need to configure each one of this packages. Let's start with the main =consult= package:
+Now we need to configure each one of this packages. Let's start with the main ~consult~ package:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3426,9 +3426,9 @@ Now we need to configure each one of this packages. Let's start with the main =c
   (setq consult-async-input-throttle 0.8))
 #+end_src
 
-We just set couple functions that are not default to =consult= and some minor tweaks on its options.
+We just set couple functions that are not default to ~consult~ and some minor tweaks on its options.
 
-At this point, our configuration is matching the standard =ivy= + =counsel= duo.
+At this point, our configuration is matching the standard ~ivy~ + ~counsel~ duo.
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -3567,7 +3567,7 @@ If ARG (universal argument), include all files, even hidden or compressed ones."
 #+end_src
 
 *** Change Doom's behavior
-By default, Doom comes with all its configuration tailored for =ivy= or =helm=, this means that some packages will need some help from us to work nicely with =selectrum= and friends.c
+By default, Doom comes with all its configuration tailored for ~ivy~ or ~helm~, this means that some packages will need some help from us to work nicely with ~selectrum~ and friends.c
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -3637,22 +3637,22 @@ By default, Doom comes with all its configuration tailored for =ivy= or =helm=, 
 The first module we have to change, is /workspaces/.
 
 ** TODO Workspaces
-There is one module on Doom that don't play nice with =selectrum=: /Workspace/ (based on =persp-mode=).
+There is one module on Doom that don't play nice with ~selectrum~: /Workspace/ (based on ~persp-mode~).
 
 The problem with /Workspace/ is that its base package is buggy, and requires Doom to do a lot of work in order to get it more or less working.
 
-Instead of trying to replace functions from this package, we will disable the module entirely and add =perspective.el=, which is the package =persp-mode= forked.
+Instead of trying to replace functions from this package, we will disable the module entirely and add ~perspective.el~, which is the package ~persp-mode~ forked.
 
-We already disable the module on our =init.el= by commenting the line referent to it (you can check it on the [[Prologue]] section). But there is another package Doom uses to synchronize its workspaces that conflicts with =perspective.el=: =treemacs-persp=.
+We already disable the module on our =init.el= by commenting the line referent to it (you can check it on the [[Prologue]] section). But there is another package Doom uses to synchronize its workspaces that conflicts with ~perspective.el~: ~treemacs-persp~.
 
-Since we will install another package to sync with =treemacs=, we can disable this one on our =packages.el=:
+Since we will install another package to sync with ~treemacs~, we can disable this one on our =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! treemacs-persp :disable t)
 #+end_src
 
-The next step is to add the three packages we will use to replace =persp-mode=:
+The next step is to add the three packages we will use to replace ~persp-mode~:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -3661,7 +3661,7 @@ The next step is to add the three packages we will use to replace =persp-mode=:
 (package! treemacs-perspective)
 #+end_src
 
-With that we can start configuring these packages with =use-package!=. Let's begin with the main package since it is the most complex:
+With that we can start configuring these packages with ~use-package!~. Let's begin with the main package since it is the most complex:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3675,7 +3675,7 @@ Add the trigger to let Doom knows when to actually load the package:
   :hook (doom-first-input . persp-mode)
 #+end_src
 
-=perspective.el= allows different styles of sorting for its workspaces, the one that is closer to what Doom offers by default is to sort them by the order we create them.
+~perspective.el~ allows different styles of sorting for its workspaces, the one that is closer to what Doom offers by default is to sort them by the order we create them.
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3685,7 +3685,7 @@ Add the trigger to let Doom knows when to actually load the package:
 
 It still print the perspectives on the inverse order that we want, but we will fix that behavior when we implement the /workspace tab bar/ later.
 
-And since we will implement the default Doom /workspace tab bar/, we don't need =perspective.el= to print its perspective on the modeline:
+And since we will implement the default Doom /workspace tab bar/, we don't need ~perspective.el~ to print its perspective on the modeline:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3699,7 +3699,7 @@ This change is something particular to my taste. Doom set the name of the worksp
   (persp-initial-frame-name "default")
 #+end_src
 
-With these configurations we can turn =perspective.el= on when Doom loads the module:
+With these configurations we can turn ~perspective.el~ on when Doom loads the module:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3707,7 +3707,7 @@ With these configurations we can turn =perspective.el= on when Doom loads the mo
   (persp-mode 1)
 #+end_src
 
-As mentioned before, Doom has the /workspaces/ module tight coupled with other ares. The problem we have is =persp-mode=, uses the same mode name of =perspective.el=, and when some Doom configuration tries to retrieve an information from /workspaces/, it can't detect we disabled the module.
+As mentioned before, Doom has the /workspaces/ module tight coupled with other ares. The problem we have is ~persp-mode~, uses the same mode name of ~perspective.el~, and when some Doom configuration tries to retrieve an information from /workspaces/, it can't detect we disabled the module.
 
 To workaround this, we need to define or alias some functions that Doom expects to be available when /workspaces/ is on:
 
@@ -3724,7 +3724,7 @@ To workaround this, we need to define or alias some functions that Doom expects 
 (defalias 'safe-persp-name (lambda (&rest _) (persp-current-name)))
 #+end_src
 
-Don't forget to close the =use-package!= sexp:
+Don't forget to close the ~use-package!~ sexp:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3984,23 +3984,23 @@ used to display the item."
 #+end_src
 
 
-Now we can install the =projectile= extension for =perspective.el=:
+Now we can install the ~projectile~ extension for ~perspective.el~:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (use-package! persp-projectile :after (projectile perspective))
 #+end_src
 
-And the one for =treemacs=:
+And the one for ~treemacs~:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (use-package! treemacs-perspective :after (treemacs perspective)
 #+end_src
 
-The =treemacs= integration, also needs some tweaks to functions and hooks that Doom installs in order to guarantee a better behavior from =treemacs= and =persp-mode=.
+The ~treemacs~ integration, also needs some tweaks to functions and hooks that Doom installs in order to guarantee a better behavior from ~treemacs~ and ~persp-mode~.
 
-Once Doom loads the =treemacs= package, we set its scope to ~'Perspectives~:
+Once Doom loads the ~treemacs~ package, we set its scope to ='Perspectives=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -4008,7 +4008,7 @@ Once Doom loads the =treemacs= package, we set its scope to ~'Perspectives~:
   (treemacs-set-scope-type 'Perspectives)
 #+end_src
 
-Next, we need to change the ~treemacs--on-scope-kill~ function signature. =persp-mode= calls all hooks from ~persp-killed-hook~ with the current perspective as an argument. =perspective.el= changed this behavior to not send any information when calling hooks.
+Next, we need to change the ~treemacs--on-scope-kill~ function signature. ~persp-mode~ calls all hooks from ~persp-killed-hook~ with the current perspective as an argument. ~perspective.el~ changed this behavior to not send any information when calling hooks.
 
 The easiest way to fix this is to create a thin wrapper function for ~treemacs--on-scope-kill~ that will call the correct function passing the result of ~(persp-curr)~ as an argument:
 
@@ -4033,7 +4033,7 @@ And finish it by closing the sexp for ~use-package!~:
   )
 #+end_src
 
-The configuration we have so far will get =perspective.el= working, but not as conveniently as the standard feature on Doom. To achieve the whole functionality, there are two changes we still needs: Dashboard integration and keybindings.
+The configuration we have so far will get ~perspective.el~ working, but not as conveniently as the standard feature on Doom. To achieve the whole functionality, there are two changes we still needs: Dashboard integration and keybindings.
 
 As with other keybindings in my configuration, I will get new functions to live on an /autoload/ file, and call them on the mapping.
 
@@ -4068,7 +4068,7 @@ The next sections will cover each one of these commands, but before we begin, le
 Now we can start with the /Display tab bar/ binding, since it is the foundation of Doom's workspace system.
 
 *** Display tab bar
-We know Doom uses two special font faces to draw the workspace tab bar (~+workspace-tab-selected-face~ and ~+workspace-tab-face~), but we removed the =workspace= module from our =init.el=. To keep our configuration as close to Doom as possible we need to redefine these faces. Let's use our /autoload/ file =autoload/workspace.el=:
+We know Doom uses two special font faces to draw the workspace tab bar (~+workspace-tab-selected-face~ and ~+workspace-tab-face~), but we removed the ~workspace~ module from our =init.el=. To keep our configuration as close to Doom as possible we need to redefine these faces. Let's use our /autoload/ file =autoload/workspace.el=:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -4130,7 +4130,7 @@ And we can simply bind it to our shortcut key:
 #+end_src
 
 *** Switch workspace
-The =persp-projectile= package will take care of creating a new workspace for each project we open, but we still need to switch to those workspaces, so let's take care of the /Switch workspace/ binding.
+The ~persp-projectile~ package will take care of creating a new workspace for each project we open, but we still need to switch to those workspaces, so let's take care of the /Switch workspace/ binding.
 
 Let's list the requirements for such function:
 
@@ -4181,7 +4181,7 @@ If you analyze this function, you'll realize we don't have some of the functions
 - ~+workspace-switch~ to call the lower level API to switch the workspace;
 - ~+workspace-error~ called when we need to present an error to the user;
 - ~+workspace-warn~ called when we need to present a less problematic error to the user;
-- ~+workspace-internal-error~ when we find a failure on the internal APIs of =perspective.el=;
+- ~+workspace-internal-error~ when we find a failure on the internal APIs of ~perspective.el~;
 
 We can start with the last workspace name:
 
@@ -4448,7 +4448,7 @@ Now we just need to bind this function:
 #+end_src
 
 *** Switch to last used workspace
-The next binding is the /Switch to last workspace/, which luckily has a function defined on =perspective.el= for it:
+The next binding is the /Switch to last workspace/, which luckily has a function defined on ~perspective.el~ for it:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -4743,7 +4743,7 @@ And since we only used functions we already have implemented, we can bind it to 
 #+end_src
 
 *** Save session to file
-Our workspace refactor is working as expected, but we still need persistence. =perspective.el= and =persp-mode= behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
+Our workspace refactor is working as expected, but we still need persistence. ~perspective.el~ and ~persp-mode~ behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
 
 With that out of the way, let's jump right into the first command:
 
@@ -5000,7 +5000,7 @@ the next."
     (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error)))))
 #+end_src
 
-When we have the feature =workspaces= on our =init.el=, Doom will add an option on its dashboard to allow us to recover the last saved session. Since we disabled that feature, we need to add this option again:
+When we have the feature ~workspaces~ on our =init.el=, Doom will add an option on its dashboard to allow us to recover the last saved session. Since we disabled that feature, we need to add this option again:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -5281,7 +5281,7 @@ And I also want to have better bullet marks:
 
 Besides /beautification/, there are some configurations I like to have as a default behavior. The first one is how I can edit a code block on a separate buffer. By default, Org will edit it using ~switch-to-buffer-other-window~. While this seams to be a popular choice, I just can't stand the two buffers together when I can't touch on the Org file while I have the source block opened.
 
-I will use the ='current-window= option to have the source block behaving like a normal buffer:
+I will use the ~'current-window~ option to have the source block behaving like a normal buffer:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -5327,32 +5327,32 @@ After all these tweaks, we can close our parenthesis:
   '(org-indent :inherit (org-hide fixed-pitch)))
 #+end_src
 
-Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called [[https://github.com/io12/org-fragtog][=org-fragtog=]]. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
+Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called [[https://github.com/io12/org-fragtog][~org-fragtog~]]. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
 
-First we add the plugin on our =packages.el= file:
+First we add the plugin on our ~packages.el~ file:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! org-fragtog)
 #+end_src
 
-Then, we use =use-package!= to defer its loading (we will load it manually later):
+Then, we use ~use-package!~ to defer its loading (we will load it manually later):
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (use-package! org-fragtog :defer t)
 #+end_src
 
-Another nice plugin to have is the [[https://github.com/casouri/valign][=valign=]] plugin. It will align your Org tables nicely, even when you have formulas and images on them.
+Another nice plugin to have is the [[https://github.com/casouri/valign][~valign~]] plugin. It will align your Org tables nicely, even when you have formulas and images on them.
 
-As with the =org-fragtog=, let's first add it to our =packages.el=:
+As with the ~org-fragtog~, let's first add it to our =packages.el=:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! valign)
 #+end_src
 
-Then, we use =use-package!= to defer its loading as we did with =org-fragtog=, but for this plugin, we want to set the ~valign-fancy-bar~ to ~t~, to have even nicer renders of tables:
+Then, we use ~use-package!~ to defer its loading as we did with ~org-fragtog~, but for this plugin, we want to set the ~valign-fancy-bar~ to =t=, to have even nicer renders of tables:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -5367,11 +5367,11 @@ We could configure the left and right gutter to achieve a narrower text area, or
 
 Let's add it to our =packages.el=:
 
-Defer its loading on our configuration, and as with the =valign= package, we will use this time to also set the maximum width for our text:
+Defer its loading on our configuration, and as with the ~valign~ package, we will use this time to also set the maximum width for our text:
 
 Now that I have a narrower width, the text will wrap more often, but the normal navigation keys will make the cursor jump from one line to the other, even if I have other /visual/ lines displayed.
 
-To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in =org-moode=, we want it bound to ~evil-next-visual-line~:
+To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in ~org-moode~, we want it bound to ~evil-next-visual-line~:
 
 While I'm sure I'm missing a command or two, these will get me started.
 
@@ -5927,7 +5927,7 @@ The first snippet, is a simple =emacs-lisp= snippet that I use all the time:
 ,#+end_src
 #+end_src
 
-Then I have the same snippet, but allowing me to add a ~:tangle~ header to it:
+Then I have the same snippet, but allowing me to add a =:tangle= header to it:
 
 #+caption: $DOOMDIR/snippets/org-mode/src-emacs-lisp-tangled
 #+begin_src snippet :tangle snippets/org-mode/src-emacs-lisp-tangled
@@ -6081,7 +6081,7 @@ To get under these two seconds to take a note when I'm on a computer, I defined 
 
 My entry point for notes is [[https://github.com/bastibe/org-journal][Org Journal]]. I will use an entry scheme of one file per year, and create an [[https://orgmode.org/manual/Capture.html][org-capture]] system that will use this single journal file and help me achieve the two seconds mark.
 
-Part of my strategy is to have one capture template per type of note to reduce the necessary amount of thinking not related to the note itself. Another artifact I will use is [[https://joaotavora.github.io/yasnippet/][Yasnippet]] instead of =org-capture= templates. The reason for this decision is to keep a visual track on the entry text. With the standard =org-capture=, I have to move my eyes from top to bottom of the screen to look between the template text and the input field.
+Part of my strategy is to have one capture template per type of note to reduce the necessary amount of thinking not related to the note itself. Another artifact I will use is [[https://joaotavora.github.io/yasnippet/][Yasnippet]] instead of ~org-capture~ templates. The reason for this decision is to keep a visual track on the entry text. With the standard ~org-capture~, I have to move my eyes from top to bottom of the screen to look between the template text and the input field.
 
 I will take notes any time I feel the need, but here are the main topics for my notes:
 
@@ -6123,7 +6123,7 @@ Talk about capture in general:
 [q]     ● Abort
 #+end_src
 
-Start with the open definition for =org-capture=:
+Start with the open definition for ~org-capture~:
 
 #+caption: $DOOMDIR/autoload/writing.el
 #+begin_src emacs-lisp :tangle autoload/writing.el
@@ -7228,7 +7228,7 @@ TBD
 #+end_src
 
 ** TODO Other modes
-Although my writing will be exclusive in =org-mode=, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with =org=mode=.
+Although my writing will be exclusive in ~org-mode~, I'm still interaction with other writing modes, and I want the experience using those modes to get /as close as possible/ to the experience with ~org-mode~.
 
 *** Markdown
 TBD
@@ -7411,7 +7411,7 @@ TBD
 
 ** TODO Requirements
 ** TODO File management
-Before we start configuring the target packages for this section (=dired= and =eshel=), I want to make some small adjustments to Treemacs. Although it is not a full blown file manager, it is a sort of a file manager for my projects, so it fits in this section.
+Before we start configuring the target packages for this section (~dired~ and ~eshel~), I want to make some small adjustments to Treemacs. Although it is not a full blown file manager, it is a sort of a file manager for my projects, so it fits in this section.
 
 The first thing I like to do, is to unpin Treemacs and let Doom use the latest version of it:
 
@@ -7420,7 +7420,7 @@ The first thing I like to do, is to unpin Treemacs and let Doom use the latest v
 (unpin! treemacs)
 #+end_src
 
-The next change is to use our custom =my-default-ui= font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
+The next change is to use our custom ~my-default-ui~ font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
 
 #+caption: $DOOMDIR/autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
@@ -7825,7 +7825,7 @@ Projectile is a great package. It usually provides more features that one partic
 (after! projectile
 #+end_src
 
-To make =projectile= work with =selectrum=, we need to tell it to use the default Emacs completion system:
+To make ~projectile~ work with ~selectrum~, we need to tell it to use the default Emacs completion system:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -7839,7 +7839,7 @@ To make =projectile= work with =selectrum=, we need to tell it to use the defaul
   (setq projectile-completion-system 'default)
 #+end_src
 
-Doom sets a function to run when we open a project with =projectile=, but that function is not calling any /open file/ function for us. Let's create our own version of such function and help projectile to do the appropriate thing when we open a project.
+Doom sets a function to run when we open a project with ~projectile~, but that function is not calling any /open file/ function for us. Let's create our own version of such function and help projectile to do the appropriate thing when we open a project.
 
 The actions I expect are:
 
@@ -7873,14 +7873,14 @@ Let's create such function as an /autoload/ function:
       (projectile-find-file))))
 #+end_src
 
-And attach it to the =projectile= hook:
+And attach it to the ~projectile~ hook:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
   (setq projectile-switch-project-action #'my-after-switch-project-action-h)
 #+end_src
 
-As usual, don't forget to close the =after!= sexp:
+As usual, don't forget to close the ~after!~ sexp:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -7934,7 +7934,7 @@ Two is the window navigation mapping:
   :select t :modeline nil :autosave nil  :ttl nil   :quit nil)
 #+end_src
 
-And three is to fix =magit-status=. When I'm on the terminal, if I open =magit-status=, everything works as expected, but when I exit back to the terminal, Emacs switch the buffer on my terminal window to something else.
+And three is to fix ~magit-status~. When I'm on the terminal, if I open ~magit-status~, everything works as expected, but when I exit back to the terminal, Emacs switch the buffer on my terminal window to something else.
 
 The ideal behavior would be to any app launch from the terminal to take over eshell's window until done. Then, revert back to the terminal.
 
@@ -7947,7 +7947,7 @@ I like to have a hint of the next possible completion while I'm working on shell
 (package! esh-autosuggest)
 #+end_src
 
-The only configuration we need to get this mode working, is to let Emacs enable it when =eshell-mode= is up.
+The only configuration we need to get this mode working, is to let Emacs enable it when ~eshell-mode~ is up.
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
