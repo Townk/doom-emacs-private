@@ -97,6 +97,7 @@ If you have any question about where you should add your configuration, I sugges
 
 For instance:
 
+#+caption: Standard configuration of a package on Doom
 #+begin_src emacs-lisp :tangle no
 (setq org-directory "~/org")
 
@@ -238,6 +239,7 @@ In order to replace the ASCII art with something more pleasant and thematic, I l
 I love the style of this image so much, that it is, besides my dashboard image, my Emacs icon as well. The author of this beauty is [[https://github.com/eccentric-j/doom-icon][Jay Zawrotny]], feel free to send him an accolade!
 
 #+begin_center
+#+caption: My favorite contender for a Doom Emacs logo
 [[./assets/doom.png]]
 #+end_center
 

@@ -22,7 +22,11 @@
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     table caption {
-#+HTML_HEAD:         font-size: 0.6em;
+#+HTML_HEAD:         font-size: 0.7em;
+#+HTML_HEAD:     }
+
+#+HTML_HEAD:     figcaption {
+#+HTML_HEAD:         font-size: 0.7em;
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     label.org-src-name {

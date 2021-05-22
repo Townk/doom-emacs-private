@@ -11,6 +11,7 @@
       org-html-head-include-default-style nil
       org-html-doctype "html5"
       org-html-html5-fancy t
+      org-html-table-caption-above nil
       org-confirm-babel-evaluate nil
       plantuml-jar-path "/tmp/plantuml.jar"
       org-plantuml-jar-path plantuml-jar-path)
