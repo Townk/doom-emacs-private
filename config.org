@@ -123,11 +123,13 @@ This will stop Emacs on the first error and print the stack trace for it. As of 
 
 Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensible to package loading.
 
-What I recommend to do, is to install a package called [[https://github.com/dholm/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking, and use it, when you have the need:
+What I recommend to do, is to install a package called [[https://github.com/kekeimiku/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking (notice that I'm not using the [[https://github.com/dholm/benchmark-init-el][official repository]] for ~benchmark-init-el~, but a fork that fixed a bug when using it with Emacs 28+), and use it, when you have the need:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! benchmark-init)
+(package! benchmark-init
+  :recipe (:host github
+           :repo "kekeimiku/benchmark-init-el"))
 #+end_src
 
 Check my =init.el= file on the [[Appendix][Appendix]], to see how I hook up benchmarking to the =--debug-init= flag.
