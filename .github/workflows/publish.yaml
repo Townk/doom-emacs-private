@@ -43,6 +43,9 @@ jobs:
       - name: Install PlantUML jar
         run: curl -sSfL https://sourceforge.net/projects/plantuml/files/plantuml.jar/download -o /tmp/plantuml.jar
 
+      - name: Install emacs-htmlize
+        run: curl -sSfL https://raw.githubusercontent.com/hniksic/emacs-htmlize/master/htmlize.el -o /tmp/htmlize.el
+
       # This step is required to make sure any package I installed
       # extra gets installed. Also it removes packages I don't use
       # - name: Synchronizing private config with Doom

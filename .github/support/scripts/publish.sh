@@ -3,7 +3,7 @@
 
 (load "~/.config/emacs/early-init.el" nil t)
 (load "~/.config/emacs/core/core-cli.el" nil t)
-(load "~/.config/emacs/.local/straight/repos/emacs-htmlize/htmlize.el")
+(load "/tmp/htmlize.el")
 
 (find-file "~/.config/doom/config.org")
 
