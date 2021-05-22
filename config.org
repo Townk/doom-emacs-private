@@ -1267,6 +1267,7 @@ With the function defined, I just need to connect them to the correct hooks:
 #+end_src
 
 ** TODO Remote editing
+TBD (still need to figure out the best way to address this).
 
 * Personal preferences
 This section will show the reader, some of the small changes I decided to implement on Doom related to Evil, my personal keybindings, my choice of appearance, and other personal configurations. All in all, is pretty safe to skip this section if you intend to implement your own customization.
