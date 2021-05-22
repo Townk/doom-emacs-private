@@ -19,6 +19,7 @@
 
 #+HTML_HEAD:     .org-src-container {
 #+HTML_HEAD:         padding: 0.3em 0.8em;
+#+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     table caption {
@@ -62,7 +63,7 @@
 #+HTML_HEAD:         background-position: 0.3em 0.8em;
 #+HTML_HEAD:         background-repeat: no-repeat;
 #+HTML_HEAD:         border: solid 1px #3498db;
-#+HTML_HEAD:         border-radius: 6px;
+#+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:         overflow: hidden;
 #+HTML_HEAD:         padding: 0 1em 0 2.2em;
 #+HTML_HEAD:     }
@@ -75,7 +76,7 @@
 #+HTML_HEAD:         background-position: 0.3em 0.8em;
 #+HTML_HEAD:         background-repeat: no-repeat;
 #+HTML_HEAD:         border: solid 1px #ce2a21;
-#+HTML_HEAD:         border-radius: 6px;
+#+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:         overflow: hidden;
 #+HTML_HEAD:         padding: 0 1em 0 2.2em;
 #+HTML_HEAD:     }
@@ -93,10 +94,9 @@
 #+HTML_HEAD:         top: 0em;
 #+HTML_HEAD:         background: #2b2b2b;
 #+HTML_HEAD:         color: #dcdccc;
-#+HTML_HEAD:         -webkit-box-shadow: 0 0 5px #777777;
-#+HTML_HEAD:         -moz-box-shadow: 0 0 5px #777777;
-#+HTML_HEAD:         -webkit-border-radius: 5px;
-#+HTML_HEAD:         -moz-border-radius: 5px;
+#+HTML_HEAD:         -webkit-box-shadow: 0 0 4px #777777;
+#+HTML_HEAD:         -moz-box-shadow: 0 0 4px #777777;
+#+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:         text-align: right;
 #+HTML_HEAD:         /* ensure doesn't flow off the screen when expanded */
 #+HTML_HEAD:         max-height: 80%;
