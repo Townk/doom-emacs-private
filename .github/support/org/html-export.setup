@@ -37,6 +37,10 @@
 #+HTML_HEAD:         line-height: 1.2em;
 #+HTML_HEAD:     }
 
+#+HTML_HEAD:     a code {
+#+HTML_HEAD:         color:#3a5fcd;
+#+HTML_HEAD:     }
+
 #+HTML_HEAD:     div.note {
 #+HTML_HEAD:         -moz-border-radius: 6px;
 #+HTML_HEAD:         -webkit-border-radius: 6px;
