@@ -1990,12 +1990,63 @@ And because I like visual cues on my editor, I will turn on the ability to displ
       doom-themes-enable-italic t)
 #+end_src
 
-The one complain I have on Doom theme in general, is the conflict =solaire-mode= has with =mixed-pitch=. If you turn both on, you will lose the variable pitch font. Until somehow, someone fix this, I will disable =solaire= mode to keep the editor UX consistent with my requirements:
++The one complain I have on Doom theme in general, is the conflict ~solaire-mode~ has with ~mixed-pitch~. If you turn both on, you will lose the variable pitch font. Until somehow, someone fix this, I will disable ~solaire~ mode to keep the editor UX consistent with my requirements:+
+
+I saw that a potential fix for ~solaire~ and ~variable-pitch~ mode is on the works, and I couldn't hold myself to try it out.
+
+To do so, I first need to unpin ~solaire~:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
-(package! solaire-mode :disable t)
+(unpin! solaire-mode)
 #+end_src
+
+And then, add [[https://gist.github.com/hlissner/5ac38df98c366f7ffc95c3564ffc73cf][this gist]] to my config:
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(defvar solaire-mode-auto-swap-bg nil)
+
+(after! solaire-mode
+  ;; Remove old hacks; no longer necessary
+  (advice-remove #'org-format-latex #'solaire-mode--org-latex-bg)
+  (advice-remove #'org-create-formula-image #'solaire-mode--org-latex-bg)
+  (advice-remove #'org--make-preview-overlay #'solaire-mode--org-put-bg-for-preview-overlay)
+
+  ;; Flip solaire-mode's strategy of remapping faces in real buffers to
+  ;; remapping faces is unreal buffers (like the minibuffer or sidebars).
+  ;;
+  ;; This resolves a) its performance issues, b) its image background issues
+  ;; (e.g. in org buffers), and c) any face-remap conflicts with other packages,
+  ;; like mixed-pitch, at the cost of having these issues in unreal buffers
+  ;; (like the minibuffer or dashboard), which is far better.
+  (defun solaire-mode-toggle-in-minibuffer-h ()
+    (dolist (buf '(" *Minibuf-0*" " *Minibuf-1*"
+                   " *Echo Area 0*" " *Echo Area 1*"))
+      (with-current-buffer (get-buffer-create buf)
+        (if solaire-global-mode
+            (when (= (buffer-size) 0)
+              (insert " "))
+          (erase-buffer))
+        (solaire-mode (if solaire-global-mode +1 -1)))))
+  (add-hook 'solaire-global-mode-hook #'solaire-mode-toggle-in-minibuffer-h)
+
+  (defadvice! fixed-turn-on-solaire-mode ()
+    :override #'turn-on-solaire-mode
+    (interactive)
+    (and (not solaire-mode)
+         (or (minibufferp)
+             (not (funcall solaire-mode-real-buffer-fn)))
+         (solaire-mode +1)))
+
+  (defadvice! fixed-create-image (image)
+    :filter-return #'create-image
+    (when (bound-and-true-p solaire-mode)
+      (plist-put (cdr image) :background (face-background 'solaire-default-face nil t)))
+    image))
+#+end_src
+
+#+RESULTS:
 
 *** Typography
 This section requires an important disclaimer to the reader. In majority of the cases, one should not /need/ to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
