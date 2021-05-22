@@ -3,6 +3,9 @@
 
 (load "~/.config/emacs/early-init.el" nil t)
 (load "~/.config/emacs/core/core-cli.el" nil t)
+
+(defvar htmlize-theme 'doom-one-light)
+
 (load "/tmp/htmlize.el")
 
 (find-file "~/.config/doom/config.org")
@@ -19,4 +22,7 @@
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 
 (require 'htmlize)
+
+(load-theme htmlize-theme t)
+
 (org-html-export-to-html)
