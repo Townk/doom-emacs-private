@@ -45,8 +45,8 @@ jobs:
 
       # This step is required to make sure any package I installed
       # extra gets installed. Also it removes packages I don't use
-      - name: Synchronizing private config with Doom
-        run: ~/.config/emacs/bin/doom sync
+      # - name: Synchronizing private config with Doom
+      #   run: ~/.config/emacs/bin/doom sync
 
       # This command tries to simulate the normal Emacs startup before
       # tangling the config file
