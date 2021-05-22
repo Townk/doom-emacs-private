@@ -2,7 +2,7 @@
 #+SUBTITLE: A detailed setup for Emacs using Doom Emacs configuration framework
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
-#+DATE: Fri, Jan 1 2021
+#+FIRST_VERSION_DATE: Fri, Jan 1 2021
 
 #+language: en
 #+startup: num
@@ -248,9 +248,9 @@ Since I use a Mac as my primary computer, I need to adjust its control keys to m
 #+name: macos-keys
 | macOS Key  | Emacs Key |
 |------------+-----------|
-| ⌘ (cmd)    | 'super    |
-| ⌃ (ctrl)   | 'control  |
-| ⌥ (option) | 'meta     |
+| ⌘ (=cmd=)    | ='super=    |
+| ⌃ (=ctrl=)   | ='control=  |
+| ⌥ (=option=) | ='meta=     |
 
 Emacs expose three variables to allow you to make these adjustments:
 
