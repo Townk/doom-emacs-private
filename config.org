@@ -511,7 +511,7 @@ If you want Evil to synchronize its visual selection with the Emacs region, set 
 
 Evil defines the priority of its highlight in a way that Emacs displays the visual selection overlays bellow search highlights. As of today I can't figure out why this is the case. One workflow pretty common is to search the name of a variable, select its prefix, and search for the rest of the variable. With the default configuration, you can't see what you're selecting until your selections is bigger than the search term.
 
-Unfortunately, Evil hard-code the [[https://github.com/magnars/.emacs.d/blob/master/site-lisp/evil/evil-visual.el#L372][visual]] [[https://github.com/magnars/.emacs.d/blob/master/site-lisp/evil/evil-visual.el#L474][priority]] value to 99 for visual selection, which is smaller then the value for the search highlight overlays.
+Unfortunately, Evil hard-code the [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L624][visual]] [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L731][priority]] value to 99 for visual selection, which is smaller then the other hard-coded values for the [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L666][search]] [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L868][highlight]] overlays, and this was already reported to Evil on issue [[https://github.com/emacs-evil/evil/issues/1089][#1089]] on GitHub.
 
 To fix this, we have to advise ~evil-visual-highlight~ and ~evil-visual-highlight-block~ to bump the overlay priority after these functions execute:
 
