@@ -2,13 +2,11 @@
 ":"; exec emacs --quick --script "$0" -- "$@" # -*- mode: emacs-lisp; lexical-binding: t; -*-
 
 (load "~/.config/emacs/early-init.el" nil t)
-
 (load "~/.config/emacs/core/core-cli.el" nil t)
-(require 'core-cli)
-(doom-initialize)
 
 (defvar htmlize-theme 'doom-one-light)
-(load-theme htmlize-theme t)
+
+(load "/tmp/htmlize.el")
 
 (find-file "~/.config/doom/config.org")
 
@@ -23,7 +21,8 @@
 (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 
-(load "/tmp/htmlize.el")
 (require 'htmlize)
+
+(load-theme htmlize-theme t)
 
 (org-html-export-to-html)
