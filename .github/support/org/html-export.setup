@@ -12,6 +12,11 @@
 #+HTML_HEAD:         color: #222
 #+HTML_HEAD:     }
 
+#+HTML_HEAD:     h1 {
+#+HTML_HEAD:         font-size: 2.2em;
+#+HTML_HEAD:         font-family: 'Cardo', serif;
+#+HTML_HEAD:     }
+
 #+HTML_HEAD:     .org-src-container {
 #+HTML_HEAD:         padding: 0.3em 0.8em;
 #+HTML_HEAD:     }

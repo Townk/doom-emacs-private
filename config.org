@@ -1,5 +1,5 @@
-#+TITLE: Thiago's Emacs Configuration
-#+SUBTITLE: A detailed setup for Emacs using Doom Emacs framework
+#+TITLE:The Doomed Emacs Configuration
+#+SUBTITLE: A detailed setup for Emacs using Doom Emacs configuration framework
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
 #+DATE: Fri, Jan 1 2021
