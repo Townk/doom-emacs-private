@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 2021-05-22 Sat 03:52 -->
+<!-- 2021-05-22 Sat 04:12 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Thiago's Emacs Configuration</title>
@@ -35,6 +35,9 @@ visibility: hidden;
 .src {
 font-size: 0.7em;
 line-height: 1.2em;
+}
+a code {
+color:#3a5fcd;
 }
 div.note {
 -moz-border-radius: 6px;
@@ -190,215 +193,215 @@ overflow: auto;
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org90a7f7e">1. Prologue</a>
+<li><a href="#org8c56d89">1. Prologue</a>
 <ul>
-<li><a href="#orgd776bd8">1.1. About this document</a></li>
-<li><a href="#orgce82142">1.2. About literate configuration</a></li>
-<li><a href="#org84f376e">1.3. About Doom configuration style</a>
+<li><a href="#orge7f7064">1.1. About this document</a></li>
+<li><a href="#orgf7b00af">1.2. About literate configuration</a></li>
+<li><a href="#org7f3a2f4">1.3. About Doom configuration style</a>
 <ul>
-<li><a href="#org9756598">1.3.1. Doom has its own package manager</a></li>
-<li><a href="#org37a9d23">1.3.2. Lazy load everything</a></li>
-<li><a href="#orgfa092c4">1.3.3. Configuration evaluation order</a></li>
-<li><a href="#org9ab174c">1.3.4. Use the <code>map!</code> macro to bind keys</a></li>
+<li><a href="#orge5a8787">1.3.1. Doom has its own package manager</a></li>
+<li><a href="#orgb4e2bfa">1.3.2. Lazy load everything</a></li>
+<li><a href="#org275b07e">1.3.3. Configuration evaluation order</a></li>
+<li><a href="#orgf459026">1.3.4. Use the <code>map!</code> macro to bind keys</a></li>
 </ul>
 </li>
-<li><a href="#org2a3fd66">1.4. Investigating issues</a></li>
-<li><a href="#org435dbce">1.5. Acknowledgments</a></li>
+<li><a href="#orge2e47eb">1.4. Investigating issues</a></li>
+<li><a href="#orgab4a280">1.5. Acknowledgments</a></li>
 </ul>
 </li>
-<li><a href="#org5d76481">2. Standard features</a>
+<li><a href="#org4b00d67">2. Standard features</a>
 <ul>
-<li><a href="#org75e0c0f">2.1. Requirements</a>
+<li><a href="#org86f03f1">2.1. Requirements</a>
 <ul>
-<li><a href="#org893ef73">2.1.1. Modal editing</a></li>
-<li><a href="#org0a3e7e5">2.1.2. Text Snippets</a></li>
-<li><a href="#org4ca5e42">2.1.3. Inline completion</a></li>
-<li><a href="#orgeb6c02d">2.1.4. Automatic indentation</a></li>
-<li><a href="#org3613d6c">2.1.5. Smart backspace</a></li>
-<li><a href="#org99cf713">2.1.6. Balanced pairs</a></li>
-<li><a href="#org27f1b91">2.1.7. Rich keybindings</a></li>
-<li><a href="#org9274f82">2.1.8. Useful line numbers</a></li>
-<li><a href="#org579ed04">2.1.9. Auto-saving</a></li>
-<li><a href="#org146beb7">2.1.10. Persist frame position and geometry</a></li>
-<li><a href="#org3beb004">2.1.11. Remote editing</a></li>
+<li><a href="#org4e86c74">2.1.1. Modal editing</a></li>
+<li><a href="#org73fbd64">2.1.2. Text Snippets</a></li>
+<li><a href="#org8db97bd">2.1.3. Inline completion</a></li>
+<li><a href="#org459de47">2.1.4. Automatic indentation</a></li>
+<li><a href="#org935e753">2.1.5. Smart backspace</a></li>
+<li><a href="#org4a411ac">2.1.6. Balanced pairs</a></li>
+<li><a href="#org50cd2f1">2.1.7. Rich keybindings</a></li>
+<li><a href="#orgf62beb9">2.1.8. Useful line numbers</a></li>
+<li><a href="#orgc55be3f">2.1.9. Auto-saving</a></li>
+<li><a href="#org3c2fc0b">2.1.10. Persist frame position and geometry</a></li>
+<li><a href="#orgfee1715">2.1.11. Remote editing</a></li>
 </ul>
 </li>
-<li><a href="#org0e7be6d">2.2. Emacs-only configurations</a>
+<li><a href="#org52e5806">2.2. Emacs-only configurations</a>
 <ul>
-<li><a href="#orgd6cbf82">2.2.1. Identity</a></li>
-<li><a href="#orga920a10">2.2.2. Dashboard</a></li>
-<li><a href="#orgcb52935">2.2.3. Key modifiers</a></li>
-<li><a href="#orgdf95fe1">2.2.4. Training wheels</a></li>
-<li><a href="#org363465a">2.2.5. Emacs source code</a></li>
-<li><a href="#org22a4220">2.2.6. Line numbers</a></li>
-<li><a href="#orgb85c47c">2.2.7. Indentation</a></li>
-<li><a href="#org2a8cfcf">2.2.8. Line wrapping</a></li>
-<li><a href="#orgaa37a63">2.2.9. Scrolling</a></li>
-<li><a href="#orgcad3bb8">2.2.10. Repeatable commands</a></li>
+<li><a href="#orgbb264fc">2.2.1. Identity</a></li>
+<li><a href="#orgca30d5b">2.2.2. Dashboard</a></li>
+<li><a href="#orga7bd9eb">2.2.3. Key modifiers</a></li>
+<li><a href="#org80f469a">2.2.4. Training wheels</a></li>
+<li><a href="#org386356d">2.2.5. Emacs source code</a></li>
+<li><a href="#orge214e58">2.2.6. Line numbers</a></li>
+<li><a href="#org0bf8895">2.2.7. Indentation</a></li>
+<li><a href="#org97bfda7">2.2.8. Line wrapping</a></li>
+<li><a href="#org9003250">2.2.9. Scrolling</a></li>
+<li><a href="#org294605b">2.2.10. Repeatable commands</a></li>
 </ul>
 </li>
-<li><a href="#orge86b995">2.3. Modal editing</a></li>
-<li><a href="#orgda75b9b">2.4. Text snippets</a></li>
-<li><a href="#org1646180">2.5. Inline completion</a></li>
-<li><a href="#orge1cf55d">2.6. Automatic indentation</a></li>
-<li><a href="#org2467cd1">2.7. Smart backspace</a></li>
-<li><a href="#org39c40ad">2.8. Balanced pairs</a></li>
-<li><a href="#org83d81cc">2.9. Rich keybindings</a></li>
-<li><a href="#orgdf48559">2.10. Useful line numbers</a></li>
-<li><a href="#orgcfa1500">2.11. Auto-Saving</a></li>
-<li><a href="#org3ed0a0e">2.12. Persist frame position and geometry</a></li>
-<li><a href="#org07d4363">2.13. <span class="todo TODO">TODO</span> Remote editing</a></li>
+<li><a href="#org41abcfe">2.3. Modal editing</a></li>
+<li><a href="#org2953375">2.4. Text snippets</a></li>
+<li><a href="#org0c39d81">2.5. Inline completion</a></li>
+<li><a href="#orgf1eb973">2.6. Automatic indentation</a></li>
+<li><a href="#orgac36f6c">2.7. Smart backspace</a></li>
+<li><a href="#orgce6f440">2.8. Balanced pairs</a></li>
+<li><a href="#org671e279">2.9. Rich keybindings</a></li>
+<li><a href="#orge13c5fc">2.10. Useful line numbers</a></li>
+<li><a href="#orga9b04d5">2.11. Auto-Saving</a></li>
+<li><a href="#org2a62c38">2.12. Persist frame position and geometry</a></li>
+<li><a href="#orgbee2145">2.13. <span class="todo TODO">TODO</span> Remote editing</a></li>
 </ul>
 </li>
-<li><a href="#orgbe134d7">3. Personal preferences</a>
+<li><a href="#orgd21508b">3. Personal preferences</a>
 <ul>
-<li><a href="#org8e9b3ff">3.1. Evil</a>
+<li><a href="#org2fdc480">3.1. Evil</a>
 <ul>
-<li><a href="#orgd503fde">3.1.1. Evil-MatchIt</a></li>
-<li><a href="#org7d8470a">3.1.2. Plus-Minus</a></li>
-<li><a href="#orgc42f110">3.1.3. Evil-String-Inflection</a></li>
+<li><a href="#org23c54b4">3.1.1. Evil-MatchIt</a></li>
+<li><a href="#org85afee0">3.1.2. Plus-Minus</a></li>
+<li><a href="#orgf4c5f96">3.1.3. Evil-String-Inflection</a></li>
 </ul>
 </li>
-<li><a href="#org3fcd017">3.2. Keybindings</a>
+<li><a href="#org4f2bd24">3.2. Keybindings</a>
 <ul>
-<li><a href="#org9fe7f3e">3.2.1. Window navigation</a></li>
-<li><a href="#org7faee39">3.2.2. Vim defaults</a></li>
-<li><a href="#org838538f">3.2.3. Personal shortcuts</a></li>
-<li><a href="#org8f0c8d8">3.2.4. Repeatable shortcuts</a></li>
+<li><a href="#org29fc01d">3.2.1. Window navigation</a></li>
+<li><a href="#org9684446">3.2.2. Vim defaults</a></li>
+<li><a href="#orge7b18e9">3.2.3. Personal shortcuts</a></li>
+<li><a href="#org03cfdd6">3.2.4. Repeatable shortcuts</a></li>
 </ul>
 </li>
-<li><a href="#org298ed3f">3.3. Appearances</a>
+<li><a href="#org5d588ec">3.3. Appearances</a>
 <ul>
-<li><a href="#org3ca923e">3.3.1. Frame</a></li>
-<li><a href="#orgfbc589d">3.3.2. Editor</a></li>
-<li><a href="#org010136d">3.3.3. Theme</a></li>
-<li><a href="#orgff8bed9">3.3.4. Typography</a></li>
-<li><a href="#orgf2cac7a">3.3.5. Iconography</a></li>
+<li><a href="#org4e9bcb7">3.3.1. Frame</a></li>
+<li><a href="#org662139c">3.3.2. Editor</a></li>
+<li><a href="#org4410ac9">3.3.3. Theme</a></li>
+<li><a href="#org1eb26f1">3.3.4. Typography</a></li>
+<li><a href="#orgf80c41d">3.3.5. Iconography</a></li>
 </ul>
 </li>
-<li><a href="#org82428e8">3.4. Editor Tabs</a>
+<li><a href="#org32d588f">3.4. Editor Tabs</a>
 <ul>
-<li><a href="#org10bfc24">3.4.1. Tab actions</a></li>
-<li><a href="#org72e31b1">3.4.2. Windows</a></li>
+<li><a href="#org3cb14b4">3.4.1. Tab actions</a></li>
+<li><a href="#org32c2b54">3.4.2. Windows</a></li>
 </ul>
 </li>
-<li><a href="#org05d261f">3.5. Special modes</a>
+<li><a href="#org63832f3">3.5. Special modes</a>
 <ul>
-<li><a href="#orge3c9b96">3.5.1. Info mode</a></li>
-<li><a href="#org3d71ba8">3.5.2. Help mode and Man mode</a></li>
-<li><a href="#org06b86e2">3.5.3. Rainbow mode</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org8ca4cc4">4. Temporary workarounds</a>
-<ul>
-<li><a href="#orgb24892f">4.1. <span class="todo TODO">TODO</span> Completion framework</a>
-<ul>
-<li><a href="#org3091f83">4.1.1. Filtering and highlighting</a></li>
-<li><a href="#org68bcebd">4.1.2. Sorting</a></li>
-<li><a href="#org21f5b17">4.1.3. Candidates annotations</a></li>
-<li><a href="#orgabde745">4.1.4. Completion UI</a></li>
-<li><a href="#org751ab57">4.1.5. Contextual Menu</a></li>
-<li><a href="#org794b462">4.1.6. Extra commands</a></li>
-<li><a href="#org04901fa">4.1.7. Change Doom's behavior</a></li>
-</ul>
-</li>
-<li><a href="#org98e82a2">4.2. <span class="todo TODO">TODO</span> Workspaces</a>
-<ul>
-<li><a href="#orge5e45fa">4.2.1. Display tab bar</a></li>
-<li><a href="#org389e83f">4.2.2. Switch workspace</a></li>
-<li><a href="#org8db0c9a">4.2.3. Switch to N<sup>th</sup> workspace</a></li>
-<li><a href="#org3e9c00c">4.2.4. Switch to final workspace</a></li>
-<li><a href="#org2363b00">4.2.5. Switch to last used workspace</a></li>
-<li><a href="#org309dc46">4.2.6. Previous and next workspace</a></li>
-<li><a href="#orgb081ea9">4.2.7. New workspace</a></li>
-<li><a href="#org17d2502">4.2.8. Rename workspace</a></li>
-<li><a href="#orgf8c61c9">4.2.9. Delete this workspace</a></li>
-<li><a href="#org2962566">4.2.10. Delete session</a></li>
-<li><a href="#orga7facf3">4.2.11. Delete session and quit</a></li>
-<li><a href="#org1778214">4.2.12. Save session to file</a></li>
-<li><a href="#org818d7d2">4.2.13. Load session from file</a></li>
-<li><a href="#org6abaa36">4.2.14. Restore last session</a></li>
-<li><a href="#org8f00198">4.2.15. Other shortcuts</a></li>
+<li><a href="#org4181597">3.5.1. Info mode</a></li>
+<li><a href="#org0275bcd">3.5.2. Help mode and Man mode</a></li>
+<li><a href="#org7fc5fcc">3.5.3. Rainbow mode</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org740c6d4">5. Writing&#xa0;&#xa0;&#xa0;<span class="tag"><span class="wip">wip</span></span></a>
+<li><a href="#org45555ae">4. Temporary workarounds</a>
 <ul>
-<li><a href="#orgaf8acf5">5.1. <span class="todo TODO">TODO</span> Requirements</a></li>
-<li><a href="#orgb99b587">5.2. <span class="todo TODO">TODO</span> Common Org configurations</a></li>
-<li><a href="#orgd4af852">5.3. <span class="todo TODO">TODO</span> Prose writing</a>
+<li><a href="#orgd8e69e0">4.1. <span class="todo TODO">TODO</span> Completion framework</a>
 <ul>
-<li><a href="#org6a89804">5.3.1. Dictionary and writing helpers</a></li>
-<li><a href="#orgcc4d1cf">5.3.2. Templates</a></li>
-<li><a href="#org9828ab6">5.3.3. Focus Writing</a></li>
-<li><a href="#orgb1ea6da">5.3.4. Snippets</a></li>
+<li><a href="#orgbadca54">4.1.1. Filtering and highlighting</a></li>
+<li><a href="#org93e3494">4.1.2. Sorting</a></li>
+<li><a href="#orgc642a64">4.1.3. Candidates annotations</a></li>
+<li><a href="#org7a2e5ee">4.1.4. Completion UI</a></li>
+<li><a href="#orgd35e752">4.1.5. Contextual Menu</a></li>
+<li><a href="#org273a284">4.1.6. Extra commands</a></li>
+<li><a href="#org7d65806">4.1.7. Change Doom's behavior</a></li>
 </ul>
 </li>
-<li><a href="#org5d74c98">5.4. <span class="todo TODO">TODO</span> Reading or reviewing</a></li>
-<li><a href="#orgd575687">5.5. <span class="todo TODO">TODO</span> Publishing</a></li>
-<li><a href="#orge8ae791">5.6. <span class="todo TODO">TODO</span> Presenting</a></li>
-<li><a href="#org40a6943">5.7. <span class="todo TODO">TODO</span> Note Taking</a>
+<li><a href="#org8421d40">4.2. <span class="todo TODO">TODO</span> Workspaces</a>
 <ul>
-<li><a href="#org8796bb1">5.7.1. Capturing</a></li>
-<li><a href="#org10bb09d">5.7.2. Journal</a></li>
-<li><a href="#orgf891364">5.7.3. Zettelkasten</a></li>
-<li><a href="#orgdc25c2e">5.7.4. Deft</a></li>
-<li><a href="#orgd4d75ba">5.7.5. Utilities</a></li>
+<li><a href="#orgcebbd8a">4.2.1. Display tab bar</a></li>
+<li><a href="#orgc33892d">4.2.2. Switch workspace</a></li>
+<li><a href="#org843ab9a">4.2.3. Switch to N<sup>th</sup> workspace</a></li>
+<li><a href="#org858ba85">4.2.4. Switch to final workspace</a></li>
+<li><a href="#orgfd8f25c">4.2.5. Switch to last used workspace</a></li>
+<li><a href="#org69c371d">4.2.6. Previous and next workspace</a></li>
+<li><a href="#orgd2e87ad">4.2.7. New workspace</a></li>
+<li><a href="#orgc5a3c1f">4.2.8. Rename workspace</a></li>
+<li><a href="#org48b3eaf">4.2.9. Delete this workspace</a></li>
+<li><a href="#orge9523cb">4.2.10. Delete session</a></li>
+<li><a href="#orge4f5ff8">4.2.11. Delete session and quit</a></li>
+<li><a href="#orgd9839da">4.2.12. Save session to file</a></li>
+<li><a href="#orgc3080b3">4.2.13. Load session from file</a></li>
+<li><a href="#orgae448e0">4.2.14. Restore last session</a></li>
+<li><a href="#orgb19e53c">4.2.15. Other shortcuts</a></li>
 </ul>
 </li>
-<li><a href="#org3ef850a">5.8. <span class="todo TODO">TODO</span> Other modes</a>
+</ul>
+</li>
+<li><a href="#org5475d3d">5. Writing&#xa0;&#xa0;&#xa0;<span class="tag"><span class="wip">wip</span></span></a>
 <ul>
-<li><a href="#org527c58f">5.8.1. Markdown</a></li>
+<li><a href="#org45b01f8">5.1. <span class="todo TODO">TODO</span> Requirements</a></li>
+<li><a href="#org55be1f2">5.2. <span class="todo TODO">TODO</span> Common Org configurations</a></li>
+<li><a href="#org27a7637">5.3. <span class="todo TODO">TODO</span> Prose writing</a>
+<ul>
+<li><a href="#org4fdef44">5.3.1. Dictionary and writing helpers</a></li>
+<li><a href="#org5b2f254">5.3.2. Templates</a></li>
+<li><a href="#org44ef441">5.3.3. Focus Writing</a></li>
+<li><a href="#org3858cdf">5.3.4. Snippets</a></li>
+</ul>
+</li>
+<li><a href="#org4028127">5.4. <span class="todo TODO">TODO</span> Reading or reviewing</a></li>
+<li><a href="#org176cebc">5.5. <span class="todo TODO">TODO</span> Publishing</a></li>
+<li><a href="#orgae48ef0">5.6. <span class="todo TODO">TODO</span> Presenting</a></li>
+<li><a href="#org06bbc2f">5.7. <span class="todo TODO">TODO</span> Note Taking</a>
+<ul>
+<li><a href="#org7d7bedb">5.7.1. Capturing</a></li>
+<li><a href="#org369d65d">5.7.2. Journal</a></li>
+<li><a href="#orgd4613d1">5.7.3. Zettelkasten</a></li>
+<li><a href="#orgc900595">5.7.4. Deft</a></li>
+<li><a href="#orge2ee5cf">5.7.5. Utilities</a></li>
+</ul>
+</li>
+<li><a href="#org5f2575c">5.8. <span class="todo TODO">TODO</span> Other modes</a>
+<ul>
+<li><a href="#orgbfeaacf">5.8.1. Markdown</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org4fce703">6. Development</a>
+<li><a href="#orgac20257">6. Development</a>
 <ul>
-<li><a href="#org13aa57b">6.1. <span class="todo TODO">TODO</span> Requirements</a></li>
-<li><a href="#org711674d">6.2. <span class="todo TODO">TODO</span> Common configuration</a>
+<li><a href="#org4012a2c">6.1. <span class="todo TODO">TODO</span> Requirements</a></li>
+<li><a href="#orge9ba357">6.2. <span class="todo TODO">TODO</span> Common configuration</a>
 <ul>
-<li><a href="#org7af83f9">6.2.1. Version control system</a></li>
-<li><a href="#orgf6196a8">6.2.2. Comments</a></li>
+<li><a href="#org4682fb2">6.2.1. Version control system</a></li>
+<li><a href="#org431317a">6.2.2. Comments</a></li>
 </ul>
 </li>
-<li><a href="#org4d9e67c">6.3. <span class="todo TODO">TODO</span> Lisp</a></li>
-<li><a href="#orgb0865ba">6.4. <span class="todo TODO">TODO</span> Shell script</a></li>
-<li><a href="#org5a0c5c8">6.5. <span class="todo TODO">TODO</span> Python</a></li>
-<li><a href="#orgb7b122e">6.6. <span class="todo TODO">TODO</span> Ansible</a></li>
-<li><a href="#orgc0d6663">6.7. <span class="todo TODO">TODO</span> Javascript/TypeScript</a></li>
-<li><a href="#orgf8c8e0c">6.8. <span class="todo TODO">TODO</span> C/C++</a></li>
-<li><a href="#orgba44970">6.9. <span class="todo TODO">TODO</span> Swift</a></li>
-<li><a href="#org2e314d5">6.10. <span class="todo TODO">TODO</span> Kotlin</a></li>
-<li><a href="#orgd757941">6.11. <span class="todo TODO">TODO</span> Java</a></li>
+<li><a href="#org253531d">6.3. <span class="todo TODO">TODO</span> Lisp</a></li>
+<li><a href="#orga2a4dbb">6.4. <span class="todo TODO">TODO</span> Shell script</a></li>
+<li><a href="#orgb0b0c85">6.5. <span class="todo TODO">TODO</span> Python</a></li>
+<li><a href="#org83b19b2">6.6. <span class="todo TODO">TODO</span> Ansible</a></li>
+<li><a href="#orgbd537f3">6.7. <span class="todo TODO">TODO</span> Javascript/TypeScript</a></li>
+<li><a href="#org57b514b">6.8. <span class="todo TODO">TODO</span> C/C++</a></li>
+<li><a href="#orge1646dc">6.9. <span class="todo TODO">TODO</span> Swift</a></li>
+<li><a href="#org1b06400">6.10. <span class="todo TODO">TODO</span> Kotlin</a></li>
+<li><a href="#org55ed8b1">6.11. <span class="todo TODO">TODO</span> Java</a></li>
 </ul>
 </li>
-<li><a href="#org2edc528">7. Non-editor features</a>
+<li><a href="#org6170f4a">7. Non-editor features</a>
 <ul>
-<li><a href="#org338a0fe">7.1. <span class="todo TODO">TODO</span> Requirements</a></li>
-<li><a href="#org69e4967">7.2. <span class="todo TODO">TODO</span> File management</a></li>
-<li><a href="#orge14fa4d">7.3. <span class="todo TODO">TODO</span> Project management</a></li>
-<li><a href="#org2623cc7">7.4. <span class="todo TODO">TODO</span> Terminal</a></li>
-<li><a href="#orgd02eebb">7.5. <span class="todo TODO">TODO</span> Emails</a></li>
-<li><a href="#org0ac6555">7.6. <span class="todo TODO">TODO</span> Calendars</a></li>
-<li><a href="#org3855f90">7.7. <span class="todo TODO">TODO</span> Contacts</a></li>
-<li><a href="#orge7ac8b2">7.8. <span class="todo TODO">TODO</span> Time Management</a></li>
+<li><a href="#orgc3baa0b">7.1. <span class="todo TODO">TODO</span> Requirements</a></li>
+<li><a href="#orga11901a">7.2. <span class="todo TODO">TODO</span> File management</a></li>
+<li><a href="#orgb2d0fbb">7.3. <span class="todo TODO">TODO</span> Project management</a></li>
+<li><a href="#org2c130b7">7.4. <span class="todo TODO">TODO</span> Terminal</a></li>
+<li><a href="#org9e4e9a0">7.5. <span class="todo TODO">TODO</span> Emails</a></li>
+<li><a href="#org4592ae1">7.6. <span class="todo TODO">TODO</span> Calendars</a></li>
+<li><a href="#orgb7f4f23">7.7. <span class="todo TODO">TODO</span> Contacts</a></li>
+<li><a href="#orgce5e79c">7.8. <span class="todo TODO">TODO</span> Time Management</a></li>
 </ul>
 </li>
-<li><a href="#org0b2ca8e">8. Appendix</a>
+<li><a href="#orga54691c">8. Appendix</a>
 <ul>
-<li><a href="#orgccc92fe">8.1. The <code>init.el</code> file</a></li>
+<li><a href="#org87a1025">8.1. The <code>init.el</code> file</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </nav>
 
-<div id="outline-container-org90a7f7e" class="outline-2">
-<h2 id="org90a7f7e"><span class="section-number-2">1</span> Prologue</h2>
+<div id="outline-container-org8c56d89" class="outline-2">
+<h2 id="org8c56d89"><span class="section-number-2">1</span> Prologue</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to the community.
@@ -416,7 +419,7 @@ Also, when you install Doom for the first time, it creates the <code>config.el</
 For instance, a Doom installation without a previous private configuration creates the file <code>$DOOMDIR/config.el</code> with the following comments:
 </p>
 
-<div class="note" id="org6e7d349">
+<div class="note" id="org900bbc9">
 <p>
 In your journey configuring Emacs the way you want, you might need to use more functions then I'm using in this configuration. Here are some additional functions or macros that could help you configure Doom:
 </p>
@@ -440,8 +443,8 @@ You can also try '<code>gd</code>' (or '<code>C-c g d</code>') to jump to their 
 </div>
 </div>
 
-<div id="outline-container-orgd776bd8" class="outline-3">
-<h3 id="orgd776bd8"><span class="section-number-3">1.1</span> About this document</h3>
+<div id="outline-container-orge7f7064" class="outline-3">
+<h3 id="orge7f7064"><span class="section-number-3">1.1</span> About this document</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 The organization of my Emacs configuration tries to structure the design and build of a text editor tailored for my needs.
@@ -487,8 +490,8 @@ Also, do not trust me blindly. I try my best to verify the information I write b
 </div>
 </div>
 
-<div id="outline-container-orgce82142" class="outline-3">
-<h3 id="orgce82142"><span class="section-number-3">1.2</span> About literate configuration</h3>
+<div id="outline-container-orgf7b00af" class="outline-3">
+<h3 id="orgf7b00af"><span class="section-number-3">1.2</span> About literate configuration</h3>
 <div class="outline-text-3" id="text-1-2">
 <p>
 A long time ago I discovered <a href="http://literateprogramming.com">Literate Programming</a> when I first read an Emacs configuration using Org Mode. It was the <a href="https://pages.sachachua.com/.emacs.d/Sacha.html">Emacs configuration</a> of <a href="https://sachachua.com/blog/about/">Sacha Chua</a>, and it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
@@ -508,8 +511,8 @@ The core difference, is the fact that each piece of code in this document may no
 </div>
 </div>
 
-<div id="outline-container-org84f376e" class="outline-3">
-<h3 id="org84f376e"><span class="section-number-3">1.3</span> About Doom configuration style</h3>
+<div id="outline-container-org7f3a2f4" class="outline-3">
+<h3 id="org7f3a2f4"><span class="section-number-3">1.3</span> About Doom configuration style</h3>
 <div class="outline-text-3" id="text-1-3">
 <p>
 One of the major hurdles for new comers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
@@ -520,8 +523,8 @@ This section describes four aspects of Doom that I felt important to understand 
 </p>
 </div>
 
-<div id="outline-container-org9756598" class="outline-4">
-<h4 id="org9756598"><span class="section-number-4">1.3.1</span> Doom has its own package manager</h4>
+<div id="outline-container-orge5a8787" class="outline-4">
+<h4 id="orge5a8787"><span class="section-number-4">1.3.1</span> Doom has its own package manager</h4>
 <div class="outline-text-4" id="text-1-3-1">
 <p>
 Doom does not use <code>package.el</code>, it has its own package manager system and even though, it uses <code>use-package</code> and <code>straight.el</code> packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your <code>config.el</code>, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your <code>config.el</code>.
@@ -529,8 +532,8 @@ Doom does not use <code>package.el</code>, it has its own package manager system
 </div>
 </div>
 
-<div id="outline-container-org37a9d23" class="outline-4">
-<h4 id="org37a9d23"><span class="section-number-4">1.3.2</span> Lazy load everything</h4>
+<div id="outline-container-orgb4e2bfa" class="outline-4">
+<h4 id="orgb4e2bfa"><span class="section-number-4">1.3.2</span> Lazy load everything</h4>
 <div class="outline-text-4" id="text-1-3-2">
 <p>
 You should get used to use the options <code>:defer</code>, <code>:hook</code>, <code>:after</code>, <code>:mode</code>, and <code>:commands</code> from <code>use-package</code> (check the <a href="https://github.com/jwiegley/use-package">package documentation</a> for more details) when configuring any package with it. Not doing so, may cause the package to get loaded during the Emacs initialization, potentially slowing the start of Emacs.
@@ -538,8 +541,8 @@ You should get used to use the options <code>:defer</code>, <code>:hook</code>, 
 </div>
 </div>
 
-<div id="outline-container-orgfa092c4" class="outline-4">
-<h4 id="orgfa092c4"><span class="section-number-4">1.3.3</span> Configuration evaluation order</h4>
+<div id="outline-container-org275b07e" class="outline-4">
+<h4 id="org275b07e"><span class="section-number-4">1.3.3</span> Configuration evaluation order</h4>
 <div class="outline-text-4" id="text-1-3-3">
 <p>
 There are four potential loading <i>spots</i> for each configuration you want do tweak, and you must always decide which one is the best option to apply your particular case:
@@ -576,8 +579,8 @@ For instance:
 </div>
 </div>
 
-<div id="outline-container-org9ab174c" class="outline-4">
-<h4 id="org9ab174c"><span class="section-number-4">1.3.4</span> Use the <code>map!</code> macro to bind keys</h4>
+<div id="outline-container-orgf459026" class="outline-4">
+<h4 id="orgf459026"><span class="section-number-4">1.3.4</span> Use the <code>map!</code> macro to bind keys</h4>
 <div class="outline-text-4" id="text-1-3-4">
 <p>
 Eventually, you will realize that <code>use-package</code> has a nice <code>:bind</code> option to it, and you may think that your configuration would be so much cleaner if you could have everything under a <code>use-package</code> call (been there, done that). Unfortunately, this is not a good idea, unless you're aware of all possible gotchas related to <code>leader</code> and <code>localleader</code>.
@@ -590,8 +593,8 @@ My recommendation to you is to always configure your keybindings using the <code
 </div>
 </div>
 
-<div id="outline-container-org2a3fd66" class="outline-3">
-<h3 id="org2a3fd66"><span class="section-number-3">1.4</span> Investigating issues</h3>
+<div id="outline-container-orge2e47eb" class="outline-3">
+<h3 id="orge2e47eb"><span class="section-number-3">1.4</span> Investigating issues</h3>
 <div class="outline-text-3" id="text-1-4">
 <p>
 If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration <i>ipsis litteris</i>, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
@@ -626,7 +629,7 @@ What I recommend to do, is to install a package called <a href="https://github.c
 </div>
 
 <p>
-Check my <code>init.el</code> file on the <a href="#org0b2ca8e">Appendix</a>, to see how I hook up benchmarking to the <code>--debug-init</code> flag.
+Check my <code>init.el</code> file on the <a href="#orga54691c">Appendix</a>, to see how I hook up benchmarking to the <code>--debug-init</code> flag.
 </p>
 
 <p>
@@ -635,8 +638,8 @@ After starting Emacs with the <code>--debug-init</code> flag, you can check the 
 </div>
 </div>
 
-<div id="outline-container-org435dbce" class="outline-3">
-<h3 id="org435dbce"><span class="section-number-3">1.5</span> Acknowledgments</h3>
+<div id="outline-container-orgab4a280" class="outline-3">
+<h3 id="orgab4a280"><span class="section-number-3">1.5</span> Acknowledgments</h3>
 <div class="outline-text-3" id="text-1-5">
 <p>
 Besides the already mentioned <a href="https://sachachua.com/blog/about/">Sacha Chua</a>, I would also like to thank Timothy (a.k.a. <a href="https://github.com/tecosaur">tecosaur</a>) for his wonderful literate config. I would be lying if I said <a href="https://www.gitmemory.com/tecosaur">tecosaur</a> was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
@@ -662,24 +665,24 @@ By the way, if you are reading this document online, there is a chance you might
 </div>
 </div>
 
-<div id="outline-container-org5d76481" class="outline-2">
-<h2 id="org5d76481"><span class="section-number-2">2</span> Standard features</h2>
+<div id="outline-container-org4b00d67" class="outline-2">
+<h2 id="org4b00d67"><span class="section-number-2">2</span> Standard features</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, and I'll be more than happy to link your document here.
 </p>
 </div>
 
-<div id="outline-container-org75e0c0f" class="outline-3">
-<h3 id="org75e0c0f"><span class="section-number-3">2.1</span> Requirements</h3>
+<div id="outline-container-org86f03f1" class="outline-3">
+<h3 id="org86f03f1"><span class="section-number-3">2.1</span> Requirements</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 This part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like <a href="https://en.wikipedia.org/wiki/Microsoft_Notepad">Notepad</a>, even though they're not present in all of them.
 </p>
 </div>
 
-<div id="outline-container-org893ef73" class="outline-4">
-<h4 id="org893ef73"><span class="section-number-4">2.1.1</span> Modal editing</h4>
+<div id="outline-container-org4e86c74" class="outline-4">
+<h4 id="org4e86c74"><span class="section-number-4">2.1.1</span> Modal editing</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <p>
 I need to come clean to the reader about my past experiences with text editors. I'm a <i>die-hard</i> Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider <i>modal editing</i>, a feature that any text editor should have.
@@ -687,8 +690,8 @@ I need to come clean to the reader about my past experiences with text editors. 
 </div>
 </div>
 
-<div id="outline-container-org0a3e7e5" class="outline-4">
-<h4 id="org0a3e7e5"><span class="section-number-4">2.1.2</span> Text Snippets</h4>
+<div id="outline-container-org73fbd64" class="outline-4">
+<h4 id="org73fbd64"><span class="section-number-4">2.1.2</span> Text Snippets</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some book keeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
@@ -696,8 +699,8 @@ Although I'm not an avid user of snippets, I believe they're a fundamental part 
 </div>
 </div>
 
-<div id="outline-container-org4ca5e42" class="outline-4">
-<h4 id="org4ca5e42"><span class="section-number-4">2.1.3</span> Inline completion</h4>
+<div id="outline-container-org8db97bd" class="outline-4">
+<h4 id="org8db97bd"><span class="section-number-4">2.1.3</span> Inline completion</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 Also know as <i>intellisence</i>, or <i>code complete</i> in other editors and IDEs, <i>at-point completion</i> are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the <i>Insert Mode</i> the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the <code>&lt;TAB&gt;</code> key).
@@ -705,8 +708,8 @@ Also know as <i>intellisence</i>, or <i>code complete</i> in other editors and I
 </div>
 </div>
 
-<div id="outline-container-orgeb6c02d" class="outline-4">
-<h4 id="orgeb6c02d"><span class="section-number-4">2.1.4</span> Automatic indentation</h4>
+<div id="outline-container-org459de47" class="outline-4">
+<h4 id="org459de47"><span class="section-number-4">2.1.4</span> Automatic indentation</h4>
 <div class="outline-text-4" id="text-2-1-4">
 <p>
 Here I'm not talking about indent after pressing '<code>RET</code>'. I'm talking about re-indenting the file as I change it. On the Emacs world, this is also known as <i>electric indent</i>.
@@ -718,8 +721,8 @@ I understand that in some occasions this process may slow down the editor, so I 
 </div>
 </div>
 
-<div id="outline-container-org3613d6c" class="outline-4">
-<h4 id="org3613d6c"><span class="section-number-4">2.1.5</span> Smart backspace</h4>
+<div id="outline-container-org935e753" class="outline-4">
+<h4 id="org935e753"><span class="section-number-4">2.1.5</span> Smart backspace</h4>
 <div class="outline-text-4" id="text-2-1-5">
 <p>
 When I'm editing a file (usually a source code), in some scenarios, the editor helps me out by inserting text that I want. One example of this is the closing pair character. If I type a ' <code>"</code> ', Doom will add a second one after my cursor. In most of the scenarios, to revert what just happened, I press <code>&lt;BACKSPACE&gt;</code>, and I get the same state I was before pressing the key that generated the completion.
@@ -735,8 +738,8 @@ This requirement, is to make sure the <code>&lt;BACKSPACE&gt;</code> key behaves
 </div>
 </div>
 
-<div id="outline-container-org99cf713" class="outline-4">
-<h4 id="org99cf713"><span class="section-number-4">2.1.6</span> Balanced pairs</h4>
+<div id="outline-container-org4a411ac" class="outline-4">
+<h4 id="org4a411ac"><span class="section-number-4">2.1.6</span> Balanced pairs</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <p>
 The common behavior you might see on text editors is to complete a character pair as you type. For instance, if you type an open parenthesis, the editor would insert the closing one automatically, and if you press the closing parenthesis, the editor would simply move the cursor to the right of the already inserted close parenthesis character.
@@ -748,8 +751,8 @@ My requirement is to my editor to keep any of these character pairs balanced. If
 </div>
 </div>
 
-<div id="outline-container-org27f1b91" class="outline-4">
-<h4 id="org27f1b91"><span class="section-number-4">2.1.7</span> Rich keybindings</h4>
+<div id="outline-container-org50cd2f1" class="outline-4">
+<h4 id="org50cd2f1"><span class="section-number-4">2.1.7</span> Rich keybindings</h4>
 <div class="outline-text-4" id="text-2-1-7">
 <p>
 Any half-decent text editor these days supports an infinite plethora of shortcuts. What I believe an editor should support to be ahead of the game, is the ability to bind <b>any</b> editor action to a key, and to offer to the user some sort of guidance while one uses the editor.
@@ -761,8 +764,8 @@ For instance, if you configure your editor to search for files when you press '<
 </div>
 </div>
 
-<div id="outline-container-org9274f82" class="outline-4">
-<h4 id="org9274f82"><span class="section-number-4">2.1.8</span> Useful line numbers</h4>
+<div id="outline-container-orgf62beb9" class="outline-4">
+<h4 id="orgf62beb9"><span class="section-number-4">2.1.8</span> Useful line numbers</h4>
 <div class="outline-text-4" id="text-2-1-8">
 <p>
 I like the text editor to show me line numbers when they mater, and when they do, I like to get the most of them. This requirement is to make sure that line numbers are aware of the modal editing, so when I'm on <i>normal mode</i> with line numbers visible, the editor should show me lines as relative numbers, and when I'm editing the file (in <i>insert mode</i>), the line numbers should be absolute.
@@ -770,8 +773,8 @@ I like the text editor to show me line numbers when they mater, and when they do
 </div>
 </div>
 
-<div id="outline-container-org579ed04" class="outline-4">
-<h4 id="org579ed04"><span class="section-number-4">2.1.9</span> Auto-saving</h4>
+<div id="outline-container-orgc55be3f" class="outline-4">
+<h4 id="orgc55be3f"><span class="section-number-4">2.1.9</span> Auto-saving</h4>
 <div class="outline-text-4" id="text-2-1-9">
 <p>
 I want to stop saving my files. Any editor has substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
@@ -779,8 +782,8 @@ I want to stop saving my files. Any editor has substantial number of undo action
 </div>
 </div>
 
-<div id="outline-container-org146beb7" class="outline-4">
-<h4 id="org146beb7"><span class="section-number-4">2.1.10</span> Persist frame position and geometry</h4>
+<div id="outline-container-org3c2fc0b" class="outline-4">
+<h4 id="org3c2fc0b"><span class="section-number-4">2.1.10</span> Persist frame position and geometry</h4>
 <div class="outline-text-4" id="text-2-1-10">
 <p>
 I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
@@ -788,8 +791,8 @@ I move my editor all around my desktop, and I resize it just as much, do I'm not
 </div>
 </div>
 
-<div id="outline-container-org3beb004" class="outline-4">
-<h4 id="org3beb004"><span class="section-number-4">2.1.11</span> Remote editing</h4>
+<div id="outline-container-orgfee1715" class="outline-4">
+<h4 id="orgfee1715"><span class="section-number-4">2.1.11</span> Remote editing</h4>
 <div class="outline-text-4" id="text-2-1-11">
 <p>
 I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
@@ -802,16 +805,16 @@ I also want my text editor to allow me to start this remote editing by picking a
 </div>
 </div>
 
-<div id="outline-container-org0e7be6d" class="outline-3">
-<h3 id="org0e7be6d"><span class="section-number-3">2.2</span> Emacs-only configurations</h3>
+<div id="outline-container-org52e5806" class="outline-3">
+<h3 id="org52e5806"><span class="section-number-3">2.2</span> Emacs-only configurations</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 This section will cover some changes I like to do on the Emacs (or Doom) default behavior, and some required settings to make sure Emacs have all the information it needs to function properly.
 </p>
 </div>
 
-<div id="outline-container-orgd6cbf82" class="outline-4">
-<h4 id="orgd6cbf82"><span class="section-number-4">2.2.1</span> Identity</h4>
+<div id="outline-container-orgbb264fc" class="outline-4">
+<h4 id="orgbb264fc"><span class="section-number-4">2.2.1</span> Identity</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <p>
 It's important we let Emacs know who we are, and also, according to Doom's comments on the sample <code>config.el</code> available upon installation, some functionality uses this identification (e.g. GPG configuration, email clients, file templates and snippets).
@@ -836,8 +839,8 @@ I also like to have a variable holding the value of my email's host name:
 </div>
 </div>
 
-<div id="outline-container-orga920a10" class="outline-4">
-<h4 id="orga920a10"><span class="section-number-4">2.2.2</span> Dashboard</h4>
+<div id="outline-container-orgca30d5b" class="outline-4">
+<h4 id="orgca30d5b"><span class="section-number-4">2.2.2</span> Dashboard</h4>
 <div class="outline-text-4" id="text-2-2-2">
 <p>
 Doom Emacs offers a lightweight dashboard, that serves as the landing page for Emacs.
@@ -864,7 +867,7 @@ I love the style of this image so much, that it is, besides my dashboard image, 
 
 <div class="org-center">
 
-<figure id="org210161c">
+<figure id="org609a5ac">
 <img src="./assets/doom.png" alt="doom.png">
 
 </figure>
@@ -872,14 +875,14 @@ I love the style of this image so much, that it is, besides my dashboard image, 
 </div>
 </div>
 
-<div id="outline-container-orgcb52935" class="outline-4">
-<h4 id="orgcb52935"><span class="section-number-4">2.2.3</span> Key modifiers</h4>
+<div id="outline-container-orga7bd9eb" class="outline-4">
+<h4 id="orga7bd9eb"><span class="section-number-4">2.2.3</span> Key modifiers</h4>
 <div class="outline-text-4" id="text-2-2-3">
 <p>
 Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
 </p>
 
-<table id="orgd616a5c">
+<table id="orgd48888a">
 <caption class="t-above"><span class="table-number">Table 1:</span> macOS key mappings</caption>
 
 <colgroup>
@@ -922,7 +925,7 @@ Emacs expose three variables to allow you to make these adjustments:
 </ul>
 
 <p>
-To adjust this values according to table <a href="#orgd616a5c">1</a>, set each one of them to the symbol described on the column <code>Emacs Key</code>:
+To adjust this values according to table <a href="#orgd48888a">1</a>, set each one of them to the symbol described on the column <code>Emacs Key</code>:
 </p>
 
 <div class="org-src-container">
@@ -934,8 +937,8 @@ To adjust this values according to table <a href="#orgd616a5c">1</a>, set each o
 </div>
 </div>
 
-<div id="outline-container-orgdf95fe1" class="outline-4">
-<h4 id="orgdf95fe1"><span class="section-number-4">2.2.4</span> Training wheels</h4>
+<div id="outline-container-org80f469a" class="outline-4">
+<h4 id="org80f469a"><span class="section-number-4">2.2.4</span> Training wheels</h4>
 <div class="outline-text-4" id="text-2-2-4">
 <p>
 By default, Emacs prevent you from executing certain <i>dangerous</i> commands inadvertently. While I understand and sympathize with the need of such feature, I personally prefer to turn it off.
@@ -954,7 +957,7 @@ To change this option, set the variable <code>disabled-command-function</code> t
 On Emacs, you can set variables when open files, we call those <a href="https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html">File Variables</a>. There are occasions I want to execute some arbitrary code when I open a file. To do that, I would add a file variable called <code>eval</code>, and pass my arbitrary code to it. As you can imagine, this is a dangerous features, so I have to give you the standard disclaimer:
 </p>
 
-<div class="warning" id="org22e9912">
+<div class="warning" id="org49b42b3">
 <p>
 The next configuration can lead to Emacs executing malicious code upon opening a file. By allowing Emacs to enable local <code>eval</code> you gain some nice ways to configure Emacs per file, on the cost of a high risk of vulnerability, so&#x2026; think a little bit about how do you indiscriminately open files on your editor before enabling this one.
 </p>
@@ -972,8 +975,8 @@ To enable Emacs to use <code>eval</code> as a file variable, set the variable <c
 </div>
 </div>
 
-<div id="outline-container-org363465a" class="outline-4">
-<h4 id="org363465a"><span class="section-number-4">2.2.5</span> Emacs source code</h4>
+<div id="outline-container-org386356d" class="outline-4">
+<h4 id="org386356d"><span class="section-number-4">2.2.5</span> Emacs source code</h4>
 <div class="outline-text-4" id="text-2-2-5">
 <p>
 Emacs documentation system is fantastic! It allows you to inspect any value, binding or function on the fly, and it displays the source code for of any callable together with its documentation.
@@ -1005,8 +1008,8 @@ Then, set the variable <code>source-directory</code> to the cloned repository's 
 </div>
 </div>
 
-<div id="outline-container-org22a4220" class="outline-4">
-<h4 id="org22a4220"><span class="section-number-4">2.2.6</span> Line numbers</h4>
+<div id="outline-container-orge214e58" class="outline-4">
+<h4 id="orge214e58"><span class="section-number-4">2.2.6</span> Line numbers</h4>
 <div class="outline-text-4" id="text-2-2-6">
 <p>
 I like to have line numbers displayed on the side of any source code I edit, but I don't like them everywhere (e.g. during prose writing), so I always make them turned off by default, and let the appropriate modes to set them on when they needed it:
@@ -1044,8 +1047,8 @@ To have such configuration, set the variable <code>display-line-numbers-grow-onl
 </div>
 </div>
 
-<div id="outline-container-orgb85c47c" class="outline-4">
-<h4 id="orgb85c47c"><span class="section-number-4">2.2.7</span> Indentation</h4>
+<div id="outline-container-org0bf8895" class="outline-4">
+<h4 id="org0bf8895"><span class="section-number-4">2.2.7</span> Indentation</h4>
 <div class="outline-text-4" id="text-2-2-7">
 <p>
 On this section, I will ask the reader to disagree on disagree, and set aside the almost religious subject of tabs versus spaces.
@@ -1071,8 +1074,8 @@ And to force emacs to always use spaces instead of tabs, set the <code>indent-ta
 </div>
 </div>
 
-<div id="outline-container-org2a8cfcf" class="outline-4">
-<h4 id="org2a8cfcf"><span class="section-number-4">2.2.8</span> Line wrapping</h4>
+<div id="outline-container-org97bfda7" class="outline-4">
+<h4 id="org97bfda7"><span class="section-number-4">2.2.8</span> Line wrapping</h4>
 <div class="outline-text-4" id="text-2-2-8">
 <p>
 Until the writing of this document, I had the opinion that <i>soft wrap</i> was evil, and it had no place on any editor. Since then, I learned to appreciate <i>soft wrap</i> for prose, and later in this document, you will see all the other setup around <i>soft wrap</i> and have an idea why I was so against it.
@@ -1089,8 +1092,8 @@ To prevent Emacs from wrapping your text as it goes over the size of thee screen
 </div>
 </div>
 
-<div id="outline-container-orgaa37a63" class="outline-4">
-<h4 id="orgaa37a63"><span class="section-number-4">2.2.9</span> Scrolling</h4>
+<div id="outline-container-org9003250" class="outline-4">
+<h4 id="org9003250"><span class="section-number-4">2.2.9</span> Scrolling</h4>
 <div class="outline-text-4" id="text-2-2-9">
 <p>
 One of my biggest gripes over Emacs is how it handles scrolling. Besides the slowness, the entire behavior is just bonkers. For me, the logical way to deal with scrolling, is to move the screen only when we move the cursor outside of it, and the editor should only move the screen by the value of current line number minus bottom line when user is going <i>down</i> the text.
@@ -1141,8 +1144,8 @@ To add a margin on your cursor as it gets on the edge of the screen, set the var
 </div>
 </div>
 
-<div id="outline-container-orgcad3bb8" class="outline-4">
-<h4 id="orgcad3bb8"><span class="section-number-4">2.2.10</span> Repeatable commands</h4>
+<div id="outline-container-org294605b" class="outline-4">
+<h4 id="org294605b"><span class="section-number-4">2.2.10</span> Repeatable commands</h4>
 <div class="outline-text-4" id="text-2-2-10">
 <p>
 There is a new feature available since Emacs 28 that allow you to define a <i>repeatable map</i> for actions that take more than one key stroke to perform, and you want to repeat them with only the last keystroke in sequence.
@@ -1197,7 +1200,7 @@ This is not bad, but with Lisp we can do better than that! The next macro helps 
 </div>
 
 <p>
-You can find the previous example using the new macro on section <a href="#org7d8470a">3.1.2</a>.
+You can find the previous example using the new macro on section <a href="#org85afee0">3.1.2</a>.
 </p>
 
 <p>
@@ -1212,11 +1215,11 @@ In order to be able to use <code>repeat-mode</code> everywhere, I will turn it o
 </div>
 </div>
 
-<div id="outline-container-orge86b995" class="outline-3">
-<h3 id="orge86b995"><span class="section-number-3">2.3</span> Modal editing</h3>
+<div id="outline-container-org41abcfe" class="outline-3">
+<h3 id="org41abcfe"><span class="section-number-3">2.3</span> Modal editing</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
-As I mentioned on section <a href="#org893ef73">2.1.1</a>, I do consider <i>Modal Editing</i> far superior then other methods. The main reason is the separation of states while editing a text. At some level, we all do modal editing, but the keybindings style popularized by Vim goes a step forward and <i>formalize</i> these states.
+As I mentioned on section <a href="#org4e86c74">2.1.1</a>, I do consider <i>Modal Editing</i> far superior then other methods. The main reason is the separation of states while editing a text. At some level, we all do modal editing, but the keybindings style popularized by Vim goes a step forward and <i>formalize</i> these states.
 </p>
 
 <p>
@@ -1377,8 +1380,8 @@ A quick trick to make Evil understand the meaning of <i>"word"</i> as I just des
 </div>
 </div>
 
-<div id="outline-container-orgda75b9b" class="outline-3">
-<h3 id="orgda75b9b"><span class="section-number-3">2.4</span> Text snippets</h3>
+<div id="outline-container-org2953375" class="outline-3">
+<h3 id="org2953375"><span class="section-number-3">2.4</span> Text snippets</h3>
 <div class="outline-text-3" id="text-2-4">
 <p>
 Snippets (also known as Live Templates on certain platforms), are tidbits of text that one can include on the editing text by typing a keyword and pressing a shortcut key (usually <code>TAB</code>) with the cursor right after the keyword.
@@ -1588,8 +1591,8 @@ Throughout this document, you will find helpful snippets I like to define for ce
 </div>
 </div>
 
-<div id="outline-container-org1646180" class="outline-3">
-<h3 id="org1646180"><span class="section-number-3">2.5</span> Inline completion</h3>
+<div id="outline-container-org0c39d81" class="outline-3">
+<h3 id="org0c39d81"><span class="section-number-3">2.5</span> Inline completion</h3>
 <div class="outline-text-3" id="text-2-5">
 <p>
 What I call inline completion, is also known as intellisense, code completion, or in the Vim world, omni completion. It's a useful tool to help the user type less and more correctly while editing source code.
@@ -1629,7 +1632,7 @@ In order to display the completion on my configuration, one has to press <code>T
 </p>
 
 <p>
-Such behavior is so wildly used that Company offers a helper function (<code>company-indent-or-complete-common</code>) to help the user to handle <i>inserting a "<code>\t</code>" character</i> versus displaying the completion. That is all and good, but unfortunately, as seen on section <a href="#orgda75b9b">2.4</a>, I have a third function for the <code>TAB</code> key.
+Such behavior is so wildly used that Company offers a helper function (<code>company-indent-or-complete-common</code>) to help the user to handle <i>inserting a "<code>\t</code>" character</i> versus displaying the completion. That is all and good, but unfortunately, as seen on section <a href="#org2953375">2.4</a>, I have a third function for the <code>TAB</code> key.
 </p>
 
 <p>
@@ -1789,8 +1792,8 @@ Last, I need to setup the proper keymaps for the package:
 </div>
 </div>
 
-<div id="outline-container-orge1cf55d" class="outline-3">
-<h3 id="orge1cf55d"><span class="section-number-3">2.6</span> Automatic indentation</h3>
+<div id="outline-container-orgf1eb973" class="outline-3">
+<h3 id="orgf1eb973"><span class="section-number-3">2.6</span> Automatic indentation</h3>
 <div class="outline-text-3" id="text-2-6">
 <p>
 I appreciate the fact that majority of editor these days can keep the indentation of the previous line, and some of them, are even capable of adding indentation where is necessary. Although this is a good start, I want my editor to do more. When I add braces around a code, or when I make a one-line statement, a multi-line one, I want the editor to reformat my file to properly intent it.
@@ -1838,8 +1841,8 @@ The reason to not include Python on this list, is the fact that Python uses inde
 </div>
 </div>
 
-<div id="outline-container-org2467cd1" class="outline-3">
-<h3 id="org2467cd1"><span class="section-number-3">2.7</span> Smart backspace</h3>
+<div id="outline-container-orgac36f6c" class="outline-3">
+<h3 id="orgac36f6c"><span class="section-number-3">2.7</span> Smart backspace</h3>
 <div class="outline-text-3" id="text-2-7">
 <p>
 As part of my day job, I had to do a lot of Android development, and inevitably I used <a href="https://www.jetbrains.com/">JetBrains</a>
@@ -1939,8 +1942,8 @@ Adding this advice as an <i>autoload</i> function on our configuration is all we
 </div>
 </div>
 
-<div id="outline-container-org39c40ad" class="outline-3">
-<h3 id="org39c40ad"><span class="section-number-3">2.8</span> Balanced pairs</h3>
+<div id="outline-container-orgce6f440" class="outline-3">
+<h3 id="orgce6f440"><span class="section-number-3">2.8</span> Balanced pairs</h3>
 <div class="outline-text-3" id="text-2-8">
 <p>
 In most editors (as far as editors go, I only saw Emacs allowing balanced pairs), there is no balanced pair protection. If you remove a line where a closing character is, without removing its open pair, your buffer becomes unbalanced.
@@ -2018,11 +2021,11 @@ To do so, enable the <code>show-smartparens-global-mode</code> after enabling <c
 </div>
 </div>
 
-<div id="outline-container-org83d81cc" class="outline-3">
-<h3 id="org83d81cc"><span class="section-number-3">2.9</span> Rich keybindings</h3>
+<div id="outline-container-org671e279" class="outline-3">
+<h3 id="org671e279"><span class="section-number-3">2.9</span> Rich keybindings</h3>
 <div class="outline-text-3" id="text-2-9">
 <p>
-The good thing about this feature is that Emacs already covers almost all of my <a href="#org27f1b91">requirements</a> for free, and doom ships with a package that covers the rest of it (<code>which-key</code>). What I need to do here, is to tweak <code>which-key</code> to <i>look</i> and <i>feel</i> like I want it.
+The good thing about this feature is that Emacs already covers almost all of my <a href="#org50cd2f1">requirements</a> for free, and doom ships with a package that covers the rest of it (<code>which-key</code>). What I need to do here, is to tweak <code>which-key</code> to <i>look</i> and <i>feel</i> like I want it.
 </p>
 
 <p>
@@ -2135,8 +2138,8 @@ With the <code>which-key-posframe</code> configured, I just need to do some mino
 </div>
 </div>
 
-<div id="outline-container-orgdf48559" class="outline-3">
-<h3 id="orgdf48559"><span class="section-number-3">2.10</span> Useful line numbers</h3>
+<div id="outline-container-orge13c5fc" class="outline-3">
+<h3 id="orge13c5fc"><span class="section-number-3">2.10</span> Useful line numbers</h3>
 <div class="outline-text-3" id="text-2-10">
 <p>
 A long time ago, I read on some Vim mailing list, an opinion on how line numbers should behave on different editing modes (if you know who is the original author of such idea, please let me know so I can give credit where credit is due). Since on normal mode is pretty useful to know the line count from the cursor until some target text, it makes more sense to have the <code>relative number</code> shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
@@ -2202,8 +2205,8 @@ To finalize, I want to make line numbers visible on any programming mode:
 </div>
 </div>
 
-<div id="outline-container-orgcfa1500" class="outline-3">
-<h3 id="orgcfa1500"><span class="section-number-3">2.11</span> Auto-Saving</h3>
+<div id="outline-container-orga9b04d5" class="outline-3">
+<h3 id="orga9b04d5"><span class="section-number-3">2.11</span> Auto-Saving</h3>
 <div class="outline-text-3" id="text-2-11">
 <p>
 First of all, since I'm going to save my work constantly, I don't want Emacs to ask me if it should really exit, or if it should kill outstanding processes while doing it. For me, if I'm telling Emacs to quit, I want it to do it, regardless its state, but I don't want to lose any content of my current work. So, the first thing I'm going to do, is to disable questions when I'm quitting Emacs:
@@ -2286,8 +2289,8 @@ To adjust that, let's make <code>ws-butler</code> behave how I expect it:
 </div>
 </div>
 
-<div id="outline-container-org3ed0a0e" class="outline-3">
-<h3 id="org3ed0a0e"><span class="section-number-3">2.12</span> Persist frame position and geometry</h3>
+<div id="outline-container-org2a62c38" class="outline-3">
+<h3 id="org2a62c38"><span class="section-number-3">2.12</span> Persist frame position and geometry</h3>
 <div class="outline-text-3" id="text-2-12">
 <p>
 Before I start tackling my own requirement, let's make Emacs <i>remember</i> its window size and position between launches.
@@ -2344,21 +2347,26 @@ With the function defined, I just need to connect them to the correct hooks:
 </div>
 </div>
 
-<div id="outline-container-org07d4363" class="outline-3">
-<h3 id="org07d4363"><span class="section-number-3">2.13</span> <span class="todo TODO">TODO</span> Remote editing</h3>
+<div id="outline-container-orgbee2145" class="outline-3">
+<h3 id="orgbee2145"><span class="section-number-3">2.13</span> <span class="todo TODO">TODO</span> Remote editing</h3>
+<div class="outline-text-3" id="text-2-13">
+<p>
+TBD (still need to figure out the best way to address this).
+</p>
+</div>
 </div>
 </div>
 
-<div id="outline-container-orgbe134d7" class="outline-2">
-<h2 id="orgbe134d7"><span class="section-number-2">3</span> Personal preferences</h2>
+<div id="outline-container-orgd21508b" class="outline-2">
+<h2 id="orgd21508b"><span class="section-number-2">3</span> Personal preferences</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 This section will show the reader, some of the small changes I decided to implement on Doom related to Evil, my personal keybindings, my choice of appearance, and other personal configurations. All in all, is pretty safe to skip this section if you intend to implement your own customization.
 </p>
 </div>
 
-<div id="outline-container-org8e9b3ff" class="outline-3">
-<h3 id="org8e9b3ff"><span class="section-number-3">3.1</span> Evil</h3>
+<div id="outline-container-org2fdc480" class="outline-3">
+<h3 id="org2fdc480"><span class="section-number-3">3.1</span> Evil</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 For most of it, Doom integration of Evil is pretty amazing, I found just one package I don't use (or don't want to use at all), two configurations that I want to do some adjustments, and three packages missing.
@@ -2511,8 +2519,8 @@ And finally, for the packages I'm missing, they are:
 </ul>
 </div>
 
-<div id="outline-container-orgd503fde" class="outline-4">
-<h4 id="orgd503fde"><span class="section-number-4">3.1.1</span> Evil-MatchIt</h4>
+<div id="outline-container-org23c54b4" class="outline-4">
+<h4 id="org23c54b4"><span class="section-number-4">3.1.1</span> Evil-MatchIt</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <p>
 In all fairness, <code>matchit</code> (the one originally from Vim) is also disabled by default, but it provides such useful feature that I can't understand why it is not part of the standard Vim/Evil.
@@ -2549,8 +2557,8 @@ Then, need to make sure to enable the plugin itself. In order to not slow the Em
 </div>
 </div>
 
-<div id="outline-container-org7d8470a" class="outline-4">
-<h4 id="org7d8470a"><span class="section-number-4">3.1.2</span> Plus-Minus</h4>
+<div id="outline-container-org85afee0" class="outline-4">
+<h4 id="org85afee0"><span class="section-number-4">3.1.2</span> Plus-Minus</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <p>
 <a href="https://github.com/peterwu/plus-minus"><code>plus-minus</code></a> is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are <code>C-a</code> and <code>C-x</code> respectively.
@@ -2666,8 +2674,8 @@ In order to allow me to repeat the last increase or decrease, I will define a <i
 </div>
 </div>
 
-<div id="outline-container-orgc42f110" class="outline-4">
-<h4 id="orgc42f110"><span class="section-number-4">3.1.3</span> Evil-String-Inflection</h4>
+<div id="outline-container-orgf4c5f96" class="outline-4">
+<h4 id="orgf4c5f96"><span class="section-number-4">3.1.3</span> Evil-String-Inflection</h4>
 <div class="outline-text-4" id="text-3-1-3">
 <p>
 I've been on situations where I realized that I used <i>camelCase</i> for all my variables, where the standard coding style of the language, request to use <i>snake<sub>case</sub></i> style. There are packages available, that allow you to cycle through all case styles on a given word.
@@ -2721,7 +2729,7 @@ In order to create a nicer workflow, I want to access the previous shortcuts by 
 </p>
 
 <p>
-To achieve this behavior I will use the <code>my-repeat-map!</code> macro introduced on the section <a href="#orgcad3bb8">2.2.10</a>:
+To achieve this behavior I will use the <code>my-repeat-map!</code> macro introduced on the section <a href="#org294605b">2.2.10</a>:
 </p>
 
 <div class="org-src-container">
@@ -2758,16 +2766,16 @@ To make <code>string-inflection</code> to work nice with Evil, I will create an 
 </div>
 </div>
 
-<div id="outline-container-org3fcd017" class="outline-3">
-<h3 id="org3fcd017"><span class="section-number-3">3.2</span> Keybindings</h3>
+<div id="outline-container-org4f2bd24" class="outline-3">
+<h3 id="org4f2bd24"><span class="section-number-3">3.2</span> Keybindings</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Since I decided to write this configuration, I also decided to try to use the standard Doom key bindings as much as possible, and for the most part of it, I'm not having as much problem as I expected. There are three main areas where I still like to define my own bindings.
 </p>
 </div>
 
-<div id="outline-container-org9fe7f3e" class="outline-4">
-<h4 id="org9fe7f3e"><span class="section-number-4">3.2.1</span> Window navigation</h4>
+<div id="outline-container-org29fc01d" class="outline-4">
+<h4 id="org29fc01d"><span class="section-number-4">3.2.1</span> Window navigation</h4>
 <div class="outline-text-4" id="text-3-2-1">
 <p>
 A while ago, I configured Vim to move the cursor from one window to another using the standard movements keys (<code>h</code>, <code>j</code>, <code>k</code>, and <code>l</code>) while keeping <code>Ctrl</code> pressed. I got so used to these shortcuts, that I can't live without it anymore.
@@ -2821,8 +2829,8 @@ Some other modes don't play nice with this particular key bindings I choose, and
 </div>
 </div>
 
-<div id="outline-container-org7faee39" class="outline-4">
-<h4 id="org7faee39"><span class="section-number-4">3.2.2</span> Vim defaults</h4>
+<div id="outline-container-org9684446" class="outline-4">
+<h4 id="org9684446"><span class="section-number-4">3.2.2</span> Vim defaults</h4>
 <div class="outline-text-4" id="text-3-2-2">
 <p>
 Here I need to make yet another disclaimer to the reader: I know what I'm about to write is a pet peeve, and most likely most Doom users won't even understand this, but&#x2026;
@@ -2845,8 +2853,8 @@ To not lose a Doom-only keymap, instead of simply rebinding <code>&lt;leader&gt;
 </div>
 </div>
 
-<div id="outline-container-org838538f" class="outline-4">
-<h4 id="org838538f"><span class="section-number-4">3.2.3</span> Personal shortcuts</h4>
+<div id="outline-container-orge7b18e9" class="outline-4">
+<h4 id="orge7b18e9"><span class="section-number-4">3.2.3</span> Personal shortcuts</h4>
 <div class="outline-text-4" id="text-3-2-3">
 <p>
 Key bindings in this section are purely personal choice. Feel free to give them a try if you want, but if you're used to Doom Emacs already, my suggestion is to skip this section.
@@ -3005,11 +3013,11 @@ Because of this, I want to set this mode as a toggable shortcut:
 </div>
 </div>
 
-<div id="outline-container-org8f0c8d8" class="outline-4">
-<h4 id="org8f0c8d8"><span class="section-number-4">3.2.4</span> Repeatable shortcuts</h4>
+<div id="outline-container-org03cfdd6" class="outline-4">
+<h4 id="org03cfdd6"><span class="section-number-4">3.2.4</span> Repeatable shortcuts</h4>
 <div class="outline-text-4" id="text-3-2-4">
 <p>
-Due to the nature of modal edit, some shortcuts need more than one key press to activate. This is usually fine until we try an action designed to repeat (e.g. side scroll and window resizing). This section will use the <code>my-repeat-map!</code> macro defined on the <a href="#orgcad3bb8">2.2.10</a> sections to make these actions more ergonomic.
+Due to the nature of modal edit, some shortcuts need more than one key press to activate. This is usually fine until we try an action designed to repeat (e.g. side scroll and window resizing). This section will use the <code>my-repeat-map!</code> macro defined on the <a href="#org294605b">2.2.10</a> sections to make these actions more ergonomic.
 </p>
 
 <div class="org-center">
@@ -3084,8 +3092,8 @@ And with those helper functions I can define the proper <i>repeatable map</i> fo
 </div>
 </div>
 
-<div id="outline-container-org298ed3f" class="outline-3">
-<h3 id="org298ed3f"><span class="section-number-3">3.3</span> Appearances</h3>
+<div id="outline-container-org5d588ec" class="outline-3">
+<h3 id="org5d588ec"><span class="section-number-3">3.3</span> Appearances</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 As far as I understand, there is a share of Emacs users that value Emacs functionalities over its looks, and I would like to write something targeted for those users.
@@ -3119,8 +3127,8 @@ So, if you're happy with the look and feel of your editor, feel free to skip thi
 </p>
 </div>
 
-<div id="outline-container-org3ca923e" class="outline-4">
-<h4 id="org3ca923e"><span class="section-number-4">3.3.1</span> Frame</h4>
+<div id="outline-container-org4e9bcb7" class="outline-4">
+<h4 id="org4e9bcb7"><span class="section-number-4">3.3.1</span> Frame</h4>
 <div class="outline-text-4" id="text-3-3-1">
 <p>
 The Emacs frame is the container for my small world, and although I intend to do most of my things within Emacs, I still want it to look like it belongs to its environment (macOS in my case), and there are couple things I like to change to make it more macOS.
@@ -3147,8 +3155,8 @@ And the second one, is to make the title bar to have the same color as the backg
 </div>
 </div>
 
-<div id="outline-container-orgfbc589d" class="outline-4">
-<h4 id="orgfbc589d"><span class="section-number-4">3.3.2</span> Editor</h4>
+<div id="outline-container-org662139c" class="outline-4">
+<h4 id="org662139c"><span class="section-number-4">3.3.2</span> Editor</h4>
 <div class="outline-text-4" id="text-3-3-2">
 <p>
 The first thing to do to help with my editor appearance, is to store the current line height in a variable. This way, other adjustments can use this value without worrying about different font sizes:
@@ -3295,8 +3303,8 @@ Since the time when widescreen monitors became the standard, when it comes to sp
 </div>
 </div>
 
-<div id="outline-container-org010136d" class="outline-4">
-<h4 id="org010136d"><span class="section-number-4">3.3.3</span> Theme</h4>
+<div id="outline-container-org4410ac9" class="outline-4">
+<h4 id="org4410ac9"><span class="section-number-4">3.3.3</span> Theme</h4>
 <div class="outline-text-4" id="text-3-3-3">
 <p>
 I believe this section to be the most volatile section on this text. Since I got interested on cool old esoteric editors, I'm on an endless search for the Holy Grail of themes. So far I got fond of Tomorrow Night and I use it for the most part of the last 5 years. Recently I got annoyed by some color choices of the theme (the background and line highlight are a bit odd in my opinion), so I kept looking.
@@ -3391,8 +3399,8 @@ And then, add <a href="https://gist.github.com/hlissner/5ac38df98c366f7ffc95c356
 </div>
 </div>
 
-<div id="outline-container-orgff8bed9" class="outline-4">
-<h4 id="orgff8bed9"><span class="section-number-4">3.3.4</span> Typography</h4>
+<div id="outline-container-org1eb26f1" class="outline-4">
+<h4 id="org1eb26f1"><span class="section-number-4">3.3.4</span> Typography</h4>
 <div class="outline-text-4" id="text-3-3-4">
 <p>
 This section requires an important disclaimer to the reader. In majority of the cases, one should not <i>need</i> to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
@@ -3744,7 +3752,7 @@ Unfortunately at this point, the answer is not clear. When I tried to implement 
 By splitting the process into cleaning and then setting, Emacs seams to behave as expected.
 </p>
 
-<div class="note" id="org01b72ed">
+<div class="note" id="org62ad7cc">
 <p>
 If you know what is going on here, please let me know. I'll be more than happy to learn and credit you for that!
 </p>
@@ -3811,8 +3819,8 @@ To close out the typography section, I like to enable font smoothing on macOS. T
 </div>
 </div>
 
-<div id="outline-container-orgf2cac7a" class="outline-4">
-<h4 id="orgf2cac7a"><span class="section-number-4">3.3.5</span> Iconography</h4>
+<div id="outline-container-orgf80c41d" class="outline-4">
+<h4 id="orgf80c41d"><span class="section-number-4">3.3.5</span> Iconography</h4>
 <div class="outline-text-4" id="text-3-3-5">
 <p>
 Doom offers the <code>all-the-icons</code> package, which allow one to insert Unicode glyphs on buffers. That is a great start, but the problem I see here is how inconsistent the size of these icons are.
@@ -3921,8 +3929,8 @@ And to finalize my icons configuration, I need to expose a function where one (m
 </div>
 </div>
 
-<div id="outline-container-org82428e8" class="outline-3">
-<h3 id="org82428e8"><span class="section-number-3">3.4</span> Editor Tabs</h3>
+<div id="outline-container-org32d588f" class="outline-3">
+<h3 id="org32d588f"><span class="section-number-3">3.4</span> Editor Tabs</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 I've been all over the place regarding the use of tabs on editors. I use to think they were useless, since all files on my editor were buffers, not tabs. I though that using tabs as a sort of layout manager was a great idea, because I would have the visual cue of <i>workspaces</i> I had configured.
@@ -4294,8 +4302,8 @@ With all that in place, we can make sure the <code>tab-line</code> gets loaded w
 </div>
 </div>
 
-<div id="outline-container-org10bfc24" class="outline-4">
-<h4 id="org10bfc24"><span class="section-number-4">3.4.1</span> Tab actions</h4>
+<div id="outline-container-org3cb14b4" class="outline-4">
+<h4 id="org3cb14b4"><span class="section-number-4">3.4.1</span> Tab actions</h4>
 <div class="outline-text-4" id="text-3-4-1">
 <p>
 There are two main actions that I need to address here: selection and closing.
@@ -4479,8 +4487,8 @@ One final configuration I need to do is to make sure Emacs selects the correct t
 </div>
 </div>
 
-<div id="outline-container-org72e31b1" class="outline-4">
-<h4 id="org72e31b1"><span class="section-number-4">3.4.2</span> Windows</h4>
+<div id="outline-container-org32c2b54" class="outline-4">
+<h4 id="org32c2b54"><span class="section-number-4">3.4.2</span> Windows</h4>
 <div class="outline-text-4" id="text-3-4-2">
 <p>
 It's impossible to get the tab configuration right without adjusting the Emacs window behavior.
@@ -4570,8 +4578,8 @@ To finish the window changes, I need to make sure Doom does not switch to the fa
 </div>
 </div>
 
-<div id="outline-container-org05d261f" class="outline-3">
-<h3 id="org05d261f"><span class="section-number-3">3.5</span> Special modes</h3>
+<div id="outline-container-org63832f3" class="outline-3">
+<h3 id="org63832f3"><span class="section-number-3">3.5</span> Special modes</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 The configuration in this section, belongs to some modes that I use all over the place or that are not big enough to justify their own section in this document.
@@ -4582,15 +4590,15 @@ In practice, most of the configurations here are about the mode's appearance, an
 </p>
 </div>
 
-<div id="outline-container-orge3c9b96" class="outline-4">
-<h4 id="orge3c9b96"><span class="section-number-4">3.5.1</span> Info mode</h4>
+<div id="outline-container-org4181597" class="outline-4">
+<h4 id="org4181597"><span class="section-number-4">3.5.1</span> Info mode</h4>
 <div class="outline-text-4" id="text-3-5-1">
 <p>
 The Info mode is where all user manuals exist. Up to now, I'm not used to read and search through the manuals, but I feel this is a habit I must acquire.
 </p>
 
 <p>
-First I need to make the manuals to <i>look</i> nicer (if you're rolling your eyes right now, have a remembering read into the section <a href="#org298ed3f">3.3</a>).
+First I need to make the manuals to <i>look</i> nicer (if you're rolling your eyes right now, have a remembering read into the section <a href="#org5d588ec">3.3</a>).
 </p>
 
 <p>
@@ -4744,8 +4752,8 @@ The last configuration for the <code>Info-mode</code> is <b>where</b> its buffer
 </div>
 </div>
 
-<div id="outline-container-org3d71ba8" class="outline-4">
-<h4 id="org3d71ba8"><span class="section-number-4">3.5.2</span> Help mode and Man mode</h4>
+<div id="outline-container-org0275bcd" class="outline-4">
+<h4 id="org0275bcd"><span class="section-number-4">3.5.2</span> Help mode and Man mode</h4>
 <div class="outline-text-4" id="text-3-5-2">
 <p>
 I want to give a similar treatment I did to the <code>Info-mode</code> to both these modes, and like the <code>Info-mode</code>, the first thing to do is to create the functions that will configure these modes:
@@ -4791,8 +4799,8 @@ The last step on these configuration is to add a popup rule for each mode to mak
 </div>
 </div>
 
-<div id="outline-container-org06b86e2" class="outline-4">
-<h4 id="org06b86e2"><span class="section-number-4">3.5.3</span> Rainbow mode</h4>
+<div id="outline-container-org7fc5fcc" class="outline-4">
+<h4 id="org7fc5fcc"><span class="section-number-4">3.5.3</span> Rainbow mode</h4>
 <div class="outline-text-4" id="text-3-5-3">
 <p>
 The Rainbow mode is a small visual helper to display colors on the buffer, whenever it finds a string that can be a color.
@@ -4828,16 +4836,16 @@ What I still need to do, is to make sure that I use a fixed font when displaying
 </div>
 </div>
 
-<div id="outline-container-org8ca4cc4" class="outline-2">
-<h2 id="org8ca4cc4"><span class="section-number-2">4</span> Temporary workarounds</h2>
+<div id="outline-container-org45555ae" class="outline-2">
+<h2 id="org45555ae"><span class="section-number-2">4</span> Temporary workarounds</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 This section contain configurations that will get integrated on Doom on a relative short period of time. This means that sooner or later, sections here will get replaced by a better module from Doom.
 </p>
 </div>
 
-<div id="outline-container-orgb24892f" class="outline-3">
-<h3 id="orgb24892f"><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> Completion framework</h3>
+<div id="outline-container-orgd8e69e0" class="outline-3">
+<h3 id="orgd8e69e0"><span class="section-number-3">4.1</span> <span class="todo TODO">TODO</span> Completion framework</h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 What I call the completion framework, is what we use to incrementally select an input when using the interactive mode.
@@ -4889,8 +4897,8 @@ To configure all these packages on Doom, I have to do it in the following order:
 </ul>
 </div>
 
-<div id="outline-container-org3091f83" class="outline-4">
-<h4 id="org3091f83"><span class="section-number-4">4.1.1</span> Filtering and highlighting</h4>
+<div id="outline-container-orgbadca54" class="outline-4">
+<h4 id="orgbadca54"><span class="section-number-4">4.1.1</span> Filtering and highlighting</h4>
 <div class="outline-text-4" id="text-4-1-1">
 <p>
 The first package I want to install is <code>orderless</code>. This package augment the standard Emacs completion system providing multiple matches for your input.
@@ -4977,8 +4985,8 @@ So, while you can’t get different faces for different components, you can at l
 </div>
 </div>
 
-<div id="outline-container-org68bcebd" class="outline-4">
-<h4 id="org68bcebd"><span class="section-number-4">4.1.2</span> Sorting</h4>
+<div id="outline-container-org93e3494" class="outline-4">
+<h4 id="org93e3494"><span class="section-number-4">4.1.2</span> Sorting</h4>
 <div class="outline-text-4" id="text-4-1-2">
 <p>
 <code>orderless</code> works pretty well, but there is one aspect of it that bothers me: the lack of a sorting system. I couldn't decide if I should use <code>prescient</code> (recommended by the <code>selectrum</code> author) and lose the nice things I like about <code>orderless</code>, or use <code>orderless</code> and lose the sorting and remembering mechanism of <code>prescient</code>.
@@ -5014,8 +5022,8 @@ Then, let's configure it, and set the persistent mode:
 </div>
 </div>
 
-<div id="outline-container-org21f5b17" class="outline-4">
-<h4 id="org21f5b17"><span class="section-number-4">4.1.3</span> Candidates annotations</h4>
+<div id="outline-container-orgc642a64" class="outline-4">
+<h4 id="orgc642a64"><span class="section-number-4">4.1.3</span> Candidates annotations</h4>
 <div class="outline-text-4" id="text-4-1-3">
 <p>
 The next package is <code>marginalia</code>. This package will add annotations on candidates depending on the context of it. Think about it as a sort of <code>ivy-rich</code>, but more organized and use to customize.
@@ -5050,8 +5058,8 @@ At this point, our completion system can filter its candidates (<code>orderless<
 </div>
 </div>
 
-<div id="outline-container-orgabde745" class="outline-4">
-<h4 id="orgabde745"><span class="section-number-4">4.1.4</span> Completion UI</h4>
+<div id="outline-container-org7a2e5ee" class="outline-4">
+<h4 id="org7a2e5ee"><span class="section-number-4">4.1.4</span> Completion UI</h4>
 <div class="outline-text-4" id="text-4-1-4">
 <p>
 I like to have a vertical and more dynamic completion UI. Here is where <code>selectrum</code> comes in play. So let's install it.
@@ -5106,8 +5114,8 @@ And set it up with <code>use-packages!</code>:
 </div>
 </div>
 
-<div id="outline-container-org751ab57" class="outline-4">
-<h4 id="org751ab57"><span class="section-number-4">4.1.5</span> Contextual Menu</h4>
+<div id="outline-container-orgd35e752" class="outline-4">
+<h4 id="orgd35e752"><span class="section-number-4">4.1.5</span> Contextual Menu</h4>
 <div class="outline-text-4" id="text-4-1-5">
 <p>
 The next package is a kind of gem I read about. It will allow you to select different actions on a completion candidate based on its context. This package is <code>embark</code>. And again, let's start with <code>packages.el</code>:
@@ -5161,8 +5169,8 @@ Now we can configure <code>embark</code> with <code>use-package!</code>:
 </div>
 </div>
 
-<div id="outline-container-org794b462" class="outline-4">
-<h4 id="org794b462"><span class="section-number-4">4.1.6</span> Extra commands</h4>
+<div id="outline-container-org273a284" class="outline-4">
+<h4 id="org273a284"><span class="section-number-4">4.1.6</span> Extra commands</h4>
 <div class="outline-text-4" id="text-4-1-6">
 <p>
 In order to be a full replacement for <code>ivy</code> + <code>counsel</code>, we need to install <code>consult</code>, which comes with a bundle of useful helper commands. Let's start with <code>packages.el</code>:
@@ -5374,8 +5382,8 @@ At this point, our configuration is matching the standard <code>ivy</code> + <co
 </div>
 </div>
 
-<div id="outline-container-org04901fa" class="outline-4">
-<h4 id="org04901fa"><span class="section-number-4">4.1.7</span> Change Doom's behavior</h4>
+<div id="outline-container-org7d65806" class="outline-4">
+<h4 id="org7d65806"><span class="section-number-4">4.1.7</span> Change Doom's behavior</h4>
 <div class="outline-text-4" id="text-4-1-7">
 <p>
 By default, Doom comes with all its configuration tailored for <code>ivy</code> or <code>helm</code>, this means that some packages will need some help from us to work nicely with <code>selectrum</code> and friends.c
@@ -5453,8 +5461,8 @@ The first module we have to change, is <i>workspaces</i>.
 </div>
 </div>
 
-<div id="outline-container-org98e82a2" class="outline-3">
-<h3 id="org98e82a2"><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> Workspaces</h3>
+<div id="outline-container-org8421d40" class="outline-3">
+<h3 id="org8421d40"><span class="section-number-3">4.2</span> <span class="todo TODO">TODO</span> Workspaces</h3>
 <div class="outline-text-3" id="text-4-2">
 <p>
 There is one module on Doom that don't play nice with <code>selectrum</code>: <i>Workspace</i> (based on <code>persp-mode</code>).
@@ -5469,7 +5477,7 @@ Instead of trying to replace functions from this package, we will disable the mo
 </p>
 
 <p>
-We already disable the module on our <code>init.el</code> by commenting the line referent to it (you can check it on the <a href="#org90a7f7e">1</a> section). But there is another package Doom uses to synchronize its workspaces that conflicts with <code>perspective.el</code>: <code>treemacs-persp</code>.
+We already disable the module on our <code>init.el</code> by commenting the line referent to it (you can check it on the <a href="#org8c56d89">1</a> section). But there is another package Doom uses to synchronize its workspaces that conflicts with <code>perspective.el</code>: <code>treemacs-persp</code>.
 </p>
 
 <p>
@@ -6019,8 +6027,8 @@ Now we can start with the <i>Display tab bar</i> binding, since it is the founda
 </p>
 </div>
 
-<div id="outline-container-orge5e45fa" class="outline-4">
-<h4 id="orge5e45fa"><span class="section-number-4">4.2.1</span> Display tab bar</h4>
+<div id="outline-container-orgcebbd8a" class="outline-4">
+<h4 id="orgcebbd8a"><span class="section-number-4">4.2.1</span> Display tab bar</h4>
 <div class="outline-text-4" id="text-4-2-1">
 <p>
 We know Doom uses two special font faces to draw the workspace tab bar (<code>+workspace-tab-selected-face</code> and <code>+workspace-tab-face</code>), but we removed the <code>workspace</code> module from our <code>init.el</code>. To keep our configuration as close to Doom as possible we need to redefine these faces. Let's use our <i>autoload</i> file <code>autoload/workspace.el</code>:
@@ -6095,8 +6103,8 @@ And we can simply bind it to our shortcut key:
 </div>
 </div>
 
-<div id="outline-container-org389e83f" class="outline-4">
-<h4 id="org389e83f"><span class="section-number-4">4.2.2</span> Switch workspace</h4>
+<div id="outline-container-orgc33892d" class="outline-4">
+<h4 id="orgc33892d"><span class="section-number-4">4.2.2</span> Switch workspace</h4>
 <div class="outline-text-4" id="text-4-2-2">
 <p>
 The <code>persp-projectile</code> package will take care of creating a new workspace for each project we open, but we still need to switch to those workspaces, so let's take care of the <i>Switch workspace</i> binding.
@@ -6415,8 +6423,8 @@ With all the functions necessary to switch between workspaces, I can bind it to 
 </div>
 </div>
 
-<div id="outline-container-org8db0c9a" class="outline-4">
-<h4 id="org8db0c9a"><span class="section-number-4">4.2.3</span> Switch to N<sup>th</sup> workspace</h4>
+<div id="outline-container-org843ab9a" class="outline-4">
+<h4 id="org843ab9a"><span class="section-number-4">4.2.3</span> Switch to N<sup>th</sup> workspace</h4>
 <div class="outline-text-4" id="text-4-2-3">
 <p>
 Doom allows you to switch workspaces by their index numbers, and since we already have the main function to do the switch, we can just create the others.
@@ -6456,8 +6464,8 @@ This will create 9 functions to switch to their respective workspace, so let's b
 </div>
 </div>
 
-<div id="outline-container-org3e9c00c" class="outline-4">
-<h4 id="org3e9c00c"><span class="section-number-4">4.2.4</span> Switch to final workspace</h4>
+<div id="outline-container-org858ba85" class="outline-4">
+<h4 id="org858ba85"><span class="section-number-4">4.2.4</span> Switch to final workspace</h4>
 <div class="outline-text-4" id="text-4-2-4">
 <p>
 Doom also provides a shortcut to get to the last opened workspace (last in the sense of order we created them):
@@ -6483,8 +6491,8 @@ Now we just need to bind this function:
 </div>
 </div>
 
-<div id="outline-container-org2363b00" class="outline-4">
-<h4 id="org2363b00"><span class="section-number-4">4.2.5</span> Switch to last used workspace</h4>
+<div id="outline-container-orgfd8f25c" class="outline-4">
+<h4 id="orgfd8f25c"><span class="section-number-4">4.2.5</span> Switch to last used workspace</h4>
 <div class="outline-text-4" id="text-4-2-5">
 <p>
 The next binding is the <i>Switch to last workspace</i>, which luckily has a function defined on <code>perspective.el</code> for it:
@@ -6497,8 +6505,8 @@ The next binding is the <i>Switch to last workspace</i>, which luckily has a fun
 </div>
 </div>
 
-<div id="outline-container-org309dc46" class="outline-4">
-<h4 id="org309dc46"><span class="section-number-4">4.2.6</span> Previous and next workspace</h4>
+<div id="outline-container-org69c371d" class="outline-4">
+<h4 id="org69c371d"><span class="section-number-4">4.2.6</span> Previous and next workspace</h4>
 <div class="outline-text-4" id="text-4-2-6">
 <p>
 I'm bundling these two commands together because usually in emacs, you have a function that move to any direction, and then you define different functions for different directions that just call the <i>move</i> function with different parameters.
@@ -6563,8 +6571,8 @@ Then, we can bind both functions to their proper keys:
 </div>
 </div>
 
-<div id="outline-container-orgb081ea9" class="outline-4">
-<h4 id="orgb081ea9"><span class="section-number-4">4.2.7</span> New workspace</h4>
+<div id="outline-container-orgd2e87ad" class="outline-4">
+<h4 id="orgd2e87ad"><span class="section-number-4">4.2.7</span> New workspace</h4>
 <div class="outline-text-4" id="text-4-2-7">
 <p>
 On the sequence, we have the <i>New workspace</i>. We already created a helper low-level function to spun new workspaces, now we need a command to call that function:
@@ -6621,8 +6629,8 @@ Now, we just need to bind the main function with its keys:
 </div>
 </div>
 
-<div id="outline-container-org17d2502" class="outline-4">
-<h4 id="org17d2502"><span class="section-number-4">4.2.8</span> Rename workspace</h4>
+<div id="outline-container-orgc5a3c1f" class="outline-4">
+<h4 id="orgc5a3c1f"><span class="section-number-4">4.2.8</span> Rename workspace</h4>
 <div class="outline-text-4" id="text-4-2-8">
 <p>
 Going through our list of commands, we need to provide a way for us to rename a giving workspace, specially if we create an empty and unnamed workspace.
@@ -6714,8 +6722,8 @@ Now, with all the functions in place, we can bind the main command to its key:
 </div>
 </div>
 
-<div id="outline-container-orgf8c61c9" class="outline-4">
-<h4 id="orgf8c61c9"><span class="section-number-4">4.2.9</span> Delete this workspace</h4>
+<div id="outline-container-org48b3eaf" class="outline-4">
+<h4 id="org48b3eaf"><span class="section-number-4">4.2.9</span> Delete this workspace</h4>
 <div class="outline-text-4" id="text-4-2-9">
 <p>
 There are two main tasks still missing in our refactor of Doom Workspaces and this next three sections will cover one of them: Delete (or kill if you want).
@@ -6779,8 +6787,8 @@ Now we can bind the command to its proper key:
 </div>
 </div>
 
-<div id="outline-container-org2962566" class="outline-4">
-<h4 id="org2962566"><span class="section-number-4">4.2.10</span> Delete session</h4>
+<div id="outline-container-orge9523cb" class="outline-4">
+<h4 id="orge9523cb"><span class="section-number-4">4.2.10</span> Delete session</h4>
 <div class="outline-text-4" id="text-4-2-10">
 <p>
 The next command on the <i>delete</i> series is to delete all workspaces.
@@ -6817,8 +6825,8 @@ And since we only used functions we already have implemented, we can bind it to 
 </div>
 </div>
 
-<div id="outline-container-orga7facf3" class="outline-4">
-<h4 id="orga7facf3"><span class="section-number-4">4.2.11</span> Delete session and quit</h4>
+<div id="outline-container-orge4f5ff8" class="outline-4">
+<h4 id="orge4f5ff8"><span class="section-number-4">4.2.11</span> Delete session and quit</h4>
 <div class="outline-text-4" id="text-4-2-11">
 <p>
 On the next sections in this document, we will configure session persistence, and the time when we will save our sessions, is when we kill Emacs. If we delete all sessions, and then quit, the result is that Emacs will save our <i>empty</i> session before quitting. Although we might desire this behavior some times, we also need a way to tell emacs to <i>discard</i> our current session. To achieve this, let's define a variable to use as a flag for saving the session or not:
@@ -6858,8 +6866,8 @@ And since we only used functions we already have implemented, we can bind it to 
 </div>
 </div>
 
-<div id="outline-container-org1778214" class="outline-4">
-<h4 id="org1778214"><span class="section-number-4">4.2.12</span> Save session to file</h4>
+<div id="outline-container-orgd9839da" class="outline-4">
+<h4 id="orgd9839da"><span class="section-number-4">4.2.12</span> Save session to file</h4>
 <div class="outline-text-4" id="text-4-2-12">
 <p>
 Our workspace refactor is working as expected, but we still need persistence. <code>perspective.el</code> and <code>persp-mode</code> behave a bit different on this regard. The former can only save your entire session to file, while the latter saves individual workspaces. For me particularly, is not a big issue, but if you rely on such feature, know that you won't have it with my setup.
@@ -6975,8 +6983,8 @@ And now we can add the command to its key:
 </div>
 </div>
 
-<div id="outline-container-org818d7d2" class="outline-4">
-<h4 id="org818d7d2"><span class="section-number-4">4.2.13</span> Load session from file</h4>
+<div id="outline-container-orgc3080b3" class="outline-4">
+<h4 id="orgc3080b3"><span class="section-number-4">4.2.13</span> Load session from file</h4>
 <div class="outline-text-4" id="text-4-2-13">
 <p>
 At this point, we can arbitrarily save our sessions to files, but still need a way to load them. Let's create the <i>load</i> command:
@@ -7037,8 +7045,8 @@ And bind this command to its key:
 </div>
 </div>
 
-<div id="outline-container-org6abaa36" class="outline-4">
-<h4 id="org6abaa36"><span class="section-number-4">4.2.14</span> Restore last session</h4>
+<div id="outline-container-orgae448e0" class="outline-4">
+<h4 id="orgae448e0"><span class="section-number-4">4.2.14</span> Restore last session</h4>
 <div class="outline-text-4" id="text-4-2-14">
 <p>
 Now that we save and load our workspace sessions, is time for us to make this process a bit more automated. Just like Doom's behavior, we want Emacs to save our session when it exits, and we want to be able to restore the last auto-saved session.
@@ -7098,8 +7106,8 @@ Now that we defined all <i>leader</i> keys, we can close our <i>leader</i> mappi
 </div>
 </div>
 
-<div id="outline-container-org8f00198" class="outline-4">
-<h4 id="org8f00198"><span class="section-number-4">4.2.15</span> Other shortcuts</h4>
+<div id="outline-container-orgb19e53c" class="outline-4">
+<h4 id="orgb19e53c"><span class="section-number-4">4.2.15</span> Other shortcuts</h4>
 <div class="outline-text-4" id="text-4-2-15">
 <p>
 Doom also offers nice shortcuts for us to access our workspace. They're all bound to <code>Meta</code> plus a number:
@@ -7200,8 +7208,8 @@ The only thing remaining on our refactor, is to connect our auto-save function t
 </div>
 </div>
 
-<div id="outline-container-org740c6d4" class="outline-2">
-<h2 id="org740c6d4"><span class="section-number-2">5</span> Writing&#xa0;&#xa0;&#xa0;<span class="tag"><span class="wip">wip</span></span></h2>
+<div id="outline-container-org5475d3d" class="outline-2">
+<h2 id="org5475d3d"><span class="section-number-2">5</span> Writing&#xa0;&#xa0;&#xa0;<span class="tag"><span class="wip">wip</span></span></h2>
 <div class="outline-text-2" id="text-5">
 <p>
 In my day-time job, my role, among other things, is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, it lacks a substantial amount of features. The amount of configurations and adjustments I would need to do to get a distance resemblance of those IDEs is prohibitive. Because of this reason, one of my main usage for Emacs is writing and scripting.
@@ -7222,7 +7230,7 @@ I come up with a directory infrastructure for my writings that will hold all typ
 </p>
 
 
-<figure id="orgc90aec3">
+<figure id="orgb83f997">
 <img src="assets/org-dir-struct.png" alt="org-dir-struct.png">
 
 </figure>
@@ -7262,8 +7270,8 @@ Regarding my configuration for writing, I will split it into 7 distinct sections
 </ul>
 </div>
 
-<div id="outline-container-orgaf8acf5" class="outline-3">
-<h3 id="orgaf8acf5"><span class="section-number-3">5.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
+<div id="outline-container-org45b01f8" class="outline-3">
+<h3 id="org45b01f8"><span class="section-number-3">5.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
 <div class="outline-text-3" id="text-5-1">
 <ul class="org-ul">
 <li>Fonts
@@ -7302,8 +7310,8 @@ Regarding my configuration for writing, I will split it into 7 distinct sections
 </div>
 </div>
 
-<div id="outline-container-orgb99b587" class="outline-3">
-<h3 id="orgb99b587"><span class="section-number-3">5.2</span> <span class="todo TODO">TODO</span> Common Org configurations</h3>
+<div id="outline-container-org55be1f2" class="outline-3">
+<h3 id="org55be1f2"><span class="section-number-3">5.2</span> <span class="todo TODO">TODO</span> Common Org configurations</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
@@ -7809,8 +7817,8 @@ With this function in place, we can <i>hook</i> it to our Org major mode:
 </div>
 </div>
 
-<div id="outline-container-orgd4af852" class="outline-3">
-<h3 id="orgd4af852"><span class="section-number-3">5.3</span> <span class="todo TODO">TODO</span> Prose writing</h3>
+<div id="outline-container-org27a7637" class="outline-3">
+<h3 id="org27a7637"><span class="section-number-3">5.3</span> <span class="todo TODO">TODO</span> Prose writing</h3>
 <div class="outline-text-3" id="text-5-3">
 <p>
 I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
@@ -7847,8 +7855,8 @@ Although we already covered most of this list of the previous section, we still 
 </p>
 </div>
 
-<div id="outline-container-org6a89804" class="outline-4">
-<h4 id="org6a89804"><span class="section-number-4">5.3.1</span> Dictionary and writing helpers</h4>
+<div id="outline-container-org4fdef44" class="outline-4">
+<h4 id="org4fdef44"><span class="section-number-4">5.3.1</span> Dictionary and writing helpers</h4>
 <div class="outline-text-4" id="text-5-3-1">
 <ul class="org-ul">
 <li><a href="https://github.com/tecosaur/lexic">https://github.com/tecosaur/lexic</a></li>
@@ -8167,8 +8175,8 @@ Rules:
 </div>
 </div>
 
-<div id="outline-container-orgcc4d1cf" class="outline-4">
-<h4 id="orgcc4d1cf"><span class="section-number-4">5.3.2</span> Templates</h4>
+<div id="outline-container-org5b2f254" class="outline-4">
+<h4 id="org5b2f254"><span class="section-number-4">5.3.2</span> Templates</h4>
 <div class="outline-text-4" id="text-5-3-2">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 329: </span>$DOOMDIR/config.el</label><pre class="src src-emacs-lisp">(<span class="org-keyword">defconst</span> <span class="org-variable-name">my-file-templates-yasnippet-dir</span> (expand-file-name <span class="org-string">"share/templates"</span> doom-private-dir))
@@ -8194,12 +8202,12 @@ Rules:
 
 
 <ol class="org-ol">
-<li><a id="orge28e854"></a><span class="todo TODO">TODO</span> Define a Hydra for <i>new documents</i> to use my templates<br></li>
+<li><a id="org51397d4"></a><span class="todo TODO">TODO</span> Define a Hydra for <i>new documents</i> to use my templates<br></li>
 </ol>
 </div>
 
-<div id="outline-container-org9828ab6" class="outline-4">
-<h4 id="org9828ab6"><span class="section-number-4">5.3.3</span> Focus Writing</h4>
+<div id="outline-container-org44ef441" class="outline-4">
+<h4 id="org44ef441"><span class="section-number-4">5.3.3</span> Focus Writing</h4>
 <div class="outline-text-4" id="text-5-3-3">
 <ul class="org-ul">
 <li><a href="https://github.com/larstvei/Focus">https://github.com/larstvei/Focus</a></li>
@@ -8221,8 +8229,8 @@ Rules:
 </div>
 </div>
 
-<div id="outline-container-orgb1ea6da" class="outline-4">
-<h4 id="orgb1ea6da"><span class="section-number-4">5.3.4</span> Snippets</h4>
+<div id="outline-container-org3858cdf" class="outline-4">
+<h4 id="org3858cdf"><span class="section-number-4">5.3.4</span> Snippets</h4>
 <div class="outline-text-4" id="text-5-3-4">
 <p>
 Even though writing does not have boilerplate typing <i>per-se</i>, Org mode still has a formal syntax to follow. Most of the syntax are straightforward, but some could use a snippet help to make it easier and faster to type them.
@@ -8239,7 +8247,7 @@ Before defining the snippets though, I need to adjust the <code>yas-keymap</code
 
 
 <ol class="org-ol">
-<li><a id="orga5b34c2"></a>Source blocks<br>
+<li><a id="orgc99dfd5"></a>Source blocks<br>
 <div class="outline-text-5" id="text-5-3-4-1">
 <p>
 This journey of literate configuration made me realize how much faster is to <i>prepare</i> source blocks using snippets.
@@ -8341,7 +8349,7 @@ This snippet is fine, but we still have to type the filename there. Let's create
 </div>
 </li>
 
-<li><a id="org9a1bd54"></a>Org elements<br>
+<li><a id="org181b4c7"></a>Org elements<br>
 <div class="outline-text-5" id="text-5-3-4-2">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 338: </span>$DOOMDIR/autoload/writing.el</label><pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;;</span><span class="org-comment">###</span><span class="org-comment"><span class="org-warning">autoload</span></span>
@@ -8384,8 +8392,8 @@ This snippet is fine, but we still have to type the filename there. Let's create
 </div>
 </div>
 
-<div id="outline-container-org5d74c98" class="outline-3">
-<h3 id="org5d74c98"><span class="section-number-3">5.4</span> <span class="todo TODO">TODO</span> Reading or reviewing</h3>
+<div id="outline-container-org4028127" class="outline-3">
+<h3 id="org4028127"><span class="section-number-3">5.4</span> <span class="todo TODO">TODO</span> Reading or reviewing</h3>
 <div class="outline-text-3" id="text-5-4">
 <ul class="org-ul">
 <li>Narrower width</li>
@@ -8407,8 +8415,8 @@ This snippet is fine, but we still have to type the filename there. Let's create
 </div>
 </div>
 
-<div id="outline-container-orgd575687" class="outline-3">
-<h3 id="orgd575687"><span class="section-number-3">5.5</span> <span class="todo TODO">TODO</span> Publishing</h3>
+<div id="outline-container-org176cebc" class="outline-3">
+<h3 id="org176cebc"><span class="section-number-3">5.5</span> <span class="todo TODO">TODO</span> Publishing</h3>
 <div class="outline-text-3" id="text-5-5">
 <ul class="org-ul">
 <li>Blog or site post</li>
@@ -8430,8 +8438,8 @@ This snippet is fine, but we still have to type the filename there. Let's create
 </div>
 </div>
 
-<div id="outline-container-orge8ae791" class="outline-3">
-<h3 id="orge8ae791"><span class="section-number-3">5.6</span> <span class="todo TODO">TODO</span> Presenting</h3>
+<div id="outline-container-orgae48ef0" class="outline-3">
+<h3 id="orgae48ef0"><span class="section-number-3">5.6</span> <span class="todo TODO">TODO</span> Presenting</h3>
 <div class="outline-text-3" id="text-5-6">
 <ul class="org-ul">
 <li>Use <code>reveal.js</code> inside a WebKit XWidget in full screen</li>
@@ -8439,8 +8447,8 @@ This snippet is fine, but we still have to type the filename there. Let's create
 </div>
 </div>
 
-<div id="outline-container-org40a6943" class="outline-3">
-<h3 id="org40a6943"><span class="section-number-3">5.7</span> <span class="todo TODO">TODO</span> Note Taking</h3>
+<div id="outline-container-org06bbc2f" class="outline-3">
+<h3 id="org06bbc2f"><span class="section-number-3">5.7</span> <span class="todo TODO">TODO</span> Note Taking</h3>
 <div class="outline-text-3" id="text-5-7">
 <p>
 Here in this section I need to come clean to the reader. I'm a horrible note taker! I have <a href="https://www.cdc.gov/ncbddd/adhd/facts.html">ADHD</a> and my capacity to keep up with any system to take notes is as short as a <a href="https://www.cdc.gov/ncbddd/adhd/facts.html">fruit fly's attention span</a>. That said, one of the longest streaks of success keeping up with notes I had in the past, was when I tried Org mode for the first time. I believe if I have a setup that makes taking notes effortless, I might be able to finally start taking notes and refer to them when needed.
@@ -8502,8 +8510,8 @@ I will be able to search notes using their reference label, title, tags, or cont
 </p>
 </div>
 
-<div id="outline-container-org8796bb1" class="outline-4">
-<h4 id="org8796bb1"><span class="section-number-4">5.7.1</span> Capturing</h4>
+<div id="outline-container-org7d7bedb" class="outline-4">
+<h4 id="org7d7bedb"><span class="section-number-4">5.7.1</span> Capturing</h4>
 <div class="outline-text-4" id="text-5-7-1">
 <p>
 Talk about capture in general:
@@ -8892,7 +8900,7 @@ Start with the open definition for <code>org-capture</code>:
 </div>
 
 <ol class="org-ol">
-<li><a id="org439bed3"></a>Dailies<br>
+<li><a id="org6baf6e8"></a>Dailies<br>
 <div class="outline-text-5" id="text-5-7-1-1">
 <div class="org-src-container">
 <pre class="src src-text">[s]     &#9679; Support
@@ -9115,7 +9123,7 @@ $0
 </div>
 </li>
 
-<li><a id="org4c916cc"></a>Journal entries<br>
+<li><a id="orgb2bc2eb"></a>Journal entries<br>
 <div class="outline-text-5" id="text-5-7-1-2">
 <div class="org-src-container">
 <pre class="src src-text">[s]     &#9679; New entry
@@ -9156,7 +9164,7 @@ $0
 </div>
 </li>
 
-<li><a id="org8c3aa81"></a>Tasks<br>
+<li><a id="orgb8e9786"></a>Tasks<br>
 <div class="outline-text-5" id="text-5-7-1-3">
 <div class="org-src-container">
 <pre class="src src-text">[t]     &#9679; General task
@@ -9198,7 +9206,7 @@ $0
 </div>
 </li>
 
-<li><a id="orgc601867"></a>Contacts<br>
+<li><a id="org3f1d7c1"></a>Contacts<br>
 <div class="outline-text-5" id="text-5-7-1-4">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 381: </span>$DOOMDIR/config.el</label><pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;; </span><span class="org-comment">(after! org-capture</span>
@@ -9234,7 +9242,7 @@ $0
 </div>
 </li>
 
-<li><a id="org4c42f65"></a>Project notes<br>
+<li><a id="org3f19355"></a>Project notes<br>
 <div class="outline-text-5" id="text-5-7-1-5">
 <div class="org-src-container">
 <pre class="src src-text">[t]     &#9679; New task
@@ -9324,7 +9332,7 @@ $0
 </div>
 </li>
 
-<li><a id="org9b9b2ce"></a>Finalize capture templates<br>
+<li><a id="orgfaa3c7f"></a>Finalize capture templates<br>
 <div class="outline-text-5" id="text-5-7-1-6">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 388: </span>$DOOMDIR/autoload/writing.el</label><pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;;</span><span class="org-comment">###</span><span class="org-comment"><span class="org-warning">autoload</span></span>
@@ -9500,8 +9508,8 @@ $0
 </ol>
 </div>
 
-<div id="outline-container-org10bb09d" class="outline-4">
-<h4 id="org10bb09d"><span class="section-number-4">5.7.2</span> Journal</h4>
+<div id="outline-container-org369d65d" class="outline-4">
+<h4 id="org369d65d"><span class="section-number-4">5.7.2</span> Journal</h4>
 <div class="outline-text-4" id="text-5-7-2">
 <p>
 TBD
@@ -9568,8 +9576,8 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orgf891364" class="outline-4">
-<h4 id="orgf891364"><span class="section-number-4">5.7.3</span> Zettelkasten</h4>
+<div id="outline-container-orgd4613d1" class="outline-4">
+<h4 id="orgd4613d1"><span class="section-number-4">5.7.3</span> Zettelkasten</h4>
 <div class="outline-text-4" id="text-5-7-3">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 395: </span>$DOOMDIR/config.el</label><pre class="src src-emacs-lisp">(<span class="org-keyword">use-package</span> org-roam
@@ -9603,8 +9611,8 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orgdc25c2e" class="outline-4">
-<h4 id="orgdc25c2e"><span class="section-number-4">5.7.4</span> Deft</h4>
+<div id="outline-container-orgc900595" class="outline-4">
+<h4 id="orgc900595"><span class="section-number-4">5.7.4</span> Deft</h4>
 <div class="outline-text-4" id="text-5-7-4">
 <p>
 TBD
@@ -9634,8 +9642,8 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orgd4d75ba" class="outline-4">
-<h4 id="orgd4d75ba"><span class="section-number-4">5.7.5</span> Utilities</h4>
+<div id="outline-container-orge2ee5cf" class="outline-4">
+<h4 id="orge2ee5cf"><span class="section-number-4">5.7.5</span> Utilities</h4>
 <div class="outline-text-4" id="text-5-7-5">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 397: </span>$DOOMDIR/autoload/writing.el</label><pre class="src src-emacs-lisp"><span class="org-comment-delimiter">;;;</span><span class="org-comment">###</span><span class="org-comment"><span class="org-warning">autoload</span></span>
@@ -9671,16 +9679,16 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-org3ef850a" class="outline-3">
-<h3 id="org3ef850a"><span class="section-number-3">5.8</span> <span class="todo TODO">TODO</span> Other modes</h3>
+<div id="outline-container-org5f2575c" class="outline-3">
+<h3 id="org5f2575c"><span class="section-number-3">5.8</span> <span class="todo TODO">TODO</span> Other modes</h3>
 <div class="outline-text-3" id="text-5-8">
 <p>
 Although my writing will be exclusive in <code>org-mode</code>, I'm still interaction with other writing modes, and I want the experience using those modes to get <i>as close as possible</i> to the experience with <code>org-mode</code>.
 </p>
 </div>
 
-<div id="outline-container-org527c58f" class="outline-4">
-<h4 id="org527c58f"><span class="section-number-4">5.8.1</span> Markdown</h4>
+<div id="outline-container-orgbfeaacf" class="outline-4">
+<h4 id="orgbfeaacf"><span class="section-number-4">5.8.1</span> Markdown</h4>
 <div class="outline-text-4" id="text-5-8-1">
 <p>
 TBD
@@ -9728,16 +9736,16 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-org4fce703" class="outline-2">
-<h2 id="org4fce703"><span class="section-number-2">6</span> Development</h2>
+<div id="outline-container-orgac20257" class="outline-2">
+<h2 id="orgac20257"><span class="section-number-2">6</span> Development</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 TBD
 </p>
 </div>
 
-<div id="outline-container-org13aa57b" class="outline-3">
-<h3 id="org13aa57b"><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
+<div id="outline-container-org4012a2c" class="outline-3">
+<h3 id="org4012a2c"><span class="section-number-3">6.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
 <div class="outline-text-3" id="text-6-1">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 401: </span>$DOOMDIR/config.el</label><pre class="src src-emacs-lisp">(<span class="org-keyword">use-package!</span> lsp-ui
@@ -9750,16 +9758,16 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-org711674d" class="outline-3">
-<h3 id="org711674d"><span class="section-number-3">6.2</span> <span class="todo TODO">TODO</span> Common configuration</h3>
+<div id="outline-container-orge9ba357" class="outline-3">
+<h3 id="orge9ba357"><span class="section-number-3">6.2</span> <span class="todo TODO">TODO</span> Common configuration</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
 TBD
 </p>
 </div>
 
-<div id="outline-container-org7af83f9" class="outline-4">
-<h4 id="org7af83f9"><span class="section-number-4">6.2.1</span> Version control system</h4>
+<div id="outline-container-org4682fb2" class="outline-4">
+<h4 id="org4682fb2"><span class="section-number-4">6.2.1</span> Version control system</h4>
 <div class="outline-text-4" id="text-6-2-1">
 <ul class="org-ul">
 <li><a href="https://github.com/Townk/gitmoji">https://github.com/Townk/gitmoji</a></li>
@@ -9829,8 +9837,8 @@ ${3:`"## Changes Description\n"`}$0
 </div>
 </div>
 
-<div id="outline-container-orgf6196a8" class="outline-4">
-<h4 id="orgf6196a8"><span class="section-number-4">6.2.2</span> Comments</h4>
+<div id="outline-container-org431317a" class="outline-4">
+<h4 id="org431317a"><span class="section-number-4">6.2.2</span> Comments</h4>
 <div class="outline-text-4" id="text-6-2-2">
 <p>
 TBD
@@ -9852,8 +9860,8 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-org4d9e67c" class="outline-3">
-<h3 id="org4d9e67c"><span class="section-number-3">6.3</span> <span class="todo TODO">TODO</span> Lisp</h3>
+<div id="outline-container-org253531d" class="outline-3">
+<h3 id="org253531d"><span class="section-number-3">6.3</span> <span class="todo TODO">TODO</span> Lisp</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 TBD
@@ -9866,14 +9874,14 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orgb0865ba" class="outline-3">
-<h3 id="orgb0865ba"><span class="section-number-3">6.4</span> <span class="todo TODO">TODO</span> Shell script</h3>
+<div id="outline-container-orga2a4dbb" class="outline-3">
+<h3 id="orga2a4dbb"><span class="section-number-3">6.4</span> <span class="todo TODO">TODO</span> Shell script</h3>
 </div>
-<div id="outline-container-org5a0c5c8" class="outline-3">
-<h3 id="org5a0c5c8"><span class="section-number-3">6.5</span> <span class="todo TODO">TODO</span> Python</h3>
+<div id="outline-container-orgb0b0c85" class="outline-3">
+<h3 id="orgb0b0c85"><span class="section-number-3">6.5</span> <span class="todo TODO">TODO</span> Python</h3>
 </div>
-<div id="outline-container-orgb7b122e" class="outline-3">
-<h3 id="orgb7b122e"><span class="section-number-3">6.6</span> <span class="todo TODO">TODO</span> Ansible</h3>
+<div id="outline-container-org83b19b2" class="outline-3">
+<h3 id="org83b19b2"><span class="section-number-3">6.6</span> <span class="todo TODO">TODO</span> Ansible</h3>
 <div class="outline-text-3" id="text-6-6">
 <p>
 TBD
@@ -9893,36 +9901,36 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orgc0d6663" class="outline-3">
-<h3 id="orgc0d6663"><span class="section-number-3">6.7</span> <span class="todo TODO">TODO</span> Javascript/TypeScript</h3>
+<div id="outline-container-orgbd537f3" class="outline-3">
+<h3 id="orgbd537f3"><span class="section-number-3">6.7</span> <span class="todo TODO">TODO</span> Javascript/TypeScript</h3>
 </div>
-<div id="outline-container-orgf8c8e0c" class="outline-3">
-<h3 id="orgf8c8e0c"><span class="section-number-3">6.8</span> <span class="todo TODO">TODO</span> C/C++</h3>
+<div id="outline-container-org57b514b" class="outline-3">
+<h3 id="org57b514b"><span class="section-number-3">6.8</span> <span class="todo TODO">TODO</span> C/C++</h3>
 </div>
-<div id="outline-container-orgba44970" class="outline-3">
-<h3 id="orgba44970"><span class="section-number-3">6.9</span> <span class="todo TODO">TODO</span> Swift</h3>
+<div id="outline-container-orge1646dc" class="outline-3">
+<h3 id="orge1646dc"><span class="section-number-3">6.9</span> <span class="todo TODO">TODO</span> Swift</h3>
 </div>
-<div id="outline-container-org2e314d5" class="outline-3">
-<h3 id="org2e314d5"><span class="section-number-3">6.10</span> <span class="todo TODO">TODO</span> Kotlin</h3>
+<div id="outline-container-org1b06400" class="outline-3">
+<h3 id="org1b06400"><span class="section-number-3">6.10</span> <span class="todo TODO">TODO</span> Kotlin</h3>
 </div>
-<div id="outline-container-orgd757941" class="outline-3">
-<h3 id="orgd757941"><span class="section-number-3">6.11</span> <span class="todo TODO">TODO</span> Java</h3>
+<div id="outline-container-org55ed8b1" class="outline-3">
+<h3 id="org55ed8b1"><span class="section-number-3">6.11</span> <span class="todo TODO">TODO</span> Java</h3>
 </div>
 </div>
 
-<div id="outline-container-org2edc528" class="outline-2">
-<h2 id="org2edc528"><span class="section-number-2">7</span> Non-editor features</h2>
+<div id="outline-container-org6170f4a" class="outline-2">
+<h2 id="org6170f4a"><span class="section-number-2">7</span> Non-editor features</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 TBD
 </p>
 </div>
 
-<div id="outline-container-org338a0fe" class="outline-3">
-<h3 id="org338a0fe"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
+<div id="outline-container-orgc3baa0b" class="outline-3">
+<h3 id="orgc3baa0b"><span class="section-number-3">7.1</span> <span class="todo TODO">TODO</span> Requirements</h3>
 </div>
-<div id="outline-container-org69e4967" class="outline-3">
-<h3 id="org69e4967"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> File management</h3>
+<div id="outline-container-orga11901a" class="outline-3">
+<h3 id="orga11901a"><span class="section-number-3">7.2</span> <span class="todo TODO">TODO</span> File management</h3>
 <div class="outline-text-3" id="text-7-2">
 <p>
 Before we start configuring the target packages for this section (<code>dired</code> and <code>eshel</code>), I want to make some small adjustments to Treemacs. Although it is not a full blown file manager, it is a sort of a file manager for my projects, so it fits in this section.
@@ -10360,8 +10368,8 @@ And to finalize the Treemacs configuration, let's make it respect my window navi
 </div>
 </div>
 
-<div id="outline-container-orge14fa4d" class="outline-3">
-<h3 id="orge14fa4d"><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> Project management</h3>
+<div id="outline-container-orgb2d0fbb" class="outline-3">
+<h3 id="orgb2d0fbb"><span class="section-number-3">7.3</span> <span class="todo TODO">TODO</span> Project management</h3>
 <div class="outline-text-3" id="text-7-3">
 <p>
 Projectile is a great package. It usually provides more features that one particular user would need. But I still want to tweak it to make it behave more according my expectations.
@@ -10452,8 +10460,8 @@ As usual, don't forget to close the <code>after!</code> sexp:
 </div>
 </div>
 
-<div id="outline-container-org2623cc7" class="outline-3">
-<h3 id="org2623cc7"><span class="section-number-3">7.4</span> <span class="todo TODO">TODO</span> Terminal</h3>
+<div id="outline-container-org2c130b7" class="outline-3">
+<h3 id="org2c130b7"><span class="section-number-3">7.4</span> <span class="todo TODO">TODO</span> Terminal</h3>
 <div class="outline-text-3" id="text-7-4">
 <p>
 In general, I really like the setup Doom has for the terminal. There are 3 things I like to add there.
@@ -10541,8 +10549,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 </div>
 </div>
 
-<div id="outline-container-orgd02eebb" class="outline-3">
-<h3 id="orgd02eebb"><span class="section-number-3">7.5</span> <span class="todo TODO">TODO</span> Emails</h3>
+<div id="outline-container-org9e4e9a0" class="outline-3">
+<h3 id="org9e4e9a0"><span class="section-number-3">7.5</span> <span class="todo TODO">TODO</span> Emails</h3>
 <div class="outline-text-3" id="text-7-5">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 448: </span>$DOOMDIR/autoload/extras.el</label><pre class="src src-emacs-lisp">
@@ -10551,8 +10559,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 </div>
 </div>
 
-<div id="outline-container-org0ac6555" class="outline-3">
-<h3 id="org0ac6555"><span class="section-number-3">7.6</span> <span class="todo TODO">TODO</span> Calendars</h3>
+<div id="outline-container-org4592ae1" class="outline-3">
+<h3 id="org4592ae1"><span class="section-number-3">7.6</span> <span class="todo TODO">TODO</span> Calendars</h3>
 <div class="outline-text-3" id="text-7-6">
 <div class="org-src-container">
 <label class="org-src-name"><span class="listing-number">Listing 449: </span>$DOOMDIR/config.el</label><pre class="src src-emacs-lisp">(<span class="org-keyword">defconst</span> <span class="org-variable-name">+work-calendar-personal</span> (expand-file-name <span class="org-string">"personal.org"</span> my-calendars-directory)
@@ -10658,8 +10666,8 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 </div>
 </div>
 
-<div id="outline-container-org3855f90" class="outline-3">
-<h3 id="org3855f90"><span class="section-number-3">7.7</span> <span class="todo TODO">TODO</span> Contacts</h3>
+<div id="outline-container-orgb7f4f23" class="outline-3">
+<h3 id="orgb7f4f23"><span class="section-number-3">7.7</span> <span class="todo TODO">TODO</span> Contacts</h3>
 <div class="outline-text-3" id="text-7-7">
 <p>
 TBD
@@ -10682,8 +10690,8 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-orge7ac8b2" class="outline-3">
-<h3 id="orge7ac8b2"><span class="section-number-3">7.8</span> <span class="todo TODO">TODO</span> Time Management</h3>
+<div id="outline-container-orgce5e79c" class="outline-3">
+<h3 id="orgce5e79c"><span class="section-number-3">7.8</span> <span class="todo TODO">TODO</span> Time Management</h3>
 <div class="outline-text-3" id="text-7-8">
 <dl class="org-dl">
 <dt>Triage</dt><dd>This process is to mark done tasks as done, and adjust any deadlines or other information on my tasks:
@@ -11074,12 +11082,12 @@ TBD
 </div>
 </div>
 
-<div id="outline-container-org0b2ca8e" class="outline-2">
-<h2 id="org0b2ca8e"><span class="section-number-2">8</span> Appendix</h2>
+<div id="outline-container-orga54691c" class="outline-2">
+<h2 id="orga54691c"><span class="section-number-2">8</span> Appendix</h2>
 <div class="outline-text-2" id="text-8">
 </div>
-<div id="outline-container-orgccc92fe" class="outline-3">
-<h3 id="orgccc92fe"><span class="section-number-3">8.1</span> The <code>init.el</code> file</h3>
+<div id="outline-container-org87a1025" class="outline-3">
+<h3 id="org87a1025"><span class="section-number-3">8.1</span> The <code>init.el</code> file</h3>
 <div class="outline-text-3" id="text-8-1">
 <p>
 We can't tangle the <code>init.el</code> on Doom because it is always loaded before <code>doom sync</code> starts tangling <code>config.org</code>.
@@ -11399,7 +11407,7 @@ For now, I will keep it as a separated Lisp file that I'm reproducing in this ap
 <div id="postamble" class="status">
 <p class="date">Date: Fri, Jan 1 2021</p>
 <p class="author">Author: Thiago Alves</p>
-<p class="date">Created: 2021-05-22 Sat 03:52</p>
+<p class="date">Created: 2021-05-22 Sat 04:12</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
