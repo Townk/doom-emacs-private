@@ -5125,7 +5125,8 @@ The first thing I like to do, is to create some variables pointing to key locati
 (setq org-html-htmlize-output-type 'css
       org-html-head-include-default-style nil
       org-html-doctype "html5"
-      org-html-html5-fancy t)
+      org-html-html5-fancy t
+      org-html-table-caption-above nil)
 #+end_src
 
 #+caption: $DOOMDIR/config.el
