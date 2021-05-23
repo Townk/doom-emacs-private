@@ -5113,11 +5113,6 @@ But before we dive in each one of these usages, there are some things I like to 
 
 The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
 
-#+caption: $DOOMDIR/packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(unpin! org-mode)
-#+end_src
-
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (setq writeroom-mode-line       t
@@ -7391,13 +7386,6 @@ TBD
 ** TODO Requirements
 ** TODO File management
 Before we start configuring the target packages for this section (~dired~ and ~eshel~), I want to make some small adjustments to Treemacs. Although it is not a full blown file manager, it is a sort of a file manager for my projects, so it fits in this section.
-
-The first thing I like to do, is to unpin Treemacs and let Doom use the latest version of it:
-
-#+caption: $DOOMDIR/packages.el
-#+begin_src emacs-lisp :tangle packages.el
-(unpin! treemacs)
-#+end_src
 
 The next change is to use our custom ~my-default-ui~ font face. I have to replace the entire ~doom-themes-enable-treemacs-variable-pitch-labels~ function with a version that uses my custom font instead. To do that, I'll use Emacs advices:
 
