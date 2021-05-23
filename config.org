@@ -5032,7 +5032,6 @@ I decided to use Org mode as my writing platform. And because of that, this sect
 
 I come up with a directory infrastructure for my writings that will hold all type of text I need to produce, while keeping them well organized:
 
-#+caption: My org directory structure
 #+begin_src plantuml :file assets/org-dir-struct.png :tangle no
 @startsalt
 !theme cerulean-outline
@@ -5059,6 +5058,10 @@ scale 2
 }
 @endsalt
 #+end_src
+
+#+NAME: fig:org-dirs
+#+CAPTION: My org directory structure
+#+RESULTS:
 
 Most of these directories are straightforward to understand their purpose, but I still want to go through them to document my need.
 

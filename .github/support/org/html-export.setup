@@ -65,7 +65,7 @@
 #+HTML_HEAD:         border: solid 1px #3498db;
 #+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:         overflow: hidden;
-#+HTML_HEAD:         padding: 0 1em 0 2.2em;
+#+HTML_HEAD:         padding: 0 1em 0 2.5em;
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     div.warning {
@@ -78,7 +78,7 @@
 #+HTML_HEAD:         border: solid 1px #ce2a21;
 #+HTML_HEAD:         border-radius: 4px;
 #+HTML_HEAD:         overflow: hidden;
-#+HTML_HEAD:         padding: 0 1em 0 2.2em;
+#+HTML_HEAD:         padding: 0 1em 0 2.5em;
 #+HTML_HEAD:     }
 
 #+HTML_HEAD:     div.outline-text-2>p:first-child:first-letter {
