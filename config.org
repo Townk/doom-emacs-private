@@ -5185,7 +5185,7 @@ Now we can wait Org to load to  continue our configuration:
     ("^ *\\([-+*] \\[-\\]\\) "
      (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
     ("^ *\\([-+*] \\[[xX]\\]\\) "
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☑ "))))
+     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☒ "))))
     ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
      (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "•"))))
     ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
@@ -5265,11 +5265,16 @@ Once we create the function, we can attach it to a hook or execute it right away
 
 And to close out my /beautification/, I want to render some unicode characters instead of some Org elements:
 
-| Org element | Unicode character |
-|-------------+-------------------|
-| =- [ ]=       | ☐                 |
-| =- [-]=       | ⊡                 |
-| =- [X]=       | ☑                 |
+#+caption: Org elements to unicode characters
+| Org element          | Org symbol | Unicode |
+|----------------------+------------+---------|
+|                      |    <c>     |   <c>   |
+| Unmarked checkbox    |   =- [ ]=    |    ☐    |
+| In-progress checkbox |   =- [-]=    |    ⊡    |
+| Finished checkbox    |   =- [X]=    |    ☒    |
+| List item bullet 1   |     =-=      |    •    |
+| List item bullet 2   |     =+=      |    ‣    |
+| List item bullet 3   |     =*=      |    ⁍    |
 
 And I also want to have better bullet marks:
 
