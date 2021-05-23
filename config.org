@@ -154,6 +154,10 @@ By the way, if you are reading this document online, there is a chance you might
 Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, and I'll be more than happy to link your document here.
 
 ** Requirements
+:PROPERTIES:
+:CUSTOM_ID: standard-requirements
+:END:
+
 This part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all of them.
 
 *** Modal editing
@@ -5068,37 +5072,41 @@ Most of these directories are straightforward to understand their purpose, but I
 - =notes= :: My curated notes. All files in this directory have no name (I use UUID as their name), and I can access their content by using the Zettelkasten method on my system;
 - =presentations= :: The directory for my presentation projects using =reveal.js=;
 
-Regarding my configuration for writing, I will split it into 7 distinct sections:
+** Requirements
+Different from the editor requirements on section [[#standard-requirements]], my writing requirements are more loosely defined, and one requirement might need multiple configurations while others might get configured on a single section. Nevertheless, I split my requirements into four distinct stories.
 
-- Org configuration
-- Prose writing
-- Reading or reviewing
-- Publishing
-- Presenting
-- Note Taking
-- Other writing modes
+*** Fonts
+Fonts for writing must use variable pitch and follow the typography rules defined on section [[Typography]]. Any reference to code or code elements must get the normal /coding/ style with fixed pitch. Also, other then headlines, element should have variable size depending on their importance.
 
-** TODO Requirements
-- Fonts
-  + Variable pitch
-  + Variable size
-- Text quality
-  + Spell-checking
-  + Grammar check
-  + Dictionary/Thesaurus
-  + Text linting
-    - Insensible words
-    - Weasel words
-- Revisions
-  + Annotations / Document comments
-- Exports
-  + Hugo
-  + XWiki
-  + Confluense
-  + Book format?
-  + RevealJS
-- Notes
-  + ???
+*** Writing quality
+Throughout the /writing sections/ you'll see a common theme: I'm not a good writer. I sure do try my best, and use whatever tools are available to me, but I'm far from the person who sits down and put on paper what is in her head.
+
+My writing quality requirement tries to specify the features that help me be /less bad/ at writing.
+
+- Spell checking :: I need a good spell checking dictionary that offers English and Portuguese (my native language) support;
+- Grammar checking :: The title says it all. I need something on the molds of [[https://www.grammarly.com/][Grammarly]] or [[https://languagetool.org/][LanguageTool]]. I would be fantastic to have such tool supporting Portuguese, but as far as I know, these tools only support English, so I would be OK if I get grammar check for English only;
+- Dictionary :: I need a good words dictionary that support thesaurus, etymology, and translation between English and Portuguese;
+- Text linting :: This is a tool closer to programming languages, but there are certain text lints that can help you write a better text. At a minimal, I want my text lint to support:
+  - Insensible words;
+  - Weasel words;
+- Revision :: I want to have some sort of tool that allows me to add comments on text files. I'll use this feature when I'm reviewing the text with a group of people and I want to add people's comments as annotations to the text;
+
+*** Publishing
+Publishing a text is not necessarily to send the manuscript to a printing shop to get back a book. In my editor's context, publishing can  encompass things like:
+
+- Posting on my blog (using [[https://gohugo.io/][Hugo]] export);
+- Publishing the text into a wiki (which I have a requirement to support [[https://www.xwiki.org/xwiki/bin/view/Main/WebHome][XWiki]] and [[http://www.confluense.com/][Confluense]]);
+- Exporting the text to a book format (PDF and [[https://www.w3.org/AudioVideo/ebook/][ePub]]);
+- Exporting the text to an article format (using [[https://www.latex-project.org/][LaTeX]]);
+- Exporting the text as an HTML presentation (using reveal.js);
+- Sending an email with the text attached as a document (using any of the previous supported formats);
+
+With the exception of the email attachment (which will have half of it here and the other half when I configure my email client), all the other publishing configuration will live in this writing section.
+
+*** Note taking
+This requirement got enormous attention from me, when I realized I couldn't keep up with storing information about my daily life, plus work, plus hobby within my brain. My current preferred method to take notes is the Zettelkasten, and I want to implement a good workflow for it in my configuration.
+
+Fleet notes should not take more than 2 seconds to take, and I will define a process for note review daily and weekly.
 
 ** TODO Common Org configurations
 But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
