@@ -4039,6 +4039,7 @@ As with other keybindings in my configuration, I will get new functions to live 
 
 The main idea is to mimic Doom's keybindings, so let's look what binds are available for workspaces:
 
+#+caption: Workspaces keybindings
 | Action                        | Keybinding  |
 |-------------------------------+-------------|
 | Display tab bar               | =SPC TAB TAB= |
