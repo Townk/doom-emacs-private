@@ -251,7 +251,7 @@ I love the style of this image so much, that it is, besides my dashboard image, 
 Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
 
 #+caption: macOS key mappings
-#+name: macos-keys
+#+name: tbl:macos-keys
 | macOS Key  | Emacs Key |
 |------------+-----------|
 | ⌘ (=cmd=)    | ='super=    |
@@ -264,7 +264,7 @@ Emacs expose three variables to allow you to make these adjustments:
 - ~mac-control-modifier~
 - ~mac-option-modifier~
 
-To adjust this values according to table [[macos-keys]], set each one of them to the symbol described on the column =Emacs Key=:
+To adjust this values according to table [[tbl:macos-keys]], set each one of them to the symbol described on the column =Emacs Key=:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2096,6 +2096,7 @@ For the size, I started with the headline level 1 and configure it to be as big 
 In practice, this means:
 
 #+caption: Headline sizes and multipliers
+#+name: tbl:typ-heads
 | Headline Level | Proportional size | Multiplier |
 |----------------+-------------------+------------|
 | Level 1        |              100% |        2.0 |
@@ -4040,6 +4041,7 @@ As with other keybindings in my configuration, I will get new functions to live 
 The main idea is to mimic Doom's keybindings, so let's look what binds are available for workspaces:
 
 #+caption: Workspaces keybindings
+#+name: tbl:workspaces-keys
 | Action                        | Keybinding  |
 |-------------------------------+-------------|
 | Display tab bar               | =SPC TAB TAB= |
@@ -5271,6 +5273,7 @@ Once we create the function, we can attach it to a hook or execute it right away
 And to close out my /beautification/, I want to render some unicode characters instead of some Org elements:
 
 #+caption: Org elements to unicode characters
+#+name: tbl:org-font-lock
 | Org element          | Org symbol | Unicode |
 |----------------------+------------+---------|
 |                      |    <c>     |   <c>   |
@@ -8463,3 +8466,6 @@ For now, I will keep it as a separated Lisp file that I'm reproducing in this ap
 
 #+caption: $DOOMDIR/init.el
 #+include: "~/.config/doom/init.el" src emacs-lisp :tangle no
+
+** List of tables
+#+TOC: tables
