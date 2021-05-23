@@ -17,6 +17,10 @@
 #+HTML_HEAD:         font-family: 'Cardo', serif;
 #+HTML_HEAD:     }
 
+#+HTML_HEAD:     #list-of-tables h2 {
+#+HTML_HEAD:       display: none
+#+HTML_HEAD:     }
+
 #+HTML_HEAD:     .org-src-container {
 #+HTML_HEAD:         padding: 0.3em 0.8em;
 #+HTML_HEAD:         border-radius: 4px;

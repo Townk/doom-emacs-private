@@ -2,17 +2,20 @@
 #+SUBTITLE: A detailed setup for Emacs using Doom Emacs configuration framework
 #+AUTHOR: Thiago Alves
 #+EMAIL: thiago@rapinialves.com
-#+FIRST_VERSION_DATE: Fri, Jan 1 2021
 
+#+keywords: emacs config literate doom
 #+language: en
+#+conseption_date: Fri, Jan 1 2021
+
 #+startup: num
 #+property: header-args :mkdirp yes
 #+property: header-args:emacs-lisp :comments link :shebang ";;; -*- lexical-binding: t; -*-\n"
 #+property: header-args:snippet :padline no
+
 #+setupfile: .github/support/org/html-export.setup
 
 * Prologue
-Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate configuration to try to contribute back to the community.
+Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate programming style, to try to contribute back to the Emacs and Doom community.
 
 This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] configuration framework (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this document (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ in the Doom's community.
 
@@ -142,7 +145,7 @@ Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]],
 
 I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the amazing theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
 
-#+begin_src org :tangle no
+#+begin_src text :tangle no
 ,#+setupfile: https://raw.githubusercontent.com/Townk/doom-emacs-private/master/.github/support/org/html-export.setup
 #+end_src
 
@@ -244,6 +247,7 @@ I love the style of this image so much, that it is, besides my dashboard image, 
 
 #+begin_center
 #+caption: My favorite contender for a Doom Emacs logo
+#+name: fig:caco-demon
 [[./assets/doom.png]]
 #+end_center
 
@@ -5062,6 +5066,7 @@ scale 2
 #+end_src
 
 #+caption: My org directory structure
+#+name: fig:org-dirs
 #+RESULTS:
 [[file:assets/org-dir-struct.svg]]
 
@@ -8469,3 +8474,7 @@ For now, I will keep it as a separated Lisp file that I'm reproducing in this ap
 
 ** List of tables
 #+TOC: tables
+
+** List of figures
+- [[fig:caco-demon][Figure 1: My favorite contender for a Doom Emacs logo]]
+- [[fig:org-dirs][Figure 2: My org directory structure]]
