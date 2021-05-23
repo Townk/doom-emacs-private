@@ -5534,6 +5534,11 @@ Although we already covered most of this list of the previous section, we still 
 
 *** Dictionary and writing helpers
 
+#+caption: $DOOMDIR/packages.el
+#+begin_src emacs-lisp :tangle packages.el
+(package! writegood-mode :disable t)
+#+end_src
+
 - https://github.com/tecosaur/lexic
 
 #+caption: $DOOMDIR/packages.el
