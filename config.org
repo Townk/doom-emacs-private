@@ -22,7 +22,7 @@ For instance, a Doom installation without a previous private configuration creat
 
 #+caption: $DOOMDIR/From the =config.el= file comments
 #+begin_note
-In your journey configuring Emacs the way you want, you might need to use more functions then I'm using in this configuration. Here are some additional functions or macros that could help you configure Doom:
+In your journey configuring Emacs the way you want, you might need to use more functions than I'm using in this configuration. Here are some additional functions or macros that could help you configure Doom:
 
 - ~load!~ for loading external =*.el= files relative to =$DOOMDIR/config.el=;
 - ~use-package!~ for configuring packages;
@@ -44,7 +44,7 @@ I want to stress out to you, that ultimately, you are reading a personal opinion
 
 I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]] and will focus the configuration, at that point, to adjust Emacs and Org to fit my personal workflow.
 
-After configuring Emacs for writing prose, my next focus is programming (which is what I do for work). I will setup [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details then others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
+After configuring Emacs for writing prose, my next focus is programming (which is what I do for work). I will set up [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details than others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
 
 Overall, my intention is to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
 
@@ -56,7 +56,7 @@ Before you move on to the next section I must give you a disclaimer:
 
 Although I'm using Emacs for about six years, I can't consider myself an expert. Was not until the beginning of 2021 that I decided to learn lisp properly, so you may find some code snippets here that are not considered optimal.
 
-Also, do not trust me blindly. I try my best to verify the information I write by reading documentation and some times reaching out to the subject-matter expert of a feature, but for your own good, you should get in the habit of reading the documentation and manuals by yourself, there will be nothing that will build your knowledge better then this.
+Also, do not trust me blindly. I try my best to verify the information I write by reading documentation and sometimes reaching out to the subject-matter expert of a feature, but for your own good, you should get in the habit of reading the documentation and manuals by yourself, there will be nothing that will build your knowledge better than this.
 
 ** About literate configuration
 A long time ago I discovered [[http://literateprogramming.com][Literate Programming]] when I first read an Emacs configuration using Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], and it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
@@ -65,10 +65,10 @@ I believe the mentality shift happened when I finally decided to read the origin
 
 Since this document is about a text editor configuration, I have to highlight couple differences between Mr. Knuth's Literate Programming and my Literate Configuration.
 
-The core difference, is the fact that each piece of code in this document may not be a self contained snippet (although I will try my best to do so). When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rational behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
+The core difference, is the fact that each piece of code in this document may not be a self-contained snippet (although I will try my best to do so). When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rationale behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
 ** About Doom configuration style
-One of the major hurdles for new comers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
+One of the major hurdles for newcomers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
 
 This section describes four aspects of Doom that I felt important to understand before I was able to properly configure it.
 
@@ -82,17 +82,17 @@ You should get used to use the options =:defer=, =:hook=, =:after=, =:mode=, and
 
 *** Configuration evaluation order
 
-There are four potential loading /spots/ for each configuration you want do tweak, and you must always decide which one is the best option to apply your particular case:
+There are four potential loading /spots/ for each configuration you want to tweak, and you must always decide which one is the best option to apply your particular case:
 
 - Directly on =config.el= :: This is the most direct point of configuration. As Emacs evaluates the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/. On Doom's world, any directory or file variable should go to directly into your =config.el=;
-- Inside the =:init= section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluate the code inside =:init= only *after* the resource stated on the option loads;
+- Inside the =:init= section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluates the code inside =:init= only *after* the resource stated on the option loads;
 - Inside the =:config= section of ~use-package~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
 - Inside an ~after!~ or ~with-eval-after-load~ macro :: Code here executes after the defined resource gets loaded, but also after all instances of ~use-package~ finish to run code from their =:config= section;
 
-If you have any question about where you should add your configuration, I suggest to follow the following rule of thumb:
+If you have any question about where you should add your configuration, I suggest following the following rule of thumb:
 
 - If a package requires you to configure a variable before Emacs loads such package, set the variable directly on the =config.el=;
-- If you're configuring a package that Doom installs as part of a module, and it does not requires you to define the configuration before Emacs loads the package, use the ~after!~ macro;
+- If you're configuring a package that Doom installs as part of a module, and it does not require you to define the configuration before Emacs loads the package, use the ~after!~ macro;
 - If you're adding a new package to your configuration, configure it using the ~use-package~ macro. To know if you should use ~use-package~ just check if you had to add the package to your =packages.el= file. If you did, then use ~use-package~.
 
 For instance:
@@ -120,11 +120,11 @@ To get a better sense of what is going on, start Emacs from terminal with the =-
 emacs --debug-init
 #+end_src
 
-This will stop Emacs on the first error and print the stack trace for it. As of now, this might not useful beyond reporting bugs, nevertheless, it's important you keep it in your mind!
+This will stop Emacs on the first error and print the stack trace for it. As of now, this might not be useful beyond reporting bugs, nevertheless, it's important you keep it in your mind!
 
 Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensible to package loading.
 
-What I recommend to do, is to install a package called [[https://github.com/kekeimiku/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking (notice that I'm not using the [[https://github.com/dholm/benchmark-init-el][official repository]] for ~benchmark-init-el~, but a fork that fixed a bug when using it with Emacs 28+), and use it, when you have the need:
+What I recommend doing, is to install a package called [[https://github.com/kekeimiku/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking (notice that I'm not using the [[https://github.com/dholm/benchmark-init-el][official repository]] for ~benchmark-init-el~, but a fork that fixed a bug when using it with Emacs 28+), and use it, when you have the need:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -161,13 +161,13 @@ Before jumping in the configuration itself, I like to describe what I'm trying t
 This part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all of them.
 
 *** Modal editing
-I need to come clean to the reader about my past experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some tim now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
+I need to come clean to the reader about my experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some time now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
 
 *** Text Snippets
-Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some book keeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
+Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some bookkeeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
 
 *** Inline completion
-Also know as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
+Also known as /intellisence/, or /code complete/ in other editors and IDEs, /at-point completion/ are those popups that show up when you type, with possible completions for what you're doing. My editor should also offer such feature, but it must play well with modal editing (if I leave the /Insert Mode/ the popup should close), and snippets (snippet expansion keywords have precedence over skipping to the next line with the =<TAB>= key).
 
 *** Automatic indentation
 Here I'm not talking about indent after pressing '=RET='. I'm talking about re-indenting the file as I change it. On the Emacs world, this is also known as /electric indent/.
@@ -192,13 +192,13 @@ Any half-decent text editor these days supports an infinite plethora of shortcut
 For instance, if you configure your editor to search for files when you press '=SPC f f=', when you press '=SPC f=' and wait, I want the editor to display all the possible options for you to complete your key sequence.
 
 *** Useful line numbers
-I like the text editor to show me line numbers when they mater, and when they do, I like to get the most of them. This requirement is to make sure that line numbers are aware of the modal editing, so when I'm on /normal mode/ with line numbers visible, the editor should show me lines as relative numbers, and when I'm editing the file (in /insert mode/), the line numbers should be absolute.
+I like the text editor to show me line numbers when mater, and when it does, I like to get the most of them. This requirement is to make sure that line numbers are aware of the modal editing, so when I'm on /normal mode/ with line numbers visible, the editor should show me lines as relative numbers, and when I'm editing the file (in /insert mode/), the line numbers should be absolute.
 
 *** Auto-saving
-I want to stop saving my files. Any editor has substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
+I want to stop saving my files. Any editor has a substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
 
 *** Persist frame position and geometry
-I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've open it.
+I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've opened it.
 
 *** Remote editing
 I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
@@ -283,7 +283,7 @@ To change this option, set the variable ~disabled-command-function~ to =nil=:
 (setq disabled-command-function nil)
 #+end_src
 
-On Emacs, you can set variables when open files, we call those [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html][File Variables]]. There are occasions I want to execute some arbitrary code when I open a file. To do that, I would add a file variable called ~eval~, and pass my arbitrary code to it. As you can imagine, this is a dangerous features, so I have to give you the standard disclaimer:
+On Emacs, you can set variables when open files, we call those [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Specifying-File-Variables.html][File Variables]]. There are occasions I want to execute some arbitrary code when I open a file. To do that, I would add a file variable called ~eval~, and pass my arbitrary code to it. As you can imagine, this is a dangerous feature, so I have to give you the standard disclaimer:
 
 #+begin_warning
 The next configuration can lead to Emacs executing malicious code upon opening a file. By allowing Emacs to enable local ~eval~ you gain some nice ways to configure Emacs per file, on the cost of a high risk of vulnerability, so... think a little bit about how do you indiscriminately open files on your editor before enabling this one.
@@ -299,7 +299,7 @@ To enable Emacs to use ~eval~ as a file variable, set the variable ~enable-local
 *** Emacs source code
 Emacs documentation system is fantastic! It allows you to inspect any value, binding or function on the fly, and it displays the source code for of any callable together with its documentation.
 
-For some of the Emacs functions, such source code is a /C/ function from its core code, and by default, Emacs does not knows where to look for its own source code.
+For some Emacs functions, such source code is a /C/ function from its core code, and by default, Emacs does not know where to look for its own source code.
 
 To help Emacs to find its own source code, first clone it from the Emacs [[https://git.savannah.gnu.org/git/emacs.git][repository]]:
 
@@ -329,9 +329,9 @@ To disable line numbers by default, set the variable ~display-line-numbers-type~
 
 Notice I used the function ~setq-default~ here. It tells Emacs that if a buffer uses a local version of it, it always starts with the given value.
 
-When Emacs is showing line numbers, it do so on the window's left /gutter/. To save some screen space, Emacs only reserves only the necessary space on its gutter, to display the biggest visible line number. I believe this behavior disrupts the user experience when I scroll from line 99 to 100 and back. The visual effect is the editor screen moving right and left as I scroll.
+When Emacs is showing line numbers, it does so on the window's left /gutter/. To save some screen space, Emacs only reserves the necessary space on its gutter, to display the biggest visible line number. I believe this behavior disrupts the user experience when I scroll from line 99 to 100 and back. The visual effect is the editor screen moving right and left as I scroll.
 
-It would be incredible inefficient to read the entire file just to check what is the biggest line number, so we can instruct Emacs do the second best thing: to only grow the gutter's size, and never shrink it.
+It would be incredible inefficient to read the entire file just to check what is the biggest line number, so we can instruct Emacs does the second best thing: to only grow the gutter's size, and never shrink it.
 
 To have such configuration, set the variable ~display-line-numbers-grow-only~ to a non-=nil= value:
 
@@ -360,7 +360,7 @@ And to force emacs to always use spaces instead of tabs, set the ~indent-tabs-mo
 *** Line wrapping
 Until the writing of this document, I had the opinion that /soft wrap/ was evil, and it had no place on any editor. Since then, I learned to appreciate /soft wrap/ for prose, and later in this document, you will see all the other setup around /soft wrap/ and have an idea why I was so against it.
 
-To prevent Emacs from wrapping your text as it goes over the size of thee screen, set the variable ~truncate-lines~ to a non-=nil= value:
+To prevent Emacs from wrapping your text as it goes over the size of the screen, set the variable ~truncate-lines~ to a non-=nil= value:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -401,11 +401,11 @@ To add a margin on your cursor as it gets on the edge of the screen, set the var
 #+end_src
 
 *** Repeatable commands
-There is a new feature available since Emacs 28 that allow you to define a /repeatable map/ for actions that take more than one key stroke to perform, and you want to repeat them with only the last keystroke in sequence.
+There is a new feature available since Emacs 28 that allow you to define a /repeatable map/ for actions that take more than one keystroke to perform, and you want to repeat them with only the last keystroke in sequence.
 
 For instance, on Doom, to increase the value of number, you need to use the key binding =g +=. If you want to increase the same number multiple times, you would have to type the same sequence multiple times (ignore the repeat command associated with the =.= key for didactic reasons).
 
-I want to press =g +=, and then multiple key strokes of =+= to increase the number multiple times, and the ~repeat-mode~ is the new feature that allows me to do that.
+I want to press =g +=, and then multiple keystrokes of =+= to increase the number multiple times, and the ~repeat-mode~ is the new feature that allows me to do that.
 
 In order to use it, you have to define a keymap for the /repeatable keys/, and associate that keymap to the command that will start the repeat. This is an example on how to accomplish that:
 
@@ -457,7 +457,7 @@ As I mentioned on section [[Modal editing]], I do consider /Modal Editing/ far s
 
 I decided to use Doom as the base of my configuration because it has good reasonable defaults, and its author is also an ex-/Vimer/ like me, so he tailored this distribution with a Vim user in mind.
 
-On Emacs, the package responsible to provide Vim inside Emacs is [[https://github.com/emacs-evil/evil][Evil]], and from all Vim plugins for other editors that I use, Evil is by far the best. So much that compare it with other Vim plugins is do injustice to Evil developers. More often than not, we call Evil the Vim inside Emacs.
+On Emacs, the package responsible to provide Vim inside Emacs is [[https://github.com/emacs-evil/evil][Evil]], and from all Vim plugins for other editors that I use, Evil is by far the best. So much that compare it with other Vim plugins is doing injustice to Evil developers. More often than not, we call Evil the Vim inside Emacs.
 
 In this section, I will go through configurations and other packages related directly to Evil, so if you don't use Evil or modal editing, feel free to skip this one.
 
@@ -465,7 +465,7 @@ In this section, I will go through configurations and other packages related dir
 ◆
 #+end_center
 
-If you're new to Vim, when you learn about the modes, on of the first /it's weird/ feelings you'll have is when you are in /Normal Mode/, then, you decide to go into /Insert Mode/ by pressing =i=, but right after that, you change your mind and press =<ESC>=... What just happened? you didn't act on anything, you didn't press any movement key, still, the cursor moved one character to the left!
+If you're new to Vim, when you learn about the modes, on of the first /it's weird/ feelings you'll have is when you are in /Normal Mode/, then, you decide to go into /Insert Mode/ by pressing =i=, but right after that, you change your mind and press =<ESC>=... What just happened? You didn't act on anything, you didn't press any movement key, still, the cursor moved one character to the left!
 
 Well, I have to tell you that this behavior is not a bug, is just how we should expect the change of modes to be.
 
@@ -516,7 +516,7 @@ If you want Evil to synchronize its visual selection with the Emacs region, set 
 
 Evil defines the priority of its highlight in a way that Emacs displays the visual selection overlays bellow search highlights. As of today I can't figure out why this is the case. One workflow pretty common is to search the name of a variable, select its prefix, and search for the rest of the variable. With the default configuration, you can't see what you're selecting until your selections is bigger than the search term.
 
-Unfortunately, Evil hard-code the [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L624][visual]] [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L731][priority]] value to 99 for visual selection, which is smaller then the other hard-coded values for the [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L666][search]] [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L868][highlight]] overlays, and this was already reported to Evil on issue [[https://github.com/emacs-evil/evil/issues/1089][#1089]] on GitHub.
+Unfortunately, Evil hard-code the [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L624][visual]] [[https://github.com/emacs-evil/evil/blob/master/evil-states.el#L731][priority]] value to 99 for visual selection, which is smaller than the other hard-coded values for the [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L666][search]] [[https://github.com/emacs-evil/evil/blob/master/evil-search.el#L868][highlight]] overlays, and this was already reported to Evil on issue [[https://github.com/emacs-evil/evil/issues/1089][#1089]] on GitHub.
 
 To fix this, we have to advise ~evil-visual-highlight~ and ~evil-visual-highlight-block~ to bump the overlay priority after these functions execute:
 
@@ -547,7 +547,7 @@ Where /operation/ is the command you're executing, operator can be /i/ (inside) 
 
 One of these target object is /w/ for /word/ and in my experience, the meaning of /"word"/ varies according to context. Let me explain...
 
-If you're editing a text file for blog, the meaning of /"word"/ is most likely the same meaning of the English dictionary, but if you're editing a /Lisp/ code, a word probably include more characters then the conventional /"word"/ (e.g. while /"foo"/ is a word in any context, /"foo-bar"/ is a word, probably only when you're editing a Lisp file).
+If you're editing a text file for blog, the meaning of /"word"/ is most likely the same meaning of the English dictionary, but if you're editing a /Lisp/ code, a word probably include more characters than the conventional /"word"/ (e.g. while /"foo"/ is a word in any context, /"foo-bar"/ is a word, probably only when you're editing a Lisp file).
 
 A quick trick to make Evil understand the meaning of /"word"/ as I just described, is to create an alias for the function ~forward-evil-symbol~, and name it ~forward-evil-word~. This way, we override the normal function to act as if it is the ~forward-evil-symbol~:
 
@@ -561,7 +561,7 @@ Snippets (also known as Live Templates on certain platforms), are tidbits of tex
 
 Doom Emacs offers basic configuration for the package /[[https://github.com/joaotavora/yasnippet][Yasnippet]]/, which is the most used snippet system on Emacs.
 
-Most snippet frameworks available across editors (including /Yasnippet/) offer the ability to edit some placeholders on the snippet so one can have a single snippet and use it on different scenarios. For instance:
+Most snippet frameworks available across editors (including /Yasnippet/) offer the ability to edit some placeholders on the snippet, so one can have a single snippet and use it on different scenarios. For instance:
 
 Let's assume I'm a Java developer, and as such, one of the most common scenarios is for me to create a class, more or less like this:
 
@@ -660,7 +660,7 @@ public class AwesomeClass {
 }
 #+end_src
 
-By default, we can achieve this by pressing =DEL= instead of =TAB=. In general, this behavior is pretty good, except when you're typing on a MacBook laptop keyboard. MacBook keyboards don't have the key =DEL= on them, and to get a =DEL=, I have to use a combination of two keys.
+By default, we can achieve this by pressing =DEL= instead of =TAB=. In general, this behavior is pretty good, except when you're typing on a MacBook laptop keyboard. MacBook's keyboards don't have the key =DEL= on them, and to get a =DEL=, I have to use a combination of two keys.
 
 For this reason, I want to make sure that the same behavior I have with =DEL=, I also have with =BACKSPACE=.
 
@@ -716,7 +716,7 @@ Throughout this document, you will find helpful snippets I like to define for ce
 ** Inline completion
 What I call inline completion, is also known as intellisense, code completion, or in the Vim world, omni completion. It's a useful tool to help the user type less and more correctly while editing source code.
 
-Years ago, there was two main packages that provided such feature on Emacs:
+Years ago, there were two main packages that provided such feature on Emacs:
 
 - [[https://github.com/auto-complete/auto-complete][auto-complete]]
 - [[https://github.com/company-mode/company-mode][company-mode]]
@@ -725,7 +725,7 @@ On the time I'm writing this part of my document, [[https://github.com/auto-comp
 
 Since I've been using [[https://github.com/company-mode/company-mode][company-mode]] for the most part of my Emacs experience, I will stick with it on my new configuration.
 
-One of the best features I like on [[https://github.com/company-mode/company-mode][company-mode]], is its architecture design, where the author decided to modularize the package, allowing other packages to integrate with it where they actually mater. For instance, if my package offers a major mode to edit files from the /Foo/ language, I can create a =foo-company-backend= to integrate it on the Company ecosystem, or if my package provides a new cool way to display inline completions, I can create a /company frontend/ to make such integration
+One of the best features I like on [[https://github.com/company-mode/company-mode][company-mode]], is its architecture design, where the author decided to modularize the package, allowing other packages to integrate with it where they actually mater. For instance, if my package offers a major mode to edit files from the /Foo/ language, I can create a =foo-company-backend= to integrate it on the Company ecosystem, or if my package provides a new cool way to display inline completions, I can create a /company frontend/ to make such integration.
 
 For the most part, Doom does a pretty good job configuring [[https://github.com/company-mode/company-mode][~company-mode~]] to my liking, I just need to adjust some small behaviors and keymaps.
 
@@ -803,7 +803,7 @@ completion, or move the company selction to the next item."
     (company-abort)))
 #+end_src
 
-Notice that the only difference between ~my-company-indent-or-complete-common~ and ~my-completion-yasnippet-or-completion~ is that I call ~company-indent-or-complete-common~ on the former, and ~company-complete-common-or-cycle~ on the later.
+Notice that the only difference between ~my-company-indent-or-complete-common~ and ~my-completion-yasnippet-or-completion~ is that I call ~company-indent-or-complete-common~ on the former, and ~company-complete-common-or-cycle~ on the latter.
 
 Another deviation from the standard that I like, is how the =RET= should work with Company.
 
@@ -812,7 +812,7 @@ For me, there are two scenarios that can happen if one presses =RET= while the C
 1. The user meant to insert a "=\n=" character on the document;
 2. The user intended to select the selected completion option;
 
-The way to distinguish between these two scenarios, is to check if Company already have a selection stored at ~company-selection~. If it does have, the =RET= should represent a ~company-complete-selection~, otherwise, the =RET= should close the Company popup, and insert a "=\n=" character on the document. I created the next function to manage these behavior:
+The way to distinguish between these two scenarios, is to check if Company already have a selection stored at ~company-selection~. If it does have, the =RET= should represent a ~company-complete-selection~, otherwise, the =RET= should close the Company popup, and insert a "=\n=" character on the document. I created the next function to manage these behaviors:
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -831,7 +831,7 @@ insert a new line character."
 
 Notice also, that I didn't use ~insert~ when a =RET= means to /add a new line/. This decision is to allow Emacs to trigger any function or hook tied to the =RET= key.
 
-With all auxiliary functions created, I just need to setup Company according to my needs:
+With all auxiliary functions created, I just need to set up Company according to my needs:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -848,7 +848,7 @@ With all auxiliary functions created, I just need to setup Company according to 
 
 One configuration that worth mention why I choose it is to set ~company-box-doc-enable~ to =nil=. I did this, not because I don't like the documentation as another child frame, is the fact that if I do show it, I can't move my popup completion without aborting Company.
 
-Last, I need to setup the proper keymaps for the package:
+Last, I need to set up the proper keymaps for the package:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -867,7 +867,7 @@ Last, I need to setup the proper keymaps for the package:
 #+end_src
 
 ** Automatic indentation
-I appreciate the fact that majority of editor these days can keep the indentation of the previous line, and some of them, are even capable of adding indentation where is necessary. Although this is a good start, I want my editor to do more. When I add braces around a code, or when I make a one-line statement, a multi-line one, I want the editor to reformat my file to properly intent it.
+I appreciate the fact that majority of editor these days can keep the indentation of the previous line, and some of them, are even capable of adding indentation where is necessary. Although this is a good start, I want my editor to do more. When I add braces around a code, or when I make a one-line statement, a multi-line one, I want the editor to reformat my file to properly indent it.
 
 Emacs offers a mode called ~electric-indent-mode~ where the ultimate goal, is to achieve exactly what I described, but unfortunately, the current state of the mode is falling short of it.
 
@@ -897,7 +897,7 @@ A point to note is where to use this package. I need it on ~prog-mode~, but due 
           typescript-mode) . aggressive-indent-mode))
 #+end_src
 
-The reason to not include Python on this list, is the fact that Python uses indentation as block delimiter, and the package does not know how where a block ends and a new starts, causing re-indentation to pretty much break the code.
+The reason to not include Python on this list, is the fact that Python uses indentation as block delimiter, and the package does not know how where a block ends, and a new one starts, causing re-indentation to pretty much break the code.
 
 ** Smart backspace
 As part of my day job, I had to do a lot of Android development, and inevitably I used [[https://www.jetbrains.com/][JetBrains]]
@@ -909,7 +909,7 @@ On both, Doom and IntelliJ, when you type an open pair, the editor completes wit
 fun foo() {|}
 #+end_src
 
-Also on both, when you press =<ENTER>=, the editor position the cursor on a newly inserted line, on using the correct indentation, and it also inserts a '=\n=' character after cursor. The result of these actions would be like this:
+Also, when you press =<ENTER>=, the editor position the cursor on a newly inserted line, on using the correct indentation, and it also inserts a '=\n=' character after cursor. The result of these actions would be like this:
 
 #+begin_src kotlin :tangle no
 fun foo() {
@@ -1002,7 +1002,7 @@ These changes will make Doom download them into its local cache when you run =do
 
 Before I configure these packages, I would like to explain why I turn on balance protection only on Emacs modes deriving from ~prog-mode~.
 
-The simplest explanation is that you don't really need pair balance protection in any other place then you coding buffers. I did some informal experiments on this area, and found that pair protection turned on when you write prose is magnitudes more annoying then useful, so I will stick with protection only in ~prog-mode~.
+The simplest explanation is that you don't really need pair balance protection in any other place then your coding buffers. I did some informal experiments on this area, and found that pair protection turned on when you write prose is magnitudes more annoying than useful, so I will stick with protection only in ~prog-mode~.
 
 To make Emacs turn ~smartparens~ and related packages correctly, make sure that you turn on ~evil-cleverparens-mode~ on the ~smartparens-enabled-hook~, and only enable the strict mode when editing a ~prog-mode~ buffer:
 
@@ -1026,7 +1026,7 @@ To do so, enable the ~show-smartparens-global-mode~ after enabling ~smartparens~
 ** Rich keybindings
 The good thing about this feature is that Emacs already covers almost all of my [[Rich keybindings][requirements]] for free, and doom ships with a package that covers the rest of it (~which-key~). What I need to do here, is to tweak ~which-key~ to /look/ and /feel/ like I want it.
 
-One aspect of which key that bothered me is not so much a ~which-key~ thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one on the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupt my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more then the ~which-key~ timeout.
+One aspect of which key that bothered me is not so much a ~which-key~ thing, and more an Emacs thing in general. This aspect is how popup windows show and hide. When Emacs shows one at the bottom of the screen, it shifts the window I'm working on upwards, and although this came to be the expected behavior, it disrupts my flow, specially if the time I take to finish a shortcut sequence is couple milliseconds more than the ~which-key~ timeout.
 
 To remediate this situation, I found this package called  [[https://github.com/yanghaoxie/which-key-posframe][~which-key-posframe~]] that display the shortcut hints on a child frame. With a configuration or two, I believe this package can deliver what I want.
 
@@ -1057,7 +1057,7 @@ And respect the border color for popups:
 
 I need also to set the ~which-key-posframe-poshandler~ variable, to allow a special behavior regarding positioning the child frame on the screen.
 
-This special behavior is simply to most of the times, show the shortcut hints on the right side of the frame, but if I invoke an Embark action, I want the shortcut hints child frame to show up right besides the cursor point.
+This special behavior is simply to most of the time, show the shortcut hints on the right side of the frame, but if I invoke an Embark action, I want the shortcut hints child frame to show up right besides the cursor point.
 
 To achieve this behavior, I'll define a =nil= placeholder variable that I can set to =t= when invoking Embark.
 
@@ -1088,7 +1088,7 @@ about the INFO structure."
             (/ (- frame-height posframe-height) 2)))))
 #+end_src
 
-In order to connect ~embark~ to ~which-key~, I need to advice the function I defined to invoke ~which-key~ when I invoke ~embark~:
+In order to connect ~embark~ to ~which-key~, I need to advise the function I defined to invoke ~which-key~ when I invoke ~embark~:
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -1115,7 +1115,7 @@ With the ~which-key-posframe~ configured, I just need to do some minor adjustmen
 #+end_src
 
 ** Useful line numbers
-A long time ago, I read on some Vim mailing list, an opinion on how line numbers should behave on different editing modes (if you know who is the original author of such idea, please let me know so I can give credit where credit is due). Since on normal mode is pretty useful to know the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
+A long time ago, I read on some Vim mailing list, an opinion on how line numbers should behave on different editing modes (if you know who is the original author of such idea, please let me know, so I can give credit where credit is due). Since on normal mode is pretty useful to know the line count from the cursor until some target text, it makes more sense to have the =relative number= shown on the gutter, but when I'm editing the buffer, is nice to have a sense of size by looking to the line numbers.
 
 So, I can describe this behavior as follows:
 
@@ -1215,7 +1215,7 @@ Doom documentation offers a partial solution to this problem asking us to remove
 (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
 #+end_src
 
-Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures ~ws-butler~. While I understand the rational behind the choice of always remove blank spaces regardless the cursor position.
+Another core behavior that does not play well with my aggressive auto-save configuration is how Doom configures ~ws-butler~. While I understand the rationale behind the choice of always remove blank spaces regardless the cursor position, I rather the plugin to not remove blank spaces before the cursor.
 
 To adjust that, let's make ~ws-butler~ behave how I expect it:
 
@@ -1228,7 +1228,7 @@ To adjust that, let's make ~ws-butler~ behave how I expect it:
 ** Persist frame position and geometry
 Before I start tackling my own requirement, let's make Emacs /remember/ its window size and position between launches.
 
-First, I like to define an auto loaded function to hook into the emacs kill process to save frame dimensions. The reason to get an auto load function, is to allow Emacs to *not* load it until it really needs it, which would be when I'm quitting Emacs.
+First, I like to define an autoloaded function to hook into the Emacs kill process to save frame dimensions. The reason to get an autoload function, is to allow Emacs to *not* load it until it really needs it, which would be when I'm quitting Emacs.
 
 #+caption: $DOOMDIR/autoload/editor.el
 #+begin_src emacs-lisp :tangle autoload/editor.el
@@ -1289,9 +1289,9 @@ If you're used to this feature, good for you, but I was never able to adjust my 
 (package! evil-escape :disable t)
 #+end_src
 
-The first Evil configuration I want to adjust to my liking is on ~evil-goggles~. I understand Henrik (Doom's creator) has a good rational on why he setup ~evil-goggles~ the way it is, but I like the original design where *all* changes get the highlight treatment.
+The first Evil configuration I want to adjust to my liking is on ~evil-goggles~. I understand Henrik (Doom's creator) has a good rational on why he set up ~evil-goggles~ the way it is, but I like the original design where *all* changes get the highlight treatment.
 
-Also, I use ~evil-cleverparens~, and its editing operations are not configured on ~evil-goggles~, so, in order to make it work for me I have to do two things:
+Also, I use ~evil-cleverparens~, and its editing operations are not configured on ~evil-goggles~, so, in order to make it work for me, I have to do two things:
 
 1. Re-enable the change feedback disabled by default on Doom;
 2. Add all ~evil-cleverparens~ commands to the ~evil-goggles--commands~ to allow ~evil-goggles~ to handle changes from those commands as well.
@@ -1376,7 +1376,7 @@ After this I can sneak a quick modification to allow ~evil-goggles~ to use the s
   (evil-goggles-use-diff-refine-faces))
 #+end_src
 
-The second configuration is regarding centralizing the cursor after search jumps. I find myself pretty uncomfortable after I press =n= following a search term, and I figured it out that what makes me uncomfortable is the fact the cursor is on the bottom of the screen, and I have almost no visibility of the text after it.
+The second configuration is regarding centralizing the cursor after search jumps. I find myself pretty uncomfortable after I press =n= following a search term, and I figured it out that what makes me uncomfortable is the fact the cursor is at the bottom of the screen, and I have almost no visibility of the text after it.
 
 To fix this, I will add an advice after the Evil search function used to perform those jumps, to recenter the cursor on the window:
 
@@ -1405,7 +1405,7 @@ And finally, for the packages I'm missing, they are:
 *** Evil-MatchIt
 In all fairness, ~matchit~ (the one originally from Vim) is also disabled by default, but it provides such useful feature that I can't understand why it is not part of the standard Vim/Evil.
 
-To the reader not familiar with this plugin, let me give a brief overview of it. You probably know that pressing the key =%= on a pair character (e.g. =(=, =)=, =[=, =]=, etc.), makes the cursor jump to the other pair.
+To the reader not familiar with this plugin, let me give a brief overview of it. You probably know that pressing the key =%= on a pair of character (e.g. =(=, =)=, =[=, =]=, etc.), makes the cursor jump to the other pair.
 
 The ~matchit~ plugin, extends this functionality to other types of pairs, like XML/HTML tags, language control flows like =if=, =else=, and =endif=, and others. So, as I said, a pretty useful plugin!
 
@@ -1429,7 +1429,7 @@ Then, need to make sure to enable the plugin itself. In order to not slow the Em
 *** Plus-Minus
 [[https://github.com/peterwu/plus-minus][~plus-minus~]] is a package that provides the functionality to increase or decrease a number value at point. On Vim, the key bindings for these actions are =C-a= and =C-x= respectively.
 
-I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using ~evil-numbers~ (which Doom provides as a core package), I'll try a brand new package called ~plus-minus~:
+I spend too much time thinking that I should preserve the =C-x= keybinding for Emacs' sake, and I learn to use a command or two that uses it, but the reality is that I don't really need it, so I will give it a try on rebinding this key to its original Vim purpose, but instead of using ~evil-numbers~ (which Doom provides as a core package), I'll try a brand-new package called ~plus-minus~:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1526,7 +1526,7 @@ In order to allow me to repeat the last increase or decrease, I will define a /r
 *** Evil-String-Inflection
 I've been on situations where I realized that I used /camelCase/ for all my variables, where the standard coding style of the language, request to use /snake_case/ style. There are packages available, that allow you to cycle through all case styles on a given word.
 
-I found the [[https://github.com/akicho8/string-inflection][~string-inflection~]] package to be one of the best available. There is the package [[https://github.com/ninrod/evil-string-inflection][~evil-string-inflection~ ]]to integrate with Evil but it turns out to not work as expected, so I will have to configure Evil integration myself. Let's start with the package itself:
+I found the [[https://github.com/akicho8/string-inflection][~string-inflection~]] package to be one of the best available. There is the package [[https://github.com/ninrod/evil-string-inflection][~evil-string-inflection~ ]]to integrate with Evil, but it turns out to not work as expected, so I will have to configure Evil integration myself. Let's start with the package itself:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
@@ -1563,7 +1563,7 @@ I want to have a rich set of mappings for this package, so I will add one key fo
       :desc "UP_CASE" "U" #'string-inflection-upcase)
 #+end_src
 
-In order to create a nicer workflow, I want to access the previous shortcuts by pressing the same key after the initial inflection. For instance, I want to press =SPC g ~= to start the inflection, and keep pressing just =~= to cycle through all of the other inflections.
+In order to create a nicer workflow, I want to access the previous shortcuts by pressing the same key after the initial inflection. For instance, I want to press =SPC g ~= to start the inflection, and keep pressing just =~= to cycle through all the other inflections.
 
 To achieve this behavior I will use the ~my-repeat-map!~ macro introduced on the section [[Repeatable commands]]:
 
@@ -1602,9 +1602,9 @@ Since I decided to write this configuration, I also decided to try to use the st
 *** Window navigation
 A while ago, I configured Vim to move the cursor from one window to another using the standard movements keys (=h=, =j=, =k=, and =l=) while keeping =Ctrl= pressed. I got so used to these shortcuts, that I can't live without it anymore.
 
-The good news is that, on most cases, there is no conflict between features I use and these shortcuts, and on the cases that a conflict exists, there are reasonable options to workaround these limitations.
+The good news is that, on most cases, there is no conflict between features I use and these shortcuts, and on the cases that a conflict exists, there are reasonable options to work around these limitations.
 
-The first step to achieve a global is to clean the target keys from any keymap that might bind them to a command:
+The first step to achieve a global window navigation shortcuts, is to clean the target keys from any keymap that might bind them to a command:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1661,7 +1661,7 @@ Key bindings in this section are purely personal choice. Feel free to give them 
 ◆
 #+end_center
 
-The first keymap group I like to add custom shortcuts is the multiple cursors. When I first heard about multiple cursors, was on a demo of the [[https://macromates.com/][TextMate]] editor. I got so impressed by it that this feature was one of the first things I would search on an editor. Fast forwarding to January 2008, I was watching yet another demo of a brand new editor, when the person showing off the features, demonstrated the multiple cursors. This editor was [[https://www.sublimetext.com][Sublime Text]], and I couldn't resist the chance to give it a try. For reasons of the brain (at least my brain), the shortcuts defined to manipulate multiple cursors got engraved in my memory, and recently, I decide to stop fighting against it and embrace! So these are the shortcuts (which might be different from the current shortcuts in Sublime) that I got /used to/:
+The first keymap group I like to add custom shortcuts is the multiple cursors. When I first heard about multiple cursors, was on a demo of the [[https://macromates.com/][TextMate]] editor. I got so impressed by it that this feature was one of the first things I would search on an editor. Fast forwarding to January 2008, I was watching yet another demo of a brand-new editor, when the person showing off the features, demonstrated the multiple cursors. This editor was [[https://www.sublimetext.com][Sublime Text]], and I couldn't resist the chance to give it a try. For reasons of the brain (at least my brain), the shortcuts defined to manipulate multiple cursors got engraved in my memory, and recently, I decide to stop fighting against it and embrace! So these are the shortcuts (which might be different from the current shortcuts in Sublime) that I got /used to/:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1690,7 +1690,7 @@ Another /nice to have/ binding I got used to, is to move blocks of text up and d
 ◆
 #+end_center
 
-Something that I really like but usually forget to use is the ability to insert a new line while on /insert mode,/ above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
+Something that I really like but usually forget to use is the ability to insert a new line while on /insert mode/, above or bellow the current line, regardless where the cursor is. To use it, I would simply press =<ENTER>= with =<SUPER>= (a.k.a. =cmd= or =⌘=) to insert a line bellow, or =<ENTER>= plus =<SHIFT>= and =<SUPER>= for a line above:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1707,7 +1707,7 @@ Something that I really like but usually forget to use is the ability to insert 
 ◆
 #+end_center
 
-Doom Emacs, offer a shortcut to bring back the last dismissed popup, which is what I want to do on the majority of the cases. But some times, I want to bring back a specific popup buffer to the front, and I like to have a dedicated prefix key to handle this scenario.
+Doom Emacs, offer a shortcut to bring back the last dismissed popup, which is what I want to do on the majority of the cases. But sometimes, I want to bring back a specific popup buffer to the front, and I like to have a dedicated prefix key to handle this scenario.
 
 For now, I set a shortcut for the =*Messages*=, and the =*Backtrace*= buffers, but more popup buffer might get added here in the future:
 
@@ -1723,9 +1723,9 @@ For now, I set a shortcut for the =*Messages*=, and the =*Backtrace*= buffers, b
                                         (pop-to-buffer "*Backtrace*")))
 #+end_src
 
-As you can see, I also like to /scroll to the bottom/ of the buffer when opening messages. The rational behind it is the fact that if I want to quick loo into the =*Messages*= buffer, is most likely to check the latest messages there.
+As you can see, I also like to /scroll to the bottom/ of the buffer when opening messages. The rationale behind it is the fact that if I want to quick loo into the =*Messages*= buffer, is most likely to check the latest messages there.
 
-Also for the =*Messages*= buffer, I like to be able to press =q= to quit as well. Unfortunately this is not defined by default:
+Also, for the =*Messages*= buffer, I like to be able to press =q= to quit as well. Unfortunately this is not defined by default:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1749,7 +1749,7 @@ One binding I feel is missing on Doom, is the ability to evaluate any sexp on *a
 ◆
 #+end_center
 
-I don't remember when this shortcut entered my life, but some time ago I got used to use =s-RET= to /confirm operations/ like sending emails and messages. In order to try to replicate this behavior I will start setting it to the ~with-editor-mode-map~ together with the analog cancel operation with =s-ESC= shortcut:
+I don't remember when this shortcut entered my life, but some time ago I got used to using =s-RET= to /confirm operations/ like sending emails and messages. In order to try to replicate this behavior I will start setting it to the ~with-editor-mode-map~ together with the analog cancel operation with =s-ESC= shortcut:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1779,9 +1779,9 @@ Due to the nature of modal edit, some shortcuts need more than one key press to 
 ◆
 #+end_center
 
-The first candidate for a repeatable pattern is window resizing. On Vim (and also Evil) for instance, the key binding to increase height is =C-w +=. Doom makes this a little bit better by making all key bindings from =C-w= accessible with the prefix =SPC w=, but still, adjusting the size of a window with multiple key strokes like this, is a bad experience.
+The first candidate for a repeatable pattern is window resizing. On Vim (and also Evil) for instance, the key binding to increase height is =C-w +=. Doom makes this a little bit better by making all key bindings from =C-w= accessible with the prefix =SPC w=, but still, adjusting the size of a window with multiple keystrokes like this, is a bad experience.
 
-We can make the window resizing commands safe to repeat, which would allow us to repeat the last resizing with the =.= repeat operator. The problem with this approach, is the fact that we can /change directions/ when repeating the resize. For instance, if we are increasing the height of a window and we press the =.= couple more times we wanted, to decrease its size, we would have to start over with the decrease command and pay attention to not get it wrong this time.
+We can make the window resizing commands safe to repeat, which would allow us to repeat the last resizing with the =.= repeat operator. The problem with this approach, is the fact that we can /change directions/ when repeating the resize. For instance, if we are increasing the height of a window, and we press the =.= couple more times we wanted, to decrease its size, we would have to start over with the decrease command and pay attention to not get it wrong this time.
 
 To avoid this issue, I will define a /repeatable map/ for resizing, and because this is a separate map from the normal window map, I can add couple extra keys there to make the operation even smoother, for instance, we can increase the window height with =+= or with the === key
 
@@ -1833,11 +1833,11 @@ And with those helper functions I can define the proper /repeatable map/ for sid
 ** Appearances
 As far as I understand, there is a share of Emacs users that value Emacs functionalities over its looks, and I would like to write something targeted for those users.
 
-You are awesome! I can't imagine how liberating it would feel if my brain did not obsessed about my editor's appearance, so, stay strong folks! The breakthroughs on technology happens more often by the desired of people like you then people like me.
+You are awesome! I can't imagine how liberating it would feel if my brain did not obsess about my editor's appearance, so, stay strong folks! The breakthroughs on technology happen more often by the desire of people like you then people like me.
 
 With that out of the way, I need to explain to the reader my personal position on this subject. As a person with [[https://en.wikipedia.org/wiki/Attention_deficit_hyperactivity_disorder][ADHD]] and [[https://en.wikipedia.org/wiki/Obsessive%E2%80%93compulsive_disorder][OCD]].
 
-Looks mater. There is not much else to say, but if you need a bit more let me say this: When your brain is constantly searching for dopamine, and is incapable to retain it for much longer, every tinny rewarding counts towards the goal to keep my focus on one subject. If my work environment is pleasing to look, there is a lower chance my brain gets distracted by the scene outside the window. If I open my editor and get the feeling of /"oh yeah"/, than my brain will look forward to use the same tool again, or as I saw on this [[https://twitter.com/ADHDelaide/status/1326412306079682560][tweet]] a while ago, and reproduce it here for you:
+Looks mater. There is not much else to say, but if you need a bit more let me say this: When your brain is constantly searching for dopamine, and is incapable to retain it for much longer, every tinny rewarding counts towards the goal to keep my focus on one subject. If my work environment is pleasing to look, there is a lower chance my brain gets distracted by the scene outside the window. If I open my editor and get the feeling of /"oh yeah"/, then my brain will look forward to using the same tool again, or as I saw on this [[https://twitter.com/ADHDelaide/status/1326412306079682560][tweet]] a while ago, and reproduce it here for you:
 
 #+begin_quote
 ❝ Having *ADHD* is basically finding new ways to trick your brain into doing the stuff you want it to do, until you die. ❞
@@ -1889,7 +1889,7 @@ One editor visual I like to have while I'm coding, is the ~fill-column-indicator
                     :foreground (doom-color 'base3 256))
 #+end_src
 
-Using /Arial Unicode MS/ allow me to use the "=┊=" character to decorate my ~prog-mode~ buffers. After setting this up, I need to adjust the ~fill-column~ value to the column I want (while is usually 100),  and make the column indicator use the correct Unicode character (which is =0x9482=):
+Using /Arial Unicode MS/ allow me to use the "=┊=" character to decorate my ~prog-mode~ buffers. After setting this up, I need to adjust the ~fill-column~ value to the column I want (while is usually 100), and make the column indicator use the correct Unicode character (which is =0x9482=):
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -1940,16 +1940,16 @@ Then, I can add the mode to all ~prog-mode~ buffers with another hook:
 
 Another extra for the editor visuals is rendering the character =^L=, which represents a page break (more precisely, the /form feed/ character).
 
-The page break character is consider a /space/ or /empty/ character, which allows one to add it on a coding file without breaking the build for such file.
+The page break character is considered a /space/ or /empty/ character, which allows one to add it on a coding file without breaking the build for such file.
 
-There are a couple packages that achieve this goal but I set on the [[https://github.com/purcell/page-break-lines][~page-break-lines~]] from [[https://github.com/purcell][Steve Purcell]] because he chose to implement this feature using glyph composition instead of /font-lock/:
+There are a couple packages that achieve this goal, but I set on the [[https://github.com/purcell/page-break-lines][~page-break-lines~]] from [[https://github.com/purcell][Steve Purcell]] because he chose to implement this feature using glyph composition instead of /font-lock/:
 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! page-break-lines)
 #+end_src
 
-There is just one configuration I prefer to change over the defaults, which is the size of thee horizontal line. I like the horizontal like to stop at the ~fill-column~ column, which gives this nice /box feeling/ to the code.
+There is just one configuration I prefer to change over the defaults, which is the size of the horizontal line. I like the horizontal like to stop at the ~fill-column~ column, which gives this nice /box feeling/ to the code.
 
 Besides this change, I only enable the mode on ~prog-mode~ buffers, and I like to define a shortcut key to jump to the next or previous page break:
 
@@ -1979,7 +1979,7 @@ Since the time when widescreen monitors became the standard, when it comes to sp
 *** Theme
 I believe this section to be the most volatile section on this text. Since I got interested on cool old esoteric editors, I'm on an endless search for the Holy Grail of themes. So far I got fond of Tomorrow Night and I use it for the most part of the last 5 years. Recently I got annoyed by some color choices of the theme (the background and line highlight are a bit odd in my opinion), so I kept looking.
 
-I decided to give /Doom-One/ a try, and so far I'm enjoying. I will admit that the purple-ish feeling of the palette is not my style, but overall, I'm not finding a bed choice.
+I decided to give /Doom-One/ a try, and so far I'm enjoying. I will admit that the purplish feeling of the palette is not my style, but overall, I'm not finding a bed choice.
 
 So, to make /Doom-One/ the default theme, set the variable ~doom-theme~ to the symbol ='doom-one= to let Doom know what is the theme it should load:
 
@@ -1997,7 +1997,7 @@ And because I like visual cues on my editor, I will turn on the ability to displ
 #+end_src
 
 *** Typography
-This section requires an important disclaimer to the reader. In majority of the cases, one should not /need/ to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
+This section requires an important disclaimer to the reader. In the majority of the cases, one should not /need/ to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
 
 Doom exposes five (optional) variables for controlling fonts:
 
@@ -2015,7 +2015,7 @@ With that out of the way, I need to explain what is, and why my /typography/ con
 ◆
 #+end_center
 
-In the past years, I've got involved in some projects where I worked directly with the UX team on visual identity tasks. One of the first thing I got used to do, is to define the typography of the project. But what is typography? According to the wikipedia:
+In the past years, I've got involved in some projects where I worked directly with the UX team on visual identity tasks. One of the first thing I got used to doing, is to define the typography of the project. But what is typography? According to the Wikipedia:
 
 #+begin_quote
 *Typography* is the art and technique of arranging type to make written language legible, readable and appealing when displayed.
@@ -2089,12 +2089,13 @@ osascript <<'END'
 END
 #+end_src
 
-The rest of the rules are more subjective, and in all honesty, the methodology I used to decide which slant, and weight to use to each one of the text elements is non existent. I simply tried, checked how it looked, and asked myself, /"Is this a nice looking element?"/. If the answer was yes, I kept the configuration.
+The rest of the rules are more subjective, and in all honesty, the methodology I used to decide which slant, and weight to use to each one of the text elements is non-existent. I simply tried, checked how it looked, and asked myself, /"Is this a nice looking element?"/. If the answer was yes, I kept the configuration.
 
 For the size, I started with the headline level 1 and configure it to be as big as it could be without looking disproportional to the text. Then, I reduced the size for the next level gradually until I get to the 8^{th} one, guaranteeing that it would not be smaller than the normal font size.
 
 In practice, this means:
 
+#+caption: Headline sizes and multipliers
 | Headline Level | Proportional size | Multiplier |
 |----------------+-------------------+------------|
 | Level 1        |              100% |        2.0 |
@@ -2244,7 +2245,7 @@ If you know what is going on here, please let me know. I'll be more than happy t
 ◆
 #+end_center
 
-To start the configuration, per-se, I will get the Doom's font system configured accordingly to my typography:
+To start the configuration, I will get the Doom's font system configured accordingly to my typography:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -2325,7 +2326,7 @@ I will create an /Association List/ to store symbols associated with an adjusted
   "Property list with all supported icons from my configuration.")
 #+end_src
 
-In order to allow other parts of this configuration to leverage the curated icons, I'll create a predicate function to  check if a given symbol has an icon associated with it:
+In order to allow other parts of this configuration to leverage the curated icons, I'll create a predicate function to check if a given symbol has an icon associated with it:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2376,15 +2377,15 @@ icons."
 #+end_src
 
 ** Editor Tabs
-I've been all over the place regarding the use of tabs on editors. I use to think they were useless, since all files on my editor were buffers, not tabs. I though that using tabs as a sort of layout manager was a great idea, because I would have the visual cue of /workspaces/ I had configured.
+I've been all over the place regarding the use of tabs on editors. I used to think they were useless, since all files on my editor were buffers, not tabs. I though that using tabs as a sort of layout manager was a great idea, because I would have the visual cue of /workspaces/ I had configured.
 
-Recently, I spent time thinking about this and I changed my mind regarding tabs. First of all, I believe the common knowledge that one tab represents one file, is too ingrained into our collective minds by all other software that use them (web browsers, IDEs, file managers, etc.). This causes a weird feeling when I look to the tabs and they do not represent opened files. Also, as I work on my editor, I lose track of files opened without tabs.
+Recently, I spent time thinking about this, and I changed my mind regarding tabs. First, I believe the common knowledge that one tab represents one file, is too ingrained into our collective minds by all other software that use them (web browsers, IDEs, file managers, etc.). This causes a weird feeling when I look to the tabs, and they do not represent opened files. Also, as I work on my editor, I lose track of files opened without tabs.
 
 For some Emacs users, all these arguments are silly because they are too used to the way Emacs works. But I believe that this argument should be the other way around. Because of the way Emacs developers decided to use the tab paradigm inside the editor, Emacs users accepted and got used to it.
 
 But, as if to point out things I'm arguing for, there are way too many packages that say they /fix the Emacs window system/ on GitHub these days.
 
-On 2020, I read a blog post from [[https://andreyorst.gitlab.io/][Andrey Listopadov]] about his desire to have [[https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/][Emacs tabs behaving more like tabs on Atom]]. The post itself is a really good read, but I would like to reproduce here Andrey's description of how he believes the tab behavior should be:
+On 2020, I read a blog post from [[https://andreyorst.gitlab.io/][Andrey Listopadov]] about his desire to have [[https://andreyorst.gitlab.io/posts/2020-05-07-making-emacs-tabs-work-like-in-atom/][Emacs tabs behaving more like tabs on Atom]]. The post itself is an excellent read, but I would like to reproduce here Andrey's description of how he believes the tab behavior should be:
 
 #+begin_quote
 In Emacs, however, we can’t close tab via close button, because it will cycle buffers, so instead we can switch to second policy of killing buffer instead. But it will not work either, because it will not kill the window, and it will kill buffer in all windows. So how do we fix this?
@@ -2547,7 +2548,7 @@ truncates text if needed. You can set the minimal width with
           (concat buffer-name (make-string (- tab-width name-width) ?\s)))))))
 #+end_src
 
-The reader might have noticed I use the size of the list returned by the function ~tab-line-tabs-function~ to calculate single tab size, and as you imagine, the function symbol used in this variable is responsible to return a list of tabs on the current window, so I will also use such function to filter some unwanted buffers on the tab bar. The function docstring, explains these exceptional cases in a bit more detail:
+The reader might have noticed I use the size of the list returned by the function ~tab-line-tabs-function~ to calculate single tab size, and as you imagine, the function symbol used in this variable is responsible to return a list of tabs on the current window, so I will also use such function to filter some unwanted buffers on the tab bar. The function's docstring, explains these exceptional cases in a bit more detail:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -2692,7 +2693,7 @@ With all that in place, we can make sure the ~tab-line~ gets loaded when Emacs s
 *** Tab actions
 There are two main actions that I need to address here: selection and closing.
 
-I would like to start talking about the later. Unfortunately, the Emacs implementation of ~tab-line-close-tab~ does not leave room to customize its behavior the way I want it. Instead, I will implement my own version (more like "I'll copy Andrey's version and change it a bit"):
+I would like to start talking about the latter. Unfortunately, the Emacs implementation of ~tab-line-close-tab~ does not leave room to customize its behavior the way I want it. Instead, I will implement my own version (more like "I'll copy Andrey's version and change it a bit"):
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -3081,7 +3082,7 @@ And then, hook them up to their modes hooks:
            #'my-help-man-buffer-config-h)
 #+end_src
 
-The last step on these configuration is to add a popup rule for each mode to make their buffers to open on the right side of the editor:
+The last step on these configurations is to add a popup rule for each mode to make their buffers to open on the right side of the editor:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
