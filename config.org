@@ -3332,7 +3332,7 @@ I like to have secondary information (anything that is *not* the main text) usin
     '(org-tag :height 150))
 #+end_src
 
-The last configuration related to fonts, is how I like to render certain document elements. Instead of showing the standard Org markup, I like to use Unicode characters instead. The table [[#tbl:org-font-lock]] shows the mapping between Org elements and the respective Unicode character I want to use:
+The last configuration related to fonts, is how I like to render certain document elements. Instead of showing the standard Org markup, I like to use Unicode characters instead. The table [[tbl:org-font-lock]] shows the mapping between Org elements and the respective Unicode character I want to use:
 
 #+caption: Org elements to unicode characters
 #+name: tbl:org-font-lock
