@@ -17,9 +17,9 @@
 * Prologue
 Hello there! Thanks for checking my Emacs configuration. I decided to go with a literate programming style, to try to contribute back to the Emacs and Doom community.
 
-This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] configuration framework (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this document (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation, because they're some sort of /common knowledge/ in the Doom's community.
+This configuration uses [[https://github.com/hlissner/doom-emacs][Doom Emacs]] configuration framework (from now on, referred as Doom) as its base, so, my suggestion to you is to get familiarized with it *before* diving deep into this document (a good starting point is the [[https://github.com/hlissner/doom-emacs/blob/develop/docs/getting_started.org][Getting Started]] page on the official repository), there will be options, functions, and variables I will use without much explanation because they're some sort of /common knowledge/ in the Doom's community.
 
-Also, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible in the form of /free text/, so I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://paypal.me/henriklissner][creator]].
+Furthermore, when you install Doom for the first time, it creates the =config.el= and =packages.el= files for you, containing some useful doc-strings there. In this version of my configuration, I will try to include as much of those comments as possible as /free text/. I want you to remember that I didn't come up with those words, some folks much smarter than me did, so feel free to [[https://liberapay.com/hlissner][thank]] the Doom's [[https://paypal.me/henriklissner][creator]].
 
 For instance, a Doom installation without a previous private configuration creates the file =$DOOMDIR/config.el= with the following comments:
 
@@ -41,15 +41,15 @@ You can also try '=gd=' (or '=C-c g d=') to jump to their definition and see the
 ** About this document
 The organization of my Emacs configuration tries to structure the design and build of a text editor tailored for my needs.
 
-Some of these needs are technology related (e.g. programming languages, diagrams tooling, etc.), while others are aesthetic or productivity related.
+Some of these needs are technology related (e.g., programming languages, diagrams tooling, etc.), while others are aesthetic or productivity related.
 
-I want to stress out to you, that ultimately, you are reading a personal opinion, and what works for me may or may not work for you.
+I want to stress out to you, that ultimately, you are reading an opinion, and what works for me may or may not work for you.
 
 I intend to start with features I consider common to any text editor, then, I'll go into some personal preferences still related to text editor in general. Once I'm done with the common features, I'll configure Emacs for writing prose. I decided to do all my prose writing using [[https://orgmode.org/][Org Mode]] and will focus the configuration, at that point, to adjust Emacs and Org to fit my personal workflow.
 
 After configuring Emacs for writing prose, my next focus is programming (which is what I do for work). I will set up [[https://www.gnu.org/software/emacs/manual/html_node/elisp/][Emacs Lisp]], [[https://www.javascript.com/][Javascript]]/[[https://www.typescriptlang.org/][Typescript]], [[https://kotlinlang.org/][Kotlin]], [[https://www.python.org/][Python]], [[https://www.shellscript.sh/][Shell Script]], [[https://developer.apple.com/swift/][Swift]], [[https://golang.org/][Go]], [[https://www.rust-lang.org/][Rust]], and [[http://www.open-std.org/JTC1/SC22/WG14/][C]]/[[http://www.open-std.org/JTC1/SC22/WG21/][C++]]. Most likely not in this order and some of them in more details than others, but at a minimum, I want Emacs to open files of those languages without errors or wrong syntax highlight.
 
-Overall, my intention is to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
+Overall, I intend to configure Doom and core Emacs to get consistent keybindings and behaviors, so that when you learn to use one part of my configuration, you will feel comfortable on the other parts.
 
 #+begin_center
 ◆
@@ -57,27 +57,27 @@ Overall, my intention is to configure Doom and core Emacs to get consistent keyb
 
 Before you move on to the next section I must give you a disclaimer:
 
-Although I'm using Emacs for about six years, I can't consider myself an expert. Was not until the beginning of 2021 that I decided to learn lisp properly, so you may find some code snippets here that are not considered optimal.
+Although I'm using Emacs for about six years, I can't consider myself an expert. It was not until the beginning of 2021 that I decided to learn lisp properly, so you may find some code snippets here that are not considered optimal.
 
-Also, do not trust me blindly. I try my best to verify the information I write by reading documentation and sometimes reaching out to the subject-matter expert of a feature, but for your own good, you should get in the habit of reading the documentation and manuals by yourself, there will be nothing that will build your knowledge better than this.
+Moreover, do not trust me blindly. I try my best to verify the information I write by reading documentation and sometimes reaching out to the subject-matter expert of a feature. But for your own good, you should create the habit of reading documentation and manuals by yourself, there will be nothing that will build your knowledge better than this.
 
 ** About literate configuration
-A long time ago I discovered [[http://literateprogramming.com][Literate Programming]] when I first read an Emacs configuration using Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], and it was a fantastic reading. I tried couple times to do the same with past configurations without much success.
+A long time ago I discovered [[http://literateprogramming.com][Literate Programming]] when I first read an Emacs configuration using Org Mode. It was the [[https://pages.sachachua.com/.emacs.d/Sacha.html][Emacs configuration]] of [[https://sachachua.com/blog/about/][Sacha Chua]], and it was a fantastic reading. I tried a couple of times to do the same with past configurations without much success.
 
 I believe the mentality shift happened when I finally decided to read the original paper about [[http://literateprogramming.com/knuthweb.pdf][Literate Programming]] by [[https://www-cs-faculty.stanford.edu/~knuth/][Donald E. Knuth]], and just like that, I wanted to practice Literate Programming on about everything I do.
 
-Since this document is about a text editor configuration, I have to highlight couple differences between Mr. Knuth's Literate Programming and my Literate Configuration.
+Since this document is about an editor configuration, I have to highlight a couple of differences between Mr. Knuth's Literate Programming and my Literate Configuration.
 
-The core difference, is the fact that each piece of code in this document may not be a self-contained snippet (although I will try my best to do so). When I find appropriate, I will split big block of code into multiples blocks separated by text used to explain the rationale behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
+The core difference, is the fact that each piece of code in this document may not be a self-contained snippet (although I will try my best to do so). When I find appropriate, I will split a big block of code into smaller blocks separated by text used to explain the rationale behind the snippet in question. So, if you're following this document and copying some snippets, make sure you include the /close parenthesis/ that these split sections contain.
 
 ** About Doom configuration style
 One of the major hurdles for newcomers, is to understand how Doom configure Emacs based on one's private configuration, specially for modules or packages which Doom supports.
 
-This section describes four aspects of Doom that I felt important to understand before I was able to properly configure it.
+This section describes four aspects of Doom that I felt important to understand before I could properly configure it.
 
-*** Doom has its own package manager
+*** Doom has its package manager
 
-Doom does not use =package.el=, it has its own package manager system and even though, it uses ~use-package~ and ~straight.el~ packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
+Doom does not use =package.el=, it has its package manager system and even though, it uses ~use-package~ and ~straight.el~ packages, it uses them as support tools for the package manager to work. This means that if you copy and paste a configuration showing how to use them into your =config.el=, most likely you will get some sort of error. So, keep this in mind when you blindly copy a snippet to your =config.el=.
 
 *** Lazy load everything
 
@@ -85,14 +85,14 @@ You should get used to use the options =:defer=, =:hook=, =:after=, =:mode=, and
 
 *** Configuration evaluation order
 
-There are four potential loading /spots/ for each configuration you want to tweak, and you must always decide which one is the best option to apply your particular case:
+There are four potential loading /spots/ for each configuration you want to tweak, and you must always decide which one is the best option to apply in your particular case:
 
-- Directly on =config.el= :: This is the most direct point of configuration. As Emacs evaluates the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /"it needs to get configured before the package gets loaded"/. On Doom's world, any directory or file variable should go to directly into your =config.el=;
-- Inside the =:init= section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluates the code inside =:init= only *after* the resource stated on the option loads;
-- Inside the =:config= section of ~use-package~ :: This always execute after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
+- Directly on =config.el= :: This is the most direct point of configuration. As Emacs evaluates the line of your configuration, it applies such configuration immediately. This is a good spot to configure variables the documentation states that /“it needs to get configured before the package gets loaded”/. On Doom's world, any directory or file variable should go to directly into your =config.el=;
+- Inside the =:init= section of ~use-package~ :: Depending on how a package gets configured, this is equivalent to configuring something directly on the =config.el=, but not always. If a package configuration uses the =:after= section from ~use-package~, Emacs evaluates the code inside =:init= only *after* the resource defined on the option, loads;
+- Inside the =:config= section of ~use-package~ :: This always executes after the given package gets loaded. You need to consider other instances of the call to ~use-package~ on the same package. The order in which they evaluate dictates who will overwrite a variable last;
 - Inside an ~after!~ or ~with-eval-after-load~ macro :: Code here executes after the defined resource gets loaded, but also after all instances of ~use-package~ finish to run code from their =:config= section;
 
-If you have any question about where you should add your configuration, I suggest following the following rule of thumb:
+If you have any question about where you should add your configuration, I suggest following this rule of thumb:
 
 - If a package requires you to configure a variable before Emacs loads such package, set the variable directly on the =config.el=;
 - If you're configuring a package that Doom installs as part of a module, and it does not require you to define the configuration before Emacs loads the package, use the ~after!~ macro;
@@ -114,7 +114,7 @@ Eventually, you will realize that ~use-package~ has a nice =:bind= option to it,
 My recommendation to you is to always configure your keybindings using the ~map!~ macro. Check its documentation for more details (on Emacs press =SPC h f map! RET=).
 
 ** Investigating issues
-If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /ipsis litteris/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
+If you, like me, try new things with your config until it breaks, is important that we have some tools to help us figure out what is going on. Regardless if you'll use this configuration /as is/, or start yours from scratch, and copy the tidbits that may interest you. Before you start know these things:
 
 To get a better sense of what is going on, start Emacs from terminal with the =--debug-init= flag:
 
@@ -125,7 +125,7 @@ emacs --debug-init
 
 This will stop Emacs on the first error and print the stack trace for it. As of now, this might not be useful beyond reporting bugs, nevertheless, it's important you keep it in your mind!
 
-Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensible to package loading.
+Another issue that may show up, is slowness, specially after adding packages. This is not uncommon since Emacs startup time is sensitive to package loading.
 
 What I recommend doing, is to install a package called [[https://github.com/kekeimiku/benchmark-init-el][~benchmark-init-el~]] that specializes on benchmarking (notice that I'm not using the [[https://github.com/dholm/benchmark-init-el][official repository]] for ~benchmark-init-el~, but a fork that fixed a bug when using it with Emacs 28+), and use it, when you have the need:
 
@@ -141,9 +141,9 @@ Check my =init.el= file on the [[Appendix][Appendix]], to see how I hook up benc
 After starting Emacs with the =--debug-init= flag, you can check the call tree with the =M-x benchmark-init/show-durations-tree= command.
 
 ** Acknowledgments
-Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! Feel free to say that this configuration is a byproduct of yours.
+Besides the already mentioned [[https://sachachua.com/blog/about/][Sacha Chua]], I would also like to thank Timothy (a.k.a. [[https://github.com/tecosaur][tecosaur]]) for his wonderful literate config. I would be lying if I said [[https://www.gitmemory.com/tecosaur][tecosaur]] was not one of the big reasons for me to give it a second try on my literate config, so thank you mate! You are welcome to say that this configuration is a byproduct of yours.
 
-I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the amazing theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
+I would also like to thank [[https://github.com/gongzhitaao][Zhitao Gong]] for the remarkable theme I'm using in this publication, it's called [[https://github.com/gongzhitaao/orgcss][OrgCSS]] and you should definitely check it out. If you try [[https://github.com/gongzhitaao][Zhitao Gong]]'s theme, and it does not look like this, you can use my extra modification by adding the following on your Org preamble:
 
 #+begin_src text :tangle no
 ,#+setupfile: https://raw.githubusercontent.com/Townk/doom-emacs-private/master/.github/support/org/html-export.setup
@@ -154,7 +154,7 @@ Last, but not least, I like to give a shout to [[https://github.com/justinbondoc
 By the way, if you are reading this document online, there is a chance you might feel a familiarity with the typography used here. This is due to the fact I'm using the same font used by [[https://github.com/mickeynp][Mickey Petersen]] on his amazing [[https://www.masteringemacs.org/][Mastering Emacs]] site. So if you think this is a nice typography for reading online, again, I can't take credit for that either, check Mickey's site and maybe purchase a copy of his [[https://www.masteringemacs.org/order][book]].
 
 * Standard features
-Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader don't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editor, drop me a line, and I'll be more than happy to link your document here.
+Before jumping in the configuration itself, I like to describe what I'm trying to achieve on each section, so the reader doesn't feel lost. Also, by defining good requirements, this document may help someone else to achieve similar results with different editors. If you are among the crazies that besides liking my choices, decided to port this to other editors, drop me a line, and I'll be more than happy to link your document here.
 
 ** Requirements
 :PROPERTIES:
@@ -164,7 +164,7 @@ Before jumping in the configuration itself, I like to describe what I'm trying t
 This part of the document will deal with configurations and functionalities that I consider as essential on any text editor, from IDEs to editors like [[https://en.wikipedia.org/wiki/Microsoft_Notepad][Notepad]], even though they're not present in all of them.
 
 *** Modal editing
-I need to come clean to the reader about my experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some time now. Nevertheless, I personally believe that modal editing is far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
+I need to come clean to the reader about my experiences with text editors. I'm a /die-hard/ Vim user, even though I'm not using Vim for some time now. Nevertheless, I, personally, believe that modal editing is a far superior way to use a text editor than any other alternative, and that is why I consider /modal editing/, a feature that any text editor should have.
 
 *** Text Snippets
 Although I'm not an avid user of snippets, I believe they're a fundamental part of modern editors. Without them, I have to resort to some bookkeeping method to save interesting coding snippets. So, I consider snippets a base requirement for my editor.
@@ -187,12 +187,12 @@ This requirement, is to make sure the =<BACKSPACE>= key behaves in the same way 
 *** Balanced pairs
 The common behavior you might see on text editors is to complete a character pair as you type. For instance, if you type an open parenthesis, the editor would insert the closing one automatically, and if you press the closing parenthesis, the editor would simply move the cursor to the right of the already inserted close parenthesis character.
 
-My requirement is to my editor to keep any of these character pairs balanced. If I try to delete a line with a closing pair character that would make the pairs of such character unbalanced, the editor would delete the line content, but would leave the closing character for the pair, preventing the file from getting on an unbalanced state.
+My requirement is to my editor to keep any of these character pairs balanced. If I try to delete a line with a closing pair character that would make the pairs of such character unbalanced. The editor would delete the line content, but would leave the closing character for the pair, preventing the file from getting to an unbalanced state.
 
 *** Rich keybindings
 Any half-decent text editor these days supports an infinite plethora of shortcuts. What I believe an editor should support to be ahead of the game, is the ability to bind *any* editor action to a key, and to offer to the user some sort of guidance while one uses the editor.
 
-For instance, if you configure your editor to search for files when you press '=SPC f f=', when you press '=SPC f=' and wait, I want the editor to display all the possible options for you to complete your key sequence.
+For instance, if you configure your editor to search for files when you press '=SPC f f=', when you press '=SPC f=' and wait. I want the editor to display all the possible options for me to complete your key sequence.
 
 *** Useful line numbers
 I like the text editor to show me line numbers when mater, and when it does, I like to get the most of them. This requirement is to make sure that line numbers are aware of the modal editing, so when I'm on /normal mode/ with line numbers visible, the editor should show me lines as relative numbers, and when I'm editing the file (in /insert mode/), the line numbers should be absolute.
@@ -201,7 +201,7 @@ I like the text editor to show me line numbers when mater, and when it does, I l
 I want to stop saving my files. Any editor has a substantial number of undo actions, and Doom even allow me to save the undo history across sessions. Because of that, I want my editor to save files I'm editing from time to time and on special events like switching to a different app, or a different buffer.
 
 *** Persist frame position and geometry
-I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be, but if I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size I defined on the last time I've opened it.
+I move my editor all around my desktop, and I resize it just as much, do I'm not particular to any specific size or position it should be. If I turn it off, the next time I decide to open it, I expect it to be in the same place, and with the same size, I defined on the last time I've opened it.
 
 *** Remote editing
 I want my text editor to edit remote files seamlessly, and by remote, I mean not in the same Operating System where the editor is running. This also include containers like Docker.
@@ -252,7 +252,7 @@ I love the style of this image so much, that it is, besides my dashboard image, 
 #+end_center
 
 *** Key modifiers
-Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
+]]Since I use a Mac as my primary computer, I need to adjust its control keys to match a good set of control keys on Emacs:
 
 #+caption: macOS key mappings
 #+name: tbl:macos-keys
@@ -2001,6 +2001,9 @@ And because I like visual cues on my editor, I will turn on the ability to displ
 #+end_src
 
 *** Typography
+:PROPERTIES:
+:CUSTOM_ID: prefs-typography
+:END:
 This section requires an important disclaimer to the reader. In the majority of the cases, one should not /need/ to customize their fonts the way I'm doing it. Doom Emacs has a system to configure the editor fonts, and one should prefer to use such systems instead of this particular configuration.
 
 Doom exposes five (optional) variables for controlling fonts:
@@ -4962,14 +4965,14 @@ Doom also offers nice shortcuts for us to access our workspace. They're all boun
       :ne "M-0"   #'+workspace/switch-to-final
 #+end_src
 
-These shortcuts close the majority of workspace binding we may need:
+With the function that will configure my buffer in place, I need to hook it to the mode initialization:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 )  ;; map!
 #+end_src
 
-There are couple shortcuts that are not defined with the ~map!~ function, so we can tackle them here:
+The last configuration for the ~Info-mode~ is *where* its buffer gets displayed. For me, it should show up on the right side of my screen. I can achieve that with a popup rule for the buffer:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -4978,7 +4981,8 @@ There are couple shortcuts that are not defined with the ~map!~ function, so we 
   [remap evil-window-delete] #'+workspace/close-window-or-workspace)
 #+end_src
 
-This will delete the current workspace if closing the last open window. But we still need to implement the target function here:
+*** Help mode and Man mode
+I want to give a similar treatment I did to the ~Info-mode~ to both these modes, and like the ~Info-mode~, the first thing to do is to create the functions that will configure these modes:
 
 #+caption: $DOOMDIR/autoload/preferences.el
 #+begin_src emacs-lisp :tangle autoload/preferences.el
@@ -5007,7 +5011,7 @@ the next."
     (t (minibuffer-message "%s" (+workspace--message-body (error-message-string err) 'error)))))
 #+end_src
 
-When we have the feature ~workspaces~ on our =init.el=, Doom will add an option on its dashboard to allow us to recover the last saved session. Since we disabled that feature, we need to add this option again:
+And then, hook them up to their modes hooks:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -5020,17 +5024,28 @@ When we have the feature ~workspaces~ on our =init.el=, Doom will add an option 
    :action +workspace/restore-last-session))
 #+end_src
 
-The only thing remaining on our refactor, is to connect our auto-save function to the hook ~kill-emacs-hook~:
+The last step on these configurations is to add a popup rule for each mode to make their buffers to open on the right side of the editor:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (add-hook 'kill-emacs-hook #'+workspace-auto-save-h)
 #+end_src
 
+*** Rainbow mode
+The Rainbow mode is a small visual helper to display colors on the buffer, whenever it finds a string that can be a color.
+
+I already configured a key binding (=SPC t R=) to toggle this mode.
+
+What I still need to do, is to make sure that I use a fixed font when displaying the color text, unfortunately, the ~rainbow-mode~ uses an anonymous face to display the colors, so the only way for me to customize it, is to override the ~rainbow-colorize-match~ with a function that add any property I want to the face (in this case, to inherit from the ~fixed-pitch~ face):
+
+#+caption: $DOOMDIR/autoload/preferences.el
+#+begin_src emacs-lisp :tangle autoload/preferences.el
+#+end_src
+
 * Writing :wip:
 In my day-time job, my role, among other things, is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, it lacks a substantial amount of features. The amount of configurations and adjustments I would need to do to get a distance resemblance of those IDEs is prohibitive. Because of this reason, one of my main usage for Emacs is writing and scripting.
 
-I decided to use Org mode as my writing platform. And because of that, this section is as big and detailed as it can be.
+I decided to use Org mode as my writing platform, and I'll detail in this section, how I configured Org mode to fit my writing workflow.
 
 #+begin_center
 ◆
@@ -5088,7 +5103,7 @@ Most of these directories are straightforward to understand their purpose, but I
 Different from the editor requirements on section [[#standard-requirements]], my writing requirements are more loosely defined, and one requirement might need multiple configurations while others might get configured on a single section. Nevertheless, I split my requirements into four distinct stories.
 
 *** Fonts
-Fonts for writing must use variable pitch and follow the typography rules defined on section [[Typography]]. Any reference to code or code elements must get the normal /coding/ style with fixed pitch. Also, other then headlines, element should have variable size depending on their importance.
+Fonts for writing must use variable pitch and follow the typography rules defined on section [[#prefs-typography]]. Any reference to code or code elements must get the normal /coding/ style with fixed pitch. Also, other than headlines, element should have variable size depending on their importance.
 
 *** Writing quality
 Throughout the /writing sections/ you'll see a common theme: I'm not a good writer. I sure do try my best, and use whatever tools are available to me, but I'm far from the person who sits down and put on paper what is in her head.
@@ -5120,10 +5135,10 @@ This requirement got enormous attention from me, when I realized I couldn't keep
 
 Fleet notes should not take more than 2 seconds to take, and I will define a process for note review daily and weekly.
 
-** TODO Common Org configurations
-But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
+** Writing typography
+Fortunately for me, ~org-mode~ and other writing major modes, derive from the built-in ~outline-mode~. This allows me to configure the headline typography for ~outline-mode~ and have ~org-mode~ inheriting it.
 
-The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
+To start, I will make sure the headlines of any mode derived from ~outline-mode~ gets the correct face configuration:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -5132,6 +5147,12 @@ The first thing I like to do, is to create some variables pointing to key locati
       +zen-text-scale           1)
 #+end_src
 
+Then, I have to adjust the document title face, that by default, gets the same treatment as any document metadata:
+
+#+end_src
+
+The next step to get Org to conform with my defined typography, is to make sure Emacs renders faces designated to display some sort of code information with a fixed pitch face:
+
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (setq org-html-htmlize-output-type 'css
@@ -5139,6 +5160,42 @@ The first thing I like to do, is to create some variables pointing to key locati
       org-html-doctype "html5"
       org-html-html5-fancy t
       org-html-table-caption-above nil)
+#+end_src
+
+The rest of the face adjustments are my personal preferences.
+
+I want the drawers from Org to use the same color as code comments:
+
+
+On the normalization front, I like to have special keywords to look like comments, formulas to use the same face as tables, and indentation to use monospaced font and also to stay hidden:
+
+
+I like to have secondary information (anything that is *not* the main text) using a smaller face:
+
+
+The last configuration related to fonts, is how I like to render certain document elements. Instead of showing the standard Org markup, I like to use Unicode characters instead. The table [[#tbl:org-font-lock]] shows the mapping between Org elements and the respective Unicode character I want to use:
+
+#+caption: Org elements to unicode characters
+#+name: tbl:org-font-lock
+| Org element          | Org symbol | Unicode |
+|----------------------+------------+---------|
+|                      |    <c>     |   <c>   |
+| Unmarked checkbox    |   =- [ ]=    |    ☐    |
+| In-progress checkbox |   =- [-]=    |    ⊡    |
+| Finished checkbox    |   =- [X]=    |    ☒    |
+| List item bullet 1   |     =-=      |    •    |
+| List item bullet 2   |     =+=      |    ‣    |
+| List item bullet 3   |     =*=      |    ⁍    |
+
+Unfortunately, I can only define new ~font-lock-keywords~ for a major mode, after loading it for the first time, so I will effectively add them when I'm configuring Org on the next section. But here, I want to define a constant holding the list of new ~font-lock-keywords~ that I can use later during the Org configuration. Another advantage to have such constant, is to allow me to reuse the same configuration on other derived modes (e.g. ~org-journal-mode~):
+
+
+** TODO Common Org configurations
+But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
+
+The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
+
+#+caption: $DOOMDIR/config.el
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -5271,26 +5328,6 @@ In some documents, I need to write math formulas and Org can render them pretty 
             '("xwiki" . "https://w.amazon.com/bin/view/%(+org-xwiki--translate-path)"))
 #+end_src
 
- I need to adjust some of the Org fonts to use fixed pitch regardless if I'm using variable pitch. This will guarantee that tables, source blocks, and some other formatting will render properly on the UI, so let's create a function for it:
-
-Once we create the function, we can attach it to a hook or execute it right away depending on Emacs running as a daemon or not:
-
-And to close out my /beautification/, I want to render some unicode characters instead of some Org elements:
-
-#+caption: Org elements to unicode characters
-#+name: tbl:org-font-lock
-| Org element          | Org symbol | Unicode |
-|----------------------+------------+---------|
-|                      |    <c>     |   <c>   |
-| Unmarked checkbox    |   =- [ ]=    |    ☐    |
-| In-progress checkbox |   =- [-]=    |    ⊡    |
-| Finished checkbox    |   =- [X]=    |    ☒    |
-| List item bullet 1   |     =-=      |    •    |
-| List item bullet 2   |     =+=      |    ‣    |
-| List item bullet 3   |     =*=      |    ⁍    |
-
-And I also want to have better bullet marks:
-
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
   (font-lock-add-keywords 'org-mode my-org-font-lock-beautify-keywords)
@@ -5388,7 +5425,7 @@ Defer its loading on our configuration, and as with the ~valign~ package, we wil
 
 Now that I have a narrower width, the text will wrap more often, but the normal navigation keys will make the cursor jump from one line to the other, even if I have other /visual/ lines displayed.
 
-To fix this behavior, we just need to re-bind some of the movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in ~org-moode~, we want it bound to ~evil-next-visual-line~:
+To fix this behavior, we just need to re-bind some movement keys to the /visual/ version of their original command, for instance, while we have =j= bound to ~evil-next-line~, in ~org-moode~, we want it bound to ~evil-next-visual-line~:
 
 While I'm sure I'm missing a command or two, these will get me started.
 
@@ -5449,7 +5486,7 @@ I also need to adjust the window navigation keys that clash with default Org bin
        :v "s-k" #'my-link-snippet-in-place))
 #+end_src
 
-At this point we can tight up everything and setup our buffer when we open an org file.
+At this point we can tight up everything and set up our buffer when we open an org file.
 
 https://github.com/awth13/org-appear
 
@@ -5530,9 +5567,9 @@ With this function in place, we can /hook/ it to our Org major mode:
 #+end_src
 
 ** TODO Prose writing
-I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more then I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not really good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
+I don't like to write. After reading this page or any other text I published you might think this is a lie, but it's not. I say way more than I need at any given moment. Suffice to say that this takes a big chunk of my energy, and on top of that, I'm not good at it. This means that for my crazy brain, there is not much reward when I write, and in some times, there is actually anxiety and discomfort.
 
-With that out of the way, I need to acknowledge that, currently in my career, there is no way I can get away with /not writing/. There are too much design, architecture, plans, and projects involved on my day to day work, that my team and I need some form of record of our decisions. And if writing is inevitable, I should, at least, try to make it less painful.
+With that out of the way, I need to acknowledge that, currently in my career, there is no way I can get away with /not writing/. There are too much design, architecture, plans, and projects involved on my day-to-day work, that my team and I need some form of record of our decisions. And if writing is inevitable, I should, at least, try to make it less painful.
 
 For me, this means I should have a tool that offers me the power required to do any kind of writing, but in the same time, makes my life easier when doing the /writing thing/.
 
@@ -6506,9 +6543,9 @@ time."
   "Filename format for the Daily Notes file.")
 
 (defconst my-roam-dailies-header (concat "#+TITLE: Daily notes for %<%A, %B %-e, %Y>\n"
-                                           "#+STARTUP: overview\n"
-                                           "#+CATEGORY: dailies\n"
-                                           "\n")
+                                         "#+STARTUP: overview\n"
+                                         "#+CATEGORY: dailies\n"
+                                         "\n")
   "Template used to create new Daily Notes files.")
 #+end_src
 
@@ -7159,6 +7196,9 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
       :file-name "websites/%(s-trim-right (shell-command-to-string \"uuidgen\"))-${slug}"
       :head "#+TITLE: ${title}\n#+ROAM_TAGS: \n#+ROAM_KEY: ${ref}\n"
       :unnarrowed t))))
+
+;; (use-package! nroam
+;;   :hook '(org-roam-mode . nroam-setup-maybe))
 
 (after! org-roam
   (setq org-roam-link-title-format "✑ %s"
