@@ -3159,17 +3159,6 @@ either white or black."
              (:inherit fixed-pitch)))))
 #+end_src
 
-*** Rainbow mode
-The Rainbow mode is a small visual helper to display colors on the buffer, whenever it finds a string that can be a color.
-
-I already configured a key binding (=SPC t R=) to toggle this mode.
-
-What I still need to do, is to make sure that I use a fixed font when displaying the color text, unfortunately, the ~rainbow-mode~ uses an anonymous face to display the colors, so the only way for me to customize it, is to override the ~rainbow-colorize-match~ with a function that add any property I want to the face (in this case, to inherit from the ~fixed-pitch~ face):
-
-#+caption: $DOOMDIR/autoload/preferences.el
-#+begin_src emacs-lisp :tangle autoload/preferences.el
-#+end_src
-
 * Writing :wip:
 In my day-time job, my role, among other things, is to do mobile development for the Android platform. While Emacs is OK handling Java, Kotlin, and friends, compared to IDEs like IntelliJ and Android Studio, it lacks a substantial amount of features. The amount of configurations and adjustments I would need to do to get a distance resemblance of those IDEs is prohibitive. Because of this reason, one of my main usage for Emacs is writing and scripting.
 
@@ -3270,36 +3259,76 @@ To start, I will make sure the headlines of any mode derived from ~outline-mode~
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(setq writeroom-mode-line       t
-      +zen-window-divider-size  2
-      +zen-text-scale           1)
+(my-typography-reset (cl-loop for i from 1 to 8 collect (intern (format "outline-%d" i))))
+(custom-set-faces!
+  `(outline-1 :inherit my-headline-1 :weight unspecified :extend unspecified)
+  `(outline-2 :inherit my-headline-2 :weight unspecified :extend unspecified)
+  `(outline-3 :inherit my-headline-3 :weight unspecified :extend unspecified)
+  `(outline-4 :inherit my-headline-4 :weight unspecified :extend unspecified)
+  `(outline-5 :inherit my-headline-5 :weight unspecified :extend unspecified)
+  `(outline-6 :inherit my-headline-6 :weight unspecified :extend unspecified)
+  `(outline-7 :inherit my-headline-7 :weight unspecified :extend unspecified)
+  `(outline-8 :inherit my-headline-8 :weight unspecified :extend unspecified))
 #+end_src
 
 Then, I have to adjust the document title face, that by default, gets the same treatment as any document metadata:
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(my-typography-reset 'org-document-title)
+(custom-set-faces!
+  '(org-document-title :inherit my-document-title :weight unspecified :extend unspecified))
 #+end_src
 
 The next step to get Org to conform with my defined typography, is to make sure Emacs renders faces designated to display some sort of code information with a fixed pitch face:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(setq org-html-htmlize-output-type 'css
-      org-html-head-include-default-style nil
-      org-html-doctype "html5"
-      org-html-html5-fancy t
-      org-html-table-caption-above nil)
+  (custom-set-faces!
+    '((org-document-info
+       org-document-info-keyword
+       org-property-value
+       org-drawer
+       org-table
+       org-block
+       org-verbatim
+       org-code
+       org-date
+       org-block-begin-line)
+      :inherit fixed-pitch))
 #+end_src
 
 The rest of the face adjustments are my personal preferences.
 
 I want the drawers from Org to use the same color as code comments:
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+  (custom-set-faces!
+    `(org-drawer :foreground ,(doom-color 'doc-comments)))
+#+end_src
 
 On the normalization front, I like to have special keywords to look like comments, formulas to use the same face as tables, and indentation to use monospaced font and also to stay hidden:
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+  (custom-set-faces!
+    '(org-special-keyword :inherit font-lock-comment-face)
+    '(org-formula :inherit org-table)
+  '(org-indent :inherit (org-hide fixed-pitch)))
+#+end_src
 
 I like to have secondary information (anything that is *not* the main text) using a smaller face:
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+  (custom-set-faces!
+    '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
+    `(org-drawer :foreground ,(doom-color 'doc-comments))
+    '(org-block-begin-line :height 0.8)
+    '(org-block-end-line :inherit org-block-begin-line)
+    '(org-tag :height 150))
+#+end_src
 
 The last configuration related to fonts, is how I like to render certain document elements. Instead of showing the standard Org markup, I like to use Unicode characters instead. The table [[#tbl:org-font-lock]] shows the mapping between Org elements and the respective Unicode character I want to use:
 
@@ -3317,6 +3346,28 @@ The last configuration related to fonts, is how I like to render certain documen
 
 Unfortunately, I can only define new ~font-lock-keywords~ for a major mode, after loading it for the first time, so I will effectively add them when I'm configuring Org on the next section. But here, I want to define a constant holding the list of new ~font-lock-keywords~ that I can use later during the Org configuration. Another advantage to have such constant, is to allow me to reuse the same configuration on other derived modes (e.g. ~org-journal-mode~):
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+  (defconst my-org-font-lock-beautify-keywords
+    `(("^#\\+TITLE: *"
+       (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+      ("^\\*+ "
+       (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
+      ("^ *\\([-+*] \\[ \\]\\) "
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☐ "))))
+      ("^ *\\([-+*] \\[-\\]\\) "
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
+      ("^ *\\([-+*] \\[[xX]\\]\\) "
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☒ "))))
+      ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "•"))))
+      ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "‣"))))
+      ("^ *\\(\\*\\) \\([^\\[]\\|\\[[^ xX-]\\)"
+       (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⁍")))))
+    "This is a list of text elements fontification for Org. It
+  beautifies title, check-boxes, and list bullets.")
+#+end_src
 
 ** TODO Common Org configurations
 But before we dive in each one of these usages, there are some things I like to configure on Org that will affect all the other areas, so I will start with them here.
@@ -3324,6 +3375,10 @@ But before we dive in each one of these usages, there are some things I like to 
 The first thing I like to do, is to create some variables pointing to key locations and files on my directory structure:
 
 #+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+  (setq writeroom-mode-line       t
+        +zen-window-divider-size  2
+        +zen-text-scale           1)
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -3356,42 +3411,7 @@ Notice that we crated these variables before loading anything related to Org. Th
 
 Now we can wait Org to load to  continue our configuration:
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-(my-typography-reset (cl-loop for i from 1 to 8 collect (intern (format "outline-%d" i))))
-(custom-set-faces!
-  `(outline-1 :inherit my-headline-1 :weight unspecified :extend unspecified)
-  `(outline-2 :inherit my-headline-2 :weight unspecified :extend unspecified)
-  `(outline-3 :inherit my-headline-3 :weight unspecified :extend unspecified)
-  `(outline-4 :inherit my-headline-4 :weight unspecified :extend unspecified)
-  `(outline-5 :inherit my-headline-5 :weight unspecified :extend unspecified)
-  `(outline-6 :inherit my-headline-6 :weight unspecified :extend unspecified)
-  `(outline-7 :inherit my-headline-7 :weight unspecified :extend unspecified)
-  `(outline-8 :inherit my-headline-8 :weight unspecified :extend unspecified))
-#+end_src
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-(defconst my-org-font-lock-beautify-keywords
-  `(("^#\\+TITLE: *"
-     (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
-    ("^\\*+ "
-     (0 (prog1 nil (put-text-property (match-beginning 0) (match-end 0) 'invisible t))))
-    ("^ *\\([-+*] \\[ \\]\\) "
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☐ "))))
-    ("^ *\\([-+*] \\[-\\]\\) "
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⊡ "))))
-    ("^ *\\([-+*] \\[[xX]\\]\\) "
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "☒ "))))
-    ("^ *\\(-\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "•"))))
-    ("^ *\\(\\+\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "‣"))))
-    ("^ *\\(\\*\\) \\([^\\[]\\|\\[[^ xX-]\\)"
-     (0 (prog1 nil (compose-region (match-beginning 1) (match-end 1) "⁍")))))
-  "This is a list of text elements fontification for Org. It
-beautifies title, check-boxes, and list bullets.")
-#+end_src
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
@@ -3477,39 +3497,8 @@ After all these tweaks, we can close our parenthesis:
 ) ;; after! org
 #+end_src
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-(custom-set-faces!
-  '((org-document-info
-     org-document-info-keyword
-     org-property-value
-     org-drawer
-     org-table
-     org-block
-     org-verbatim
-     org-code
-     org-date
-     org-block-begin-line)
-    :inherit fixed-pitch))
-#+end_src
 
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-(my-typography-reset 'org-document-title)
-
-(custom-set-faces!
-  '(org-document-title :inherit my-document-title :weight unspecified :extend unspecified)
-  '(org-meta-line :height 0.8 :inherit font-lock-comment-face)
-  '(org-special-keyword :inherit font-lock-comment-face)
-  `(org-drawer :foreground ,(doom-color 'doc-comments))
-  '(org-formula :inherit org-table)
-  '(org-block-begin-line :height 0.8)
-  '(org-block-end-line :inherit org-block-begin-line)
-  '(org-tag :height 150)
-  '(org-indent :inherit (org-hide fixed-pitch)))
-#+end_src
-
-Even though our configuration can renders math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called [[https://github.com/io12/org-fragtog][~org-fragtog~]]. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
+Even though our configuration can render math formulas nicely, it's still awkward to edit them once you write them. To help us with this task, I'll install a plugin called [[https://github.com/io12/org-fragtog][~org-fragtog~]]. This plugin will show the math formula with the LaTeX syntax if the cursor is inside the formula area, and will render the formula when the cursor leaves it.
 
 First we add the plugin on our ~packages.el~ file:
 
@@ -3561,8 +3550,25 @@ I also need to adjust the window navigation keys that clash with default Org bin
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(map! :after org
-      :map org-mode-map
+(map! :after org :map org-mode-map
+      :localleader
+      :desc "org-reveal" :n "R" #'org-reveal
+      :desc "Copy visible" :v "y" #'org-copy-visible)
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(map! :after org :map org-mode-map
+      :localleader :prefix ("s" . "tree/subtree")
+      :desc "Clone subtree" :n "c" #'org-clone-subtree-with-time-shift
+      :desc "Copy special" :n "y" #'org-copy-special
+      :desc "Cut special" :n "d" #'org-cut-special
+      :desc "Cut special" :n "x" #'org-cut-special)
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(map! :after org :map org-mode-map
       :prefix ("g" . "action")
       :desc "org-ctrl-c-ctrl-c" :n [return] #'org-ctrl-c-ctrl-c
       :desc "org-ctrl-c-ctrl-c" :n "RET" #'org-ctrl-c-ctrl-c)
