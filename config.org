@@ -1217,7 +1217,7 @@ Emacs allows you to define some /advices/ to any function you want. This allows 
 
 This is a part of the full auto-save feature."
   :before (list #'save-buffers-kill-emacs #'my-tabs-close-buffer-tab)
-  (save-some-buffers t t))
+  (save-some-buffers t nil))
 #+end_src
 
 And to wrap up this configuration, I enable the auto-save mode:
@@ -1545,7 +1545,9 @@ With all in place, we just need to define the keybindings:
     :desc "Inc sequence" :v "=" #'+/-:block+
     :desc "Dec sequence" :v "-" #'+/-:block-
     :desc "Inc sequence" :n "=" #'my-inc-or-rotate-at-point
-    :desc "Dec sequence" :v "-" #'my-dec-or-rotate-at-point))
+    :desc "Dec sequence" :v "-" #'my-dec-or-rotate-at-point)
+  (:leader
+   :desc "Emacs C-x" :n "C-x" ctl-x-map))
 #+end_src
 
 In order to allow me to repeat the last increase or decrease, I will define a /repeatable map/ for my custom increase and decrease functions:
@@ -3057,7 +3059,7 @@ And then, we modify all the faces to match my particular configuration:
   `(info-isolated-backquote :inherit info-quoted-name)
   `(info-glossary-word :foreground ,(doom-color 'type 256)
                        :background ,(doom-darken 'type 0.7)
-                       :box (:line-width (4 . 1) :color ,(doom-darken 'type 0.7) :style nil)
+                       :box (:line-width 1 :color ,(doom-darken 'type 0.7) :style nil)
                        :inherit fixed-pitch)
   `(link-visited :foreground ,(doom-color 'violet 256))
   `(info-double-quoted-name :inherit font-lock-string-face)
@@ -3576,28 +3578,26 @@ I also need to adjust the window navigation keys that clash with default Org bin
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(map! :after org
-      :map org-mode-map
+(map! :after org :map org-mode-map
       :n "s-j" #'org-next-visible-heading
       :n "s-k" #'org-previous-visible-heading
-      :n "C-s-j" #'org-forward-heading-same-level
-      :n "C-s-k" #'org-backward-heading-same-level
+      :n "s-C-h" #'org-up-element
+      :n "s-C-j" #'org-forward-heading-same-level
+      :n "s-C-k" #'org-backward-heading-same-level
       :n "C-j" #'evil-window-down
       :n "C-k" #'evil-window-up)
 #+end_src
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(map! :after org
-      :map org-mode-map
+(map! :after org :map org-mode-map
       :g "s-RET"     #'org-edit-special
       :g [s-return]  #'org-edit-special)
 #+end_src
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(map! :after org
-      :map org-src-mode-map
+(map! :after org :map org-src-mode-map
       :in [s-escape] #'org-edit-src-abort
       :gin "s-RET"     #'org-edit-src-exit
       :gin [s-return]  #'org-edit-src-exit)
@@ -3615,9 +3615,8 @@ I also need to adjust the window navigation keys that clash with default Org bin
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(map! :after org
-      (:map org-mode-map
-       :v "s-k" #'my-link-snippet-in-place))
+(map! :after org :map org-mode-map
+      :v "s-k" #'my-link-snippet-in-place)
 #+end_src
 
 At this point we can tight up everything and set up our buffer when we open an org file.
@@ -3726,6 +3725,23 @@ Although we already covered most of this list of the previous section, we still 
 #+caption: $DOOMDIR/packages.el
 #+begin_src emacs-lisp :tangle packages.el
 (package! writegood-mode :disable t)
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(custom-set-faces!
+  `(langtool-errline :background "#372C34"
+                     :underline (:style wave :color "red")))
+
+(after! langtool
+  (setq langtool-disabled-rules '("WHITESPACE_RULE"
+                                  "EN_UNPAIRED_BRACKETS"
+                                  "COMMA_PARENTHESIS_WHITESPACE"
+                                  "EN_QUOTES"
+                                  "MORFOLOGIK_RULE_EN_US"))
+
+  (setq langtool-http-server-host "localhost"
+        langtool-http-server-port 8010))
 #+end_src
 
 - https://github.com/tecosaur/lexic
@@ -4229,6 +4245,16 @@ This snippet is fine, but we still have to type the filename there. Let's create
 - Email document
 - Wiki entry
 
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(setq org-html-htmlize-output-type 'css
+      org-html-head-include-default-style nil
+      org-html-doctype "html5"
+      org-html-html5-fancy t
+      org-html-table-caption-above nil)
+#+end_src
+
+
 #+caption: $DOOMDIR/snippets/org-mode/macro
 #+begin_src snippet :tangle snippets/org-mode/macro
 # name: #+BEGIN_MACRO ... block
@@ -4673,7 +4699,10 @@ time."
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-(defconst my-roam-dailies-file-name "notes/daily/daily-notes-%<%Y-%m-%d>.org"
+(defconst my-roam-dailies-file-name-base "daily/daily-notes-%<%Y-%m-%d>"
+  "Filename format for the Daily Notes file.")
+
+(defconst my-roam-dailies-file-name (format "notes/%s.org" my-roam-dailies-file-name-base)
   "Filename format for the Daily Notes file.")
 
 (defconst my-roam-dailies-header (concat "#+TITLE: Daily notes for %<%A, %B %-e, %Y>\n"
@@ -4681,6 +4710,60 @@ time."
                                          "#+CATEGORY: dailies\n"
                                          "\n")
   "Template used to create new Daily Notes files.")
+#+end_src
+
+#+caption: autoload/writing.el
+#+begin_src emacs-lisp :tangle autoload/writing.el
+;;;###autoload
+(defun my-dailies-find (tag)
+  "Open the right daily note based on the given TAG.
+
+Accepted values for TAG are:
+
+- \"yesterday\"
+- \"today\"
+- \"tomorrow\"
+
+If TAG is not one of these values, this function will raise an error."
+  (pcase tag
+    ("yesterday"
+     (format "file:%s"
+             (string-trim
+              (expand-file-name
+               (let ((org-capture-plist
+                      `(:default-time ,(org-time-string-to-time (org-read-date nil nil "-1")))))
+                 (org-capture-fill-template my-roam-dailies-file-name))
+               org-directory))))
+    ("today"
+     (format "file:%s"
+             (string-trim
+              (expand-file-name
+               (org-capture-fill-template my-roam-dailies-file-name)
+               org-directory))))
+    ("tomorrow"
+     (format "file:%s"
+             (string-trim
+              (expand-file-name
+               (let ((org-capture-plist
+                      `(:default-time ,(org-time-string-to-time (org-read-date nil nil "+1")))))
+                 (org-capture-fill-template my-roam-dailies-file-name))
+               org-directory))))))
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(after! org
+  (pushnew! org-link-abbrev-alist '("dailies" . "%(my-dailies-find)"))
+  (org-add-link-type "info" 'org-info-command))
+#+end_src
+
+#+caption: $DOOMDIR/config.el
+#+begin_src emacs-lisp
+(after! org-roam
+  (setq org-roam-dailies-capture-templates
+        `(("d" "default" entry #'org-roam-capture--get-point "* %?"
+           :file-name ,my-roam-dailies-file-name-base
+           :head ,my-roam-dailies-header))))
 #+end_src
 
 #+caption: $DOOMDIR/config.el
@@ -5338,12 +5421,8 @@ local variable. If PREFIX or VARIABLE is nil, this argument has no effect."
   (setq org-roam-link-title-format "✑ %s"
         org-roam-graph-extra-config '(("overlap" . "false"))
         org-roam-encrypt-files nil
-        org-roam-directory my-notes-directory)
-
-  (advice-add 'org-roam-dailies-capture-yesterday :filter-return #'+org-capture-open-frame-get-info-a)
-  (advice-add 'org-roam-dailies-capture-today :filter-return #'+org-capture-open-frame-get-info-a)
-  (advice-add 'org-roam-dailies-capture-tomorrow :filter-return #'+org-capture-open-frame-get-info-a)
-  (advice-add 'org-roam-dailies-capture-date :filter-return #'+org-capture-open-frame-get-info-a))
+        org-roam-directory my-notes-directory
+        +org-roam-open-buffer-on-find-file nil))
 #+end_src
 
 *** Deft
@@ -5988,20 +6067,9 @@ Projectile is a great package. It usually provides more features that one partic
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
 (after! projectile
-#+end_src
-
-To make ~projectile~ work with ~selectrum~, we need to tell it to use the default Emacs completion system:
-
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
   (setq projectile-ignored-projects `("~/"
                                       "/tmp"
-                                      ,(expand-file-name "straight/repos" doom-local-dir)))
-#+end_src
-
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-  (setq projectile-completion-system 'default)
+                                      ,(expand-file-name "straight/repos" doom-local-dir))))
 #+end_src
 
 Doom sets a function to run when we open a project with ~projectile~, but that function is not calling any /open file/ function for us. Let's create our own version of such function and help projectile to do the appropriate thing when we open a project.
@@ -6019,37 +6087,31 @@ Let's create such function as an /autoload/ function:
 #+caption: $DOOMDIR/autoload/extras.el
 #+begin_src emacs-lisp :tangle autoload/extras.el
 ;;;###autoload
-(defun my-after-switch-project-action-h ()
+(defun my-after-switch-project-action-h (dir)
   "A project first action to execute when we switch our current project."
-  (let ((file (file-exists-p! (or "README.rst"
-                                  "README.md"
-                                  "README"
-                                  "README.org"
-                                  "NEWS.rst"
-                                  "NEWS.md"
-                                  "NEWS"
-                                  "NEWS.org"
-                                  "CHANGELOG.rst"
-                                  "CHANGELOG.md"
-                                  "CHANGELOG"
-                                  "CHANGELOG.org"))))
+  (let ((file (file-exists-p! (ignore-errors (expand-file-name (or "README.org"
+                                                                   "README.md"
+                                                                   "README"
+                                                                   "README.rst"
+                                                                   "NEWS.org"
+                                                                   "NEWS.md"
+                                                                   "NEWS"
+                                                                   "NEWS.rst"
+                                                                   "CHANGELOG.org"
+                                                                   "CHANGELOG.md"
+                                                                   "CHANGELOG"
+                                                                   "CHANGELOG.rst") dir)))))
     (if file
-        (find-file-existing file)
-      (projectile-find-file))))
+        (find-file file)
+      (doom-project-find-file dir))))
 #+end_src
 
 And attach it to the ~projectile~ hook:
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
-  (setq projectile-switch-project-action #'my-after-switch-project-action-h)
-#+end_src
-
-As usual, don't forget to close the ~after!~ sexp:
-
-#+caption: $DOOMDIR/config.el
-#+begin_src emacs-lisp
-   )  ;; after! projectile
+(after! projectile
+  (setq +workspaces-switch-project-function #'my-after-switch-project-action-h))
 #+end_src
 
 ** TODO Terminal
@@ -6122,12 +6184,10 @@ The only configuration we need to get this mode working, is to let Emacs enable 
 #+end_src
 
 ** TODO Emails
-
-#+caption: $DOOMDIR/autoload/extras.el
-#+begin_src emacs-lisp :tangle autoload/extras.el
-#+end_src
+TBD
 
 ** TODO Calendars
+TBD
 
 #+caption: $DOOMDIR/config.el
 #+begin_src emacs-lisp
